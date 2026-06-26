@@ -1,0 +1,6 @@
+package tournament_trail.demo.services;
+import org.springframework.stereotype.Service;
+
+@Service
+public class TournamentService {
+}
