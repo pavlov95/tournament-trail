@@ -2,6 +2,7 @@ package tournament_trail.demo.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
+import tournament_trail.demo.entities.enums.Role;
 
 
 import java.time.LocalDateTime;
@@ -19,13 +20,13 @@ public class User {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(nullable = false, unique = true, length = 50)
+    @Column(nullable = false, unique = true, length = 30)
     private String username;
 
-    @Column(nullable = false, length = 50)
+    @Column(length = 50)
     private String firstName;
 
-    @Column(nullable = false, length = 50)
+    @Column(length = 50)
     private String lastName;
 
     @Column(length = 50)
@@ -34,7 +35,7 @@ public class User {
     @Column(nullable = false, unique = true, length = 50)
     private String email;
 
-    @Column(nullable = false, length = 20)
+    @Column(nullable = false, length = 100)
     private String password;
 
     @Enumerated(EnumType.STRING)

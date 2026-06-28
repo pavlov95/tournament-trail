@@ -2,6 +2,9 @@ package tournament_trail.demo.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
+import tournament_trail.demo.entities.enums.CurrencyCode;
+import tournament_trail.demo.entities.enums.TransportationType;
+import tournament_trail.demo.entities.enums.TravelGroupStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
