@@ -1,15 +1,15 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
 </head>
 <body>
  LOGIN
- <div th:if="${param.containsKey('error')}">
+ <div th:if="${param.error}">
      Invalid username or password.
  </div>
- <p th:if="${param.containsKey('verified')}">
+ <p th:if="${param.verified}">
      Your account was verified successfully. You can now log in.
  </p>
 <form th:method="POST" th:action="@{/login}" th:object="${loginRequest}">
