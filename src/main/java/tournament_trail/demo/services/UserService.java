@@ -1,6 +1,5 @@
 package tournament_trail.demo.services;
 
-import jakarta.transaction.Transactional;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -14,24 +13,20 @@ import tournament_trail.demo.security.AuthenticationUserDetails;
 import tournament_trail.demo.web.dtos.RegisterRequest;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Service
 public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final VerificationTokenService verificationTokenService;
-    private final EmailService emailService;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, VerificationTokenService verificationTokenService, EmailService emailService) {
+
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
-        this.verificationTokenService = verificationTokenService;
-        this.emailService = emailService;
     }
 
-    @Transactional
-    public void register(RegisterRequest registerRequest) {
+
+    public User register(RegisterRequest registerRequest) {
         User user = User.builder()
                 .username(registerRequest.getUsername())
                 .password(passwordEncoder.encode(registerRequest.getPassword()))
@@ -42,34 +37,14 @@ public class UserService implements UserDetailsService {
                 .updatedOn(LocalDateTime.now())
                 .build();
         userRepository.save(user);
+        return user;
 
-        VerificationToken verificationToken = verificationTokenService.generateToken(user);
-        verificationTokenService.update(verificationToken);
-
-        String verificationLink =
-                "http://localhost:8080/verify?token=" + verificationToken.getToken();
-
-        emailService.sendVerificationEmail(
-                user.getEmail(),
-                verificationLink
-        );
     }
 
-    @Transactional
-    public void verifyAccount(String tokenValue) {
-
-        VerificationToken token = verificationTokenService.findByToken(tokenValue).orElseThrow(() ->
-                        new IllegalArgumentException("Invalid verification token"));
-
-        if (token.getExpiresAt().isBefore(LocalDateTime.now())) {
-            throw new IllegalArgumentException("Verification token has expired");
-        }
-
-        User user = token.getUser();
+    public void enableAccount(VerificationToken verificationToken) {
+        User user = verificationToken.getUser();
         user.setEnabled(true);
-
         userRepository.save(user);
-        verificationTokenService.delete(token);
     }
 
     @Override

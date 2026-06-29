@@ -7,16 +7,17 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
-import tournament_trail.demo.services.UserService;
+import tournament_trail.demo.services.RegistrationService;
 import tournament_trail.demo.web.dtos.LoginRequest;
 import tournament_trail.demo.web.dtos.RegisterRequest;
 
+
 @Controller
 public class IndexController {
-    private final UserService userService;
+    private final RegistrationService registrationService;
 
-    public IndexController(UserService userService) {
-        this.userService = userService;
+    public IndexController(RegistrationService registrationService) {
+        this.registrationService = registrationService;
     }
 
     @GetMapping()
@@ -43,30 +44,22 @@ public class IndexController {
         if (bindingResult.hasErrors()) {
             return new ModelAndView("register");
         }
-        userService.register(registerRequest);
+        registrationService.register(registerRequest);
         return new ModelAndView("redirect:/login");
-
     }
 
     @GetMapping("/home")
-    public ModelAndView getHomePage(){
+    public ModelAndView getHomePage() {
         return new ModelAndView("home");
     }
+
     @GetMapping("/verify")
     public ModelAndView verifyAccount(@RequestParam String token) {
+        registrationService.verifyToken(token);
+        ModelAndView modelAndView = new ModelAndView("redirect:/login");
 
-        try {
-            userService.verifyAccount(token);
+        modelAndView.addObject("verified", true);
+        return modelAndView;
 
-            ModelAndView modelAndView = new ModelAndView("redirect:/login");
-
-            modelAndView.addObject("verified", true);
-            return modelAndView;
-
-        } catch (IllegalArgumentException exception) {
-            return new ModelAndView(
-                    "redirect:/verification-failed"
-            );
-        }
     }
 }

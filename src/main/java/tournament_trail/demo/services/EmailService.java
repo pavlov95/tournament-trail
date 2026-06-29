@@ -8,26 +8,28 @@ import org.springframework.stereotype.Service;
 public class EmailService {
 
     private final JavaMailSender mailSender;
+    private final String VERIFICATION_LINK = "http://localhost:8080/verify?token=";
 
     public EmailService(JavaMailSender mailSender) {
         this.mailSender = mailSender;
     }
 
-    public void sendVerificationEmail(String recipient, String verificationLink) {
+    public void sendVerificationEmail(String recipient, String tokenValue) {
         SimpleMailMessage message = new SimpleMailMessage();
+        String verificationUrl = VERIFICATION_LINK+tokenValue;
 
         message.setTo(recipient);
         message.setSubject("Verify your TournamentTrail account");
         message.setText(
                 """
-                Welcome to TournamentTrail.
-
-                Verify your account by opening this link:
-
-                %s
-
-                The link expires in 24 hours.
-                """.formatted(verificationLink)
+                        Welcome to TournamentTrail.
+                        
+                        Verify your account by opening this link:
+                        
+                        %s
+                        
+                        The link expires in 1 hour.
+                        """.formatted(verificationUrl)
         );
 
         mailSender.send(message);
