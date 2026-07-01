@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About | TournamentTrail</title>
+    <link rel="stylesheet" th:href="@{/css/about.css}">
+</head>
+<body>
+
+<header class="site-header">
+    <nav class="navbar">
+        <a class="brand" th:href="@{/}">TournamentTrail</a>
+
+        <div class="nav-links">
+            <a th:href="@{/}">Home</a>
+            <a th:href="@{/tournaments}">Tournaments</a>
+            <a th:href="@{/travel-groups}">Travel groups</a>
+            <a class="active" th:href="@{/about}">About</a>
+            <a th:href="@{/contact}">Contact</a>
+        </div>
+
+        <div class="nav-actions" sec:authorize="isAnonymous()">
+            <a class="button button-secondary" th:href="@{/login}">Login</a>
+            <a class="button button-primary" th:href="@{/register}">Create account</a>
+        </div>
+
+        <div class="nav-actions" sec:authorize="isAuthenticated()">
+            <a class="button button-primary" th:href="@{/home}">Dashboard</a>
+            <form th:action="@{/logout}" method="post">
+                <button class="button button-secondary" type="submit">Logout</button>
+            </form>
+        </div>
+    </nav>
+</header>
+
+<main>
+    <section class="hero-section">
+        <div class="hero-content">
+            <p class="eyebrow">About TournamentTrail</p>
+            <h1>Helping chess players compete beyond their home city.</h1>
+            <p class="hero-description">
+                TournamentTrail brings tournament discovery, registration,
+                travel coordination, and organiser tools into one platform.
+            </p>
+        </div>
+
+        <div class="hero-summary">
+            <div>
+                <strong>Discover</strong>
+                <span>Find upcoming chess tournaments.</span>
+            </div>
+            <div>
+                <strong>Compete</strong>
+                <span>Register and track participation details.</span>
+            </div>
+            <div>
+                <strong>Travel</strong>
+                <span>Coordinate journeys with other players.</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="content-section">
+        <div class="section-heading">
+            <p class="eyebrow">The idea</p>
+            <h2>Why TournamentTrail exists</h2>
+        </div>
+
+        <div class="two-column">
+            <article class="text-panel">
+                <h3>The problem</h3>
+                <p>
+                    Chess tournaments are often published across different websites,
+                    social media pages, and local communities. Players may need to search
+                    through multiple sources before finding the event details they need.
+                </p>
+                <p>
+                    Travelling to another city can also be expensive and difficult to
+                    organise, especially when players do not know who else is attending
+                    from their area.
+                </p>
+            </article>
+
+            <article class="text-panel">
+                <h3>The solution</h3>
+                <p>
+                    TournamentTrail provides one place where players can browse events,
+                    review participation requirements, register for tournaments,
+                    and track their status.
+                </p>
+                <p>
+                    Players can also create or join travel groups connected to a specific
+                    tournament and coordinate the journey with other participants.
+                </p>
+            </article>
+        </div>
+    </section>
+
+    <section class="content-section">
+        <div class="section-heading">
+            <p class="eyebrow">Platform features</p>
+            <h2>What users can do</h2>
+        </div>
+
+        <div class="feature-grid">
+            <article class="feature-card">
+                <span class="feature-number">01</span>
+                <h3>Browse tournaments</h3>
+                <p>Search by location, date, time control, entry fee, and tournament status.</p>
+            </article>
+
+            <article class="feature-card">
+                <span class="feature-number">02</span>
+                <h3>Manage registrations</h3>
+                <p>Register for tournaments and follow registration and payment progress.</p>
+            </article>
+
+            <article class="feature-card">
+                <span class="feature-number">03</span>
+                <h3>Organise shared travel</h3>
+                <p>Create travel groups, review join requests, and coordinate with accepted members.</p>
+            </article>
+
+            <article class="feature-card">
+                <span class="feature-number">04</span>
+                <h3>Publish events</h3>
+                <p>Approved organisers can create tournaments and manage participants.</p>
+            </article>
+
+            <article class="feature-card">
+                <span class="feature-number">05</span>
+                <h3>Track travel costs</h3>
+                <p>Group members can record expected and actual travel expenses.</p>
+            </article>
+
+            <article class="feature-card">
+                <span class="feature-number">06</span>
+                <h3>Build trust</h3>
+                <p>Reviews, organiser approval, and clear event details support informed decisions.</p>
+            </article>
+        </div>
+    </section>
+
+    <section class="roles-section">
+        <div class="section-heading">
+            <p class="eyebrow">Different roles</p>
+            <h2>One platform, several responsibilities</h2>
+        </div>
+
+        <div class="roles-grid">
+            <article>
+                <h3>Players</h3>
+                <p>Browse events, register, create travel groups, and manage personal activity.</p>
+            </article>
+
+            <article>
+                <h3>Organisers</h3>
+                <p>Publish tournaments, update details, and manage registrations.</p>
+            </article>
+
+            <article>
+                <h3>Administrators</h3>
+                <p>Review organiser applications, manage roles, and moderate content.</p>
+            </article>
+        </div>
+    </section>
+
+    <section class="mission-section">
+        <div>
+            <p class="eyebrow">Our goal</p>
+            <h2>Make tournament participation easier from discovery to arrival.</h2>
+            <p>
+                TournamentTrail reduces the organisational work around chess events,
+                so players can focus more on preparation and competition.
+            </p>
+        </div>
+
+        <div class="mission-actions">
+            <a class="button button-primary" th:href="@{/tournaments}">Browse tournaments</a>
+            <a class="button button-secondary" th:href="@{/register}" sec:authorize="isAnonymous()">Create account</a>
+            <a class="button button-secondary" th:href="@{/home}" sec:authorize="isAuthenticated()">Open dashboard</a>
+        </div>
+    </section>
+</main>
+
+<footer class="site-footer">
+    <div>
+        <a class="brand footer-brand" th:href="@{/}">TournamentTrail</a>
+        <p>Chess tournaments, registrations, and shared travel in one platform.</p>
+    </div>
+
+    <nav>
+        <a th:href="@{/tournaments}">Tournaments</a>
+        <a th:href="@{/travel-groups}">Travel groups</a>
+        <a class="active" th:href="@{/about}">About</a>
+        <a th:href="@{/contact}">Contact</a>
+    </nav>
+
+    <p>&copy; 2026 TournamentTrail</p>
+</footer>
+
+</body>
+</html>
