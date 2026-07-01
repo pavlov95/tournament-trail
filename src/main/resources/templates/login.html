@@ -2,25 +2,99 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | TournamentTrail</title>
+    <link rel="stylesheet" th:href="@{/css/login.css}">
 </head>
 <body>
- LOGIN
- <div th:if="${param.error}">
-     Invalid username or password.
- </div>
- <p th:if="${param.verified}">
-     Your account was verified successfully. You can now log in.
- </p>
-<form th:method="POST" th:action="@{/login}" th:object="${loginRequest}">
-    <label>Username:</label>
-    <input th:field="*{username}" >
+<header class="site-header">
+    <nav class="navbar">
+        <a class="brand" th:href="@{/}">TournamentTrail</a>
+        <div class="nav-links">
+            <a th:href="@{/}">Home</a>
+            <a th:href="@{/tournaments}">Tournaments</a>
+            <a th:href="@{/about}">About</a>
+            <a th:href="@{/contact}">Contact</a>
+        </div>
+        <a class="button button-secondary" th:href="@{/register}">Create account</a>
+    </nav>
+</header>
 
-    <label>Password:</label>
-    <input th:field="*{password}" >
+<main class="auth-layout">
+    <section class="auth-introduction">
+        <p class="eyebrow">Welcome back</p>
+        <h1>Continue your TournamentTrail journey.</h1>
+        <p>Access your tournament registrations, travel groups, organiser tools, and personal dashboard.</p>
+        <ul>
+            <li>Track tournament registrations</li>
+            <li>Manage shared travel groups</li>
+            <li>Review payment and participation status</li>
+        </ul>
+    </section>
 
-    <button type="submit">Login</button>
-</form>
+    <section class="auth-card">
+        <div class="auth-card-heading">
+            <p class="eyebrow">Account access</p>
+            <h2>Login</h2>
+            <p>Enter your username and password.</p>
+        </div>
 
+        <div class="message message-error" th:if="${param.error}">
+            Invalid username or password.
+        </div>
+
+        <div class="message message-success" th:if="${param.verified}">
+            Your account was verified successfully. You can now log in.
+        </div>
+
+        <div class="message message-success" th:if="${param.registered}">
+            Registration completed. Check your email to verify your account.
+        </div>
+
+        <div class="message message-info" th:if="${param.logout}">
+            You have been logged out successfully.
+        </div>
+
+        <form class="auth-form" th:action="@{/login}" method="post">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input id="username"
+                       name="username"
+                       type="text"
+                       autocomplete="username"
+                       placeholder="Enter your username"
+                       required
+                       autofocus>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input id="password"
+                       name="password"
+                       type="password"
+                       autocomplete="current-password"
+                       placeholder="Enter your password"
+                       required>
+            </div>
+
+            <button class="button button-primary submit-button" type="submit">Login</button>
+        </form>
+
+        <p class="auth-switch">
+            Do not have an account?
+            <a th:href="@{/register}">Create one</a>
+        </p>
+
+        <a class="back-link" th:href="@{/}">Return to the public page</a>
+    </section>
+</main>
+
+<footer class="site-footer">
+    <p>&copy; 2026 TournamentTrail</p>
+    <nav>
+        <a th:href="@{/about}">About</a>
+        <a th:href="@{/contact}">Contact</a>
+    </nav>
+</footer>
 </body>
 </html>
