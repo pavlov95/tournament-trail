@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact and FAQ | TournamentTrail</title>
+    <link rel="stylesheet" th:href="@{/css/contact.css}">
+</head>
+<body>
+<header class="site-header">
+    <nav class="navbar">
+        <a class="brand" th:href="@{/}">TournamentTrail</a>
+        <div class="nav-links">
+            <a th:href="@{/}">Home</a>
+            <a th:href="@{/tournaments}">Tournaments</a>
+            <a th:href="@{/travel-groups}">Travel groups</a>
+            <a th:href="@{/about}">About</a>
+            <a class="active" th:href="@{/contact}">Contact</a>
+        </div>
+        <div class="nav-actions" sec:authorize="isAnonymous()">
+            <a class="button button-secondary" th:href="@{/login}">Login</a>
+            <a class="button button-primary" th:href="@{/register}">Create account</a>
+        </div>
+        <div class="nav-actions" sec:authorize="isAuthenticated()">
+            <a class="button button-primary" th:href="@{/home}">Dashboard</a>
+            <form th:action="@{/logout}" method="post">
+                <button class="button button-secondary" type="submit">Logout</button>
+            </form>
+        </div>
+    </nav>
+</header>
+
+<main>
+    <section class="hero-section">
+        <div>
+            <p class="eyebrow">Help and contact</p>
+            <h1>Frequently asked questions</h1>
+            <p class="hero-description">
+                Find answers about tournament registration, travel groups,
+                organiser permissions, payments, and rated chess events.
+            </p>
+        </div>
+
+        <aside class="contact-card">
+            <p class="eyebrow">Further questions</p>
+            <h2>Contact TournamentTrail</h2>
+            <p>If your question is not answered below, send an email to:</p>
+            <a class="email-link" href="mailto:support@tournamenttrail.com">
+                support@tournamenttrail.com
+            </a>
+            <p class="contact-note">
+                TournamentTrail can help with platform-related issues. Tournament rules,
+                refunds, disputes, and title requirements may also require contacting the
+                tournament organiser or the relevant chess federation.
+            </p>
+        </aside>
+    </section>
+
+    <section class="faq-section">
+        <div class="section-heading">
+            <p class="eyebrow">FAQ</p>
+            <h2>Using TournamentTrail</h2>
+        </div>
+
+        <div class="faq-list">
+            <details>
+                <summary>Do I need an account to browse tournaments?</summary>
+                <p>
+                    No. Public tournaments can be viewed without an account. You need to
+                    create an account and log in before registering for a tournament,
+                    joining a travel group, or using private features.
+                </p>
+            </details>
+
+            <details>
+                <summary>How do I register for a tournament?</summary>
+                <p>
+                    Open the tournament details page and select <strong>Register for tournament</strong>.
+                    You must be logged in and meet any requirements listed by the organiser.
+                    Your registration and payment status will then appear on your dashboard.
+                </p>
+            </details>
+
+            <details>
+                <summary>How do I join a travel group?</summary>
+                <p>
+                    Open a tournament and view its available travel groups. Select a group,
+                    review its public details, and submit a join request. The group owner
+                    decides whether to approve or reject the request.
+                </p>
+            </details>
+
+            <details>
+                <summary>Who can create tournaments?</summary>
+                <p>
+                    Only approved organisers and administrators can create tournaments.
+                    A regular player must first submit an organiser application and receive
+                    administrator approval.
+                </p>
+            </details>
+
+            <details>
+                <summary>How do I become an organiser?</summary>
+                <p>
+                    Create an account, log in, and submit an organiser application. An
+                    administrator will review it. If approved, your account receives organiser
+                    permissions and you can create and manage tournaments.
+                </p>
+            </details>
+
+            <details>
+                <summary>Are travel-group comments and budgets private?</summary>
+                <p>
+                    Yes. Private comments, member information, meeting details, budgets, and
+                    expenses should be visible only to accepted group members, the group owner,
+                    and authorised administrators when moderation is required.
+                </p>
+            </details>
+
+            <details>
+                <summary>Will the site help me if my travel group cheated me of money?</summary>
+                <p>
+                    TournamentTrail can provide platform records and allow you to report users
+                    or suspicious activity, but it does not hold payments and cannot guarantee
+                    reimbursement. Avoid sending money without clear agreement and proof. For
+                    suspected fraud, contact your payment provider and, when appropriate, the
+                    relevant authorities.
+                </p>
+            </details>
+
+            <details>
+                <summary>How do I become a GM?</summary>
+                <p>
+                    Grandmaster is an official chess title awarded by FIDE. TournamentTrail
+                    cannot grant it. It normally requires meeting FIDE rating and performance
+                    requirements in eligible rated events. Consult the current FIDE title
+                    regulations and your national chess federation for the exact process.
+                </p>
+            </details>
+
+            <details>
+                <summary>What do I need to bring if this is my first rated tournament?</summary>
+                <p>
+                    Check the organiser's instructions before travelling. You may need
+                    identification, your federation or player number, proof of registration or
+                    payment, and any equipment specifically requested by the organiser. Arrive
+                    early and confirm the venue, starting time, time control, and tournament rules.
+                </p>
+            </details>
+
+            <details>
+                <summary>Can I cancel a tournament registration?</summary>
+                <p>
+                    Cancellation depends on the tournament's rules and current status. If
+                    cancellation is enabled, use the option on the tournament or registration
+                    page. Refunds are controlled by the organiser's policy and are not
+                    automatically guaranteed by TournamentTrail.
+                </p>
+            </details>
+
+            <details>
+                <summary>How is my payment status confirmed?</summary>
+                <p>
+                    Payment is made according to the organiser's instructions. The organiser
+                    reviews the payment information and updates your status. TournamentTrail
+                    displays that status but does not process the payment unless a payment
+                    service is added in the future.
+                </p>
+            </details>
+        </div>
+    </section>
+
+    <section class="support-section">
+        <div>
+            <p class="eyebrow">Still need help?</p>
+            <h2>Send us your question</h2>
+            <p>
+                Include your username, the tournament or travel-group name, and a clear
+                description of the issue. Do not send passwords, card details, or other
+                sensitive payment information.
+            </p>
+        </div>
+        <a class="button button-primary"
+           href="mailto:support@tournamenttrail.com?subject=TournamentTrail%20support%20question">
+            Email support
+        </a>
+    </section>
+</main>
+
+<footer class="site-footer">
+    <div>
+        <a class="brand footer-brand" th:href="@{/}">TournamentTrail</a>
+        <p>Chess tournaments, registrations, and shared travel in one platform.</p>
+    </div>
+    <nav>
+        <a th:href="@{/tournaments}">Tournaments</a>
+        <a th:href="@{/travel-groups}">Travel groups</a>
+        <a th:href="@{/about}">About</a>
+        <a class="active" th:href="@{/contact}">Contact</a>
+    </nav>
+    <p>&copy; 2026 TournamentTrail</p>
+</footer>
+</body>
+</html>
