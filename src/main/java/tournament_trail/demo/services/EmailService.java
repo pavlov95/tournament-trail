@@ -7,10 +7,12 @@ import org.springframework.stereotype.Service;
 @Service
 public class EmailService {
 
+    private final VerificationTokenService verificationTokenService;
     private final JavaMailSender mailSender;
     private final String VERIFICATION_LINK = "http://localhost:8080/verify?token=";
 
-    public EmailService(JavaMailSender mailSender) {
+    public EmailService(VerificationTokenService verificationTokenService, JavaMailSender mailSender) {
+        this.verificationTokenService = verificationTokenService;
         this.mailSender = mailSender;
     }
 
@@ -29,9 +31,16 @@ public class EmailService {
                         %s
                         
                         The link expires in 1 hour.
-                        """.formatted(verificationUrl)
-        );
+                        """.formatted(verificationUrl));
 
         mailSender.send(message);
     }
+
+
+
+
+//    public void sendSuccessfulTournamentCreation(){
+//        SimpleMailMessage message = new SimpleMailMessage();
+//        message.setTo(rec);
+//    }
 }

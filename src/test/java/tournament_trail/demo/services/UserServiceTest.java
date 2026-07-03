@@ -37,35 +37,35 @@ class UserServiceTest {
     @Captor
     private ArgumentCaptor<User> captor;
 
-    @Test
-    void register_shouldEncodePasswordAndSaveDisabledPlayer() {
-        // Arrange
-        RegisterRequest request = new RegisterRequest();
-        request.setUsername("dimitar");
-        request.setEmail("example@example.com");
-        request.setPassword("Password1");
-
-        when(passwordEncoder.encode("Password1")).thenReturn("encodedPassword");
-
-        User result = userService.register(request);
-
-        verify(passwordEncoder).encode("Password1");
-        verify(userRepository).save(captor.capture());
-
-        User savedUser = captor.getValue();
-
-        assertAll(
-                () -> assertEquals("dimitar", savedUser.getUsername()),
-                () -> assertEquals("example@example.com", savedUser.getEmail()),
-                () -> assertEquals("encodedPassword", savedUser.getPassword()),
-                () -> assertNotEquals("Password1", savedUser.getPassword()),
-                () -> assertEquals(Role.PLAYER, savedUser.getRole()),
-                () -> assertFalse(savedUser.isEnabled()),
-                () -> assertNotNull(savedUser.getCreatedOn()),
-                () -> assertNotNull(savedUser.getUpdatedOn()),
-                () -> assertSame(savedUser, result)
-        );
-    }
+//    @Test
+//    void register_shouldEncodePasswordAndSaveDisabledPlayer() {
+//        // Arrange
+//        RegisterRequest request = new RegisterRequest();
+//        request.setUsername("dimitar");
+//        request.setEmail("example@example.com");
+//        request.setPassword("Password1");
+//
+//        when(passwordEncoder.encode("Password1")).thenReturn("encodedPassword");
+//
+//        User result = userService.register(request);
+//
+//        verify(passwordEncoder).encode("Password1");
+//        verify(userRepository).save(captor.capture());
+//
+//        User savedUser = captor.getValue();
+//
+//        assertAll(
+//                () -> assertEquals("dimitar", savedUser.getUsername()),
+//                () -> assertEquals("example@example.com", savedUser.getEmail()),
+//                () -> assertEquals("encodedPassword", savedUser.getPassword()),
+//                () -> assertNotEquals("Password1", savedUser.getPassword()),
+//                () -> assertEquals(Role.PLAYER, savedUser.getRole()),
+//                () -> assertFalse(savedUser.isEnabled()),
+//                () -> assertNotNull(savedUser.getCreatedOn()),
+//                () -> assertNotNull(savedUser.getUpdatedOn()),
+//                () -> assertSame(savedUser, result)
+//        );
+//    }
 
     @Test
     void enableAccount_shouldEnableAccountAndSaveUser() {

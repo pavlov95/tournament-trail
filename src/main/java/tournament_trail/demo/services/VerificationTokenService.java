@@ -1,6 +1,7 @@
 package tournament_trail.demo.services;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import tournament_trail.demo.entities.User;
 import tournament_trail.demo.entities.VerificationToken;
 import tournament_trail.demo.exceptions.ExpiredVerificationTokenException;
@@ -53,4 +54,5 @@ public class VerificationTokenService {
         }
         return verificationToken;
     }
+
 }
