@@ -2,16 +2,28 @@
 <html lang="en"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
     <title>Home | TournamentTrail</title>
-    <link rel="stylesheet" th:href="@{/css/home.css}">
+
+    <link rel="stylesheet"
+          th:href="@{/css/home.css}">
 </head>
+
 <body>
+
 <header class="site-header">
     <nav class="navbar">
-        <a class="brand" th:href="@{/home}">TournamentTrail</a>
+
+        <a class="brand"
+           th:href="@{/home}">
+            TournamentTrail
+        </a>
+
         <div class="nav-links">
             <a th:href="@{/home}">Home</a>
             <a th:href="@{/tournaments}">Tournaments</a>
@@ -19,125 +31,500 @@
             <a th:href="@{/about}">About</a>
             <a th:href="@{/contact}">Contact</a>
         </div>
+
         <div class="nav-actions">
-            <a class="button button-secondary" th:href="@{/profile/edit}">Edit profile</a>
-            <form th:action="@{/logout}" method="post"><button class="button button-outline" type="submit">Logout</button></form>
+
+            <a class="button button-secondary"
+               th:href="@{/profile/edit}">
+                Edit profile
+            </a>
+
+            <form th:action="@{/logout}"
+                  method="post">
+
+                <button class="button button-outline"
+                        type="submit">
+                    Logout
+                </button>
+            </form>
         </div>
     </nav>
 </header>
 
 <main>
+
     <section class="welcome-panel">
+
         <div>
             <p class="eyebrow">Personal dashboard</p>
-            <h1>Welcome, <span sec:authentication="name">Player</span></h1>
-            <p>Track your tournaments, travel groups, and role-specific activity.</p>
+
+            <h1>
+                Welcome,
+                <span sec:authentication="name">
+                    Player
+                </span>
+            </h1>
+
+            <p>
+                Track your tournaments, travel groups,
+                and role-specific activity.
+            </p>
         </div>
+
         <div class="quick-actions">
-            <a class="button button-primary" th:href="@{/tournaments}">Browse tournaments</a>
-            <a class="button button-secondary" th:href="@{/travel-groups}">Browse travel groups</a>
-            <a class="button button-secondary" th:href="@{/travel-groups/create}" sec:authorize="hasAuthority('TRAVEL_GROUP_CREATE')">Create travel group</a>
-            <a class="button button-secondary" th:href="@{/tournaments/create}" sec:authorize="hasAuthority('TOURNAMENT_CREATE')">Create tournament</a>
+
+            <a class="button button-primary"
+               th:href="@{/tournaments}">
+                Browse tournaments
+            </a>
+
+            <a class="button button-secondary"
+               th:href="@{/travel-groups}">
+                Browse travel groups
+            </a>
+
+            <a class="button button-secondary"
+               th:href="@{/travel-groups/create}"
+               sec:authorize="hasAuthority('TRAVEL_GROUP_CREATE')">
+                Create travel group
+            </a>
+
+            <a class="button button-secondary"
+               th:href="@{/tournaments#create-tournament}"
+               sec:authorize="hasAuthority('TOURNAMENT_CREATE')">
+                Create tournament
+            </a>
         </div>
     </section>
 
+    <!-- My tournament registrations -->
     <section class="dashboard-section">
+
         <div class="section-heading">
-            <div><p class="eyebrow">Competition</p><h2>My tournament registrations</h2></div>
-            <a th:href="@{/registrations/mine}">View all</a>
+            <div>
+                <p class="eyebrow">Competition</p>
+                <h2>My tournament registrations</h2>
+            </div>
+
+            <a th:href="@{/registrations/mine}">
+                View all
+            </a>
         </div>
-        <div class="empty-state" th:if="${registrations == null or #lists.isEmpty(registrations)}">
-            <h3>You have not registered for any tournaments yet.</h3>
-            <p>Browse the catalogue and choose your next competition.</p>
-            <a class="button button-primary" th:href="@{/tournaments}">Browse tournaments</a>
+
+        <div class="empty-state"
+             th:if="${registrations == null
+                     or #lists.isEmpty(registrations)}">
+
+            <h3>
+                You have not registered for any tournaments yet.
+            </h3>
+
+            <p>
+                Browse the catalogue and choose your next competition.
+            </p>
+
+            <a class="button button-primary"
+               th:href="@{/tournaments}">
+                Browse tournaments
+            </a>
         </div>
-        <div class="card-grid" th:if="${registrations != null and !#lists.isEmpty(registrations)}">
-            <article class="dashboard-card" th:each="registration : ${registrations}">
-                <div class="card-heading"><span class="badge" th:text="${registration.registrationStatus}">Confirmed</span><span class="muted" th:text="${registration.paymentStatus}">Confirmed</span></div>
-                <h3 th:text="${registration.tournament.name}">Tournament name</h3>
-                <p><span th:text="${registration.tournament.city}">City</span>, <span th:text="${registration.tournament.country}">Country</span></p>
-                <p>Starts: <strong th:text="${#temporals.format(registration.tournament.startTime, 'dd MMM yyyy, HH:mm')}">12 Aug 2026</strong></p>
-                <a class="card-link" th:href="@{/tournaments/{id}(id=${registration.tournament.id})}">View tournament</a>
+
+        <div class="card-grid"
+             th:if="${registrations != null
+                     and !#lists.isEmpty(registrations)}">
+
+            <article class="dashboard-card"
+                     th:each="registration : ${registrations}">
+
+                <div class="card-heading">
+
+                    <span class="badge"
+                          th:text="${registration.registrationStatus}">
+                        Confirmed
+                    </span>
+
+                    <span class="muted"
+                          th:text="${registration.paymentStatus}">
+                        Confirmed
+                    </span>
+                </div>
+
+                <h3 th:text="${registration.tournament.name}">
+                    Tournament name
+                </h3>
+
+                <p>
+                    <span th:text="${registration.tournament.city}">
+                        City
+                    </span>,
+                    <span th:text="${registration.tournament.country}">
+                        Country
+                    </span>
+                </p>
+
+                <p>
+                    Starts:
+
+                    <strong th:text="${#temporals.format(
+                            registration.tournament.startTime,
+                            'dd MMM yyyy, HH:mm'
+                    )}">
+                        12 Aug 2026
+                    </strong>
+                </p>
+
+                <a class="card-link"
+                   th:href="@{/tournaments/{id}(
+                        id=${registration.tournament.id}
+                   )}">
+                    View tournament
+                </a>
             </article>
         </div>
     </section>
 
+    <!-- Travel groups organised by the user -->
     <section class="dashboard-section">
+
         <div class="section-heading">
-            <div><p class="eyebrow">Travel</p><h2>Travel groups I organise</h2></div>
-            <a th:href="@{/travel-groups/create}" sec:authorize="hasAuthority('TRAVEL_GROUP_CREATE')">Create group</a>
+
+            <div>
+                <p class="eyebrow">Travel</p>
+                <h2>Travel groups I organise</h2>
+            </div>
+
+            <a th:href="@{/travel-groups/create}"
+               sec:authorize="hasAuthority('TRAVEL_GROUP_CREATE')">
+                Create group
+            </a>
         </div>
-        <div class="empty-state" th:if="${travelGroups == null or #lists.isEmpty(travelGroups)}">
-            <h3>You have not organised a travel group yet.</h3><p>Create a group for one of the tournaments you plan to attend.</p>
+
+        <div class="empty-state"
+             th:if="${travelGroups == null
+                     or #lists.isEmpty(travelGroups)}">
+
+            <h3>
+                You have not organised a travel group yet.
+            </h3>
+
+            <p>
+                Create a group for one of the tournaments
+                you plan to attend.
+            </p>
         </div>
-        <div class="card-grid" th:if="${travelGroups != null and !#lists.isEmpty(travelGroups)}">
-            <article class="dashboard-card" th:each="group : ${travelGroups}">
-                <div class="card-heading"><span class="badge" th:text="${group.status}">Open</span><span class="muted">Owner</span></div>
-                <h3 th:text="${group.name}">Group name</h3>
-                <p>Tournament: <strong th:text="${group.tournament.name}">Tournament</strong></p>
-                <p>Departure: <strong><span th:text="${group.departureCity}">City</span>, <span th:text="${group.departureCountry}">Country</span></strong></p>
-                <p>Leaves: <strong th:text="${#temporals.format(group.departureTime, 'dd MMM yyyy, HH:mm')}">Departure time</strong></p>
-                <a class="card-link" th:href="@{/travel-groups/{id}(id=${group.id})}">Manage group</a>
+
+        <div class="card-grid"
+             th:if="${travelGroups != null
+                     and !#lists.isEmpty(travelGroups)}">
+
+            <article class="dashboard-card"
+                     th:each="group : ${travelGroups}">
+
+                <div class="card-heading">
+
+                    <span class="badge"
+                          th:text="${group.status}">
+                        Open
+                    </span>
+
+                    <span class="muted">
+                        Owner
+                    </span>
+                </div>
+
+                <h3 th:text="${group.name}">
+                    Group name
+                </h3>
+
+                <p>
+                    Tournament:
+
+                    <strong th:text="${group.tournament.name}">
+                        Tournament
+                    </strong>
+                </p>
+
+                <p>
+                    Departure:
+
+                    <strong>
+                        <span th:text="${group.departureCity}">
+                            City
+                        </span>,
+                        <span th:text="${group.departureCountry}">
+                            Country
+                        </span>
+                    </strong>
+                </p>
+
+                <p>
+                    Leaves:
+
+                    <strong th:text="${#temporals.format(
+                            group.departureTime,
+                            'dd MMM yyyy, HH:mm'
+                    )}">
+                        Departure time
+                    </strong>
+                </p>
+
+                <a class="card-link"
+                   th:href="@{/travel-groups/{id}(id=${group.id})}">
+                    Manage group
+                </a>
             </article>
         </div>
     </section>
 
+    <!-- Travel groups joined by the user -->
     <section class="dashboard-section">
+
         <div class="section-heading">
-            <div><p class="eyebrow">Membership</p><h2>Travel groups I joined</h2></div>
-            <a th:href="@{/travel-groups}">Browse groups</a>
+
+            <div>
+                <p class="eyebrow">Membership</p>
+                <h2>Travel groups I joined</h2>
+            </div>
+
+            <a th:href="@{/travel-groups}">
+                Browse groups
+            </a>
         </div>
-        <div class="empty-state" th:if="${travelRequests == null or #lists.isEmpty(travelRequests)}">
-            <h3>You have not joined any travel groups yet.</h3><p>Browse open groups connected to your upcoming tournaments.</p>
+
+        <div class="empty-state"
+             th:if="${travelRequests == null
+                     or #lists.isEmpty(travelRequests)}">
+
+            <h3>
+                You have not joined any travel groups yet.
+            </h3>
+
+            <p>
+                Browse open groups connected to your
+                upcoming tournaments.
+            </p>
         </div>
-        <div class="card-grid" th:if="${travelRequests != null and !#lists.isEmpty(travelRequests)}">
-            <article class="dashboard-card" th:each="request : ${travelRequests}">
-                <div class="card-heading"><span class="badge" th:text="${request.status}">Approved</span><span class="muted">Member</span></div>
-                <h3 th:text="${request.travelGroup.name}">Travel group name</h3>
-                <p>Tournament: <strong th:text="${request.travelGroup.tournament.name}">Tournament</strong></p>
-                <p>Organised by: <strong th:text="${request.travelGroup.owner.username}">Owner</strong></p>
-                <p>Departure: <strong th:text="${#temporals.format(request.travelGroup.departureTime, 'dd MMM yyyy, HH:mm')}">Departure time</strong></p>
-                <a class="card-link" th:href="@{/travel-groups/{id}(id=${request.travelGroup.id})}">View group</a>
+
+        <div class="card-grid"
+             th:if="${travelRequests != null
+                     and !#lists.isEmpty(travelRequests)}">
+
+            <article class="dashboard-card"
+                     th:each="request : ${travelRequests}">
+
+                <div class="card-heading">
+
+                    <span class="badge"
+                          th:text="${request.status}">
+                        Approved
+                    </span>
+
+                    <span class="muted">
+                        Member
+                    </span>
+                </div>
+
+                <h3 th:text="${request.travelGroup.name}">
+                    Travel group name
+                </h3>
+
+                <p>
+                    Tournament:
+
+                    <strong th:text="${request.travelGroup.tournament.name}">
+                        Tournament
+                    </strong>
+                </p>
+
+                <p>
+                    Organised by:
+
+                    <strong th:text="${request.travelGroup.owner.username}">
+                        Owner
+                    </strong>
+                </p>
+
+                <p>
+                    Departure:
+
+                    <strong th:text="${#temporals.format(
+                            request.travelGroup.departureTime,
+                            'dd MMM yyyy, HH:mm'
+                    )}">
+                        Departure time
+                    </strong>
+                </p>
+
+                <a class="card-link"
+                   th:href="@{/travel-groups/{id}(
+                        id=${request.travelGroup.id}
+                   )}">
+                    View group
+                </a>
             </article>
         </div>
     </section>
 
-    <section class="role-section" th:if="${currentRole != null and currentRole.name() == 'PLAYER'}">
-        <div><p class="eyebrow">Organise events</p><h2>Become an organiser</h2><p>Apply for permission to publish tournaments and manage registrations.</p></div>
-        <a class="button button-primary" th:href="@{/organiser-applications/create}">Apply to become an organiser</a>
+    <!-- Player application section -->
+    <section class="role-section"
+             th:if="${currentRole != null
+                     and currentRole.name() == 'PLAYER'}">
+
+        <div>
+            <p class="eyebrow">Organise events</p>
+            <h2>Become an organiser</h2>
+
+            <p>
+                Apply for permission to publish tournaments
+                and manage registrations.
+            </p>
+        </div>
+
+        <a class="button button-primary"
+           th:href="@{/organiser-applications/create}">
+            Apply to become an organiser
+        </a>
     </section>
 
-    <section class="dashboard-section organiser-section" sec:authorize="hasAuthority('TOURNAMENT_CREATE')">
+    <!-- Organiser tournament tools -->
+    <section class="dashboard-section organiser-section"
+             sec:authorize="hasAuthority('TOURNAMENT_CREATE')">
+
         <div class="section-heading">
-            <div><p class="eyebrow">Organiser tools</p><h2>My organised tournaments</h2></div>
-            <a th:href="@{/tournaments/create}">Create tournament</a>
+
+            <div>
+                <p class="eyebrow">Organiser tools</p>
+                <h2>My organised tournaments</h2>
+            </div>
+
+            <a th:href="@{/tournaments#create-tournament}">
+                Create tournament
+            </a>
         </div>
-        <div class="empty-state" th:if="${organisedTournaments == null or #lists.isEmpty(organisedTournaments)}">
-            <h3>You have not created any tournaments yet.</h3><p>Create a draft and publish it when the details are complete.</p>
+
+        <div class="empty-state"
+             th:if="${organisedTournaments == null
+                     or #lists.isEmpty(organisedTournaments)}">
+
+            <h3>
+                You have not created any tournaments yet.
+            </h3>
+
+            <p>
+                Create a draft and publish it when
+                the details are complete.
+            </p>
+
+            <a class="button button-primary"
+               th:href="@{/tournaments#create-tournament}">
+                Create tournament
+            </a>
         </div>
-        <div class="card-grid" th:if="${organisedTournaments != null and !#lists.isEmpty(organisedTournaments)}">
-            <article class="dashboard-card" th:each="tournament : ${organisedTournaments}">
-                <div class="card-heading"><span class="badge" th:text="${tournament.status}">Draft</span><span class="muted" th:text="${tournament.timeControl}">Rapid</span></div>
-                <h3 th:text="${tournament.name}">Tournament name</h3>
-                <p>Starts: <strong th:text="${#temporals.format(tournament.startTime, 'dd MMM yyyy, HH:mm')}">Start time</strong></p>
-                <a class="card-link" th:href="@{/tournaments/{id}(id=${tournament.id})}">Manage tournament</a>
+
+        <div class="card-grid"
+             th:if="${organisedTournaments != null
+                     and !#lists.isEmpty(organisedTournaments)}">
+
+            <article class="dashboard-card"
+                     th:each="tournament : ${organisedTournaments}">
+
+                <div class="card-heading">
+
+                    <span class="badge"
+                          th:text="${tournament.status}">
+                        Draft
+                    </span>
+
+                    <span class="muted"
+                          th:text="${tournament.timeControl}">
+                        Rapid
+                    </span>
+                </div>
+
+                <h3 th:text="${tournament.name}">
+                    Tournament name
+                </h3>
+
+                <p>
+                    Starts:
+
+                    <strong th:text="${#temporals.format(
+                            tournament.startTime,
+                            'dd MMM yyyy, HH:mm'
+                    )}">
+                        Start time
+                    </strong>
+                </p>
+
+                <a class="card-link"
+                   th:href="@{/tournaments/{id}(id=${tournament.id})}">
+                    Manage tournament
+                </a>
             </article>
         </div>
     </section>
 
-    <section class="admin-section" sec:authorize="hasAuthority('ORGANISER_APPLICATION_REVIEW')">
-        <div><p class="eyebrow">Administration</p><h2>Administrative tools</h2><p>Review organiser applications, manage users, and moderate platform content.</p></div>
+    <!-- Admin tools -->
+    <section class="admin-section"
+             sec:authorize="hasAuthority(
+                'ORGANISER_APPLICATION_REVIEW'
+             )">
+
+        <div>
+            <p class="eyebrow">Administration</p>
+            <h2>Administrative tools</h2>
+
+            <p>
+                Review organiser applications, manage users,
+                and moderate platform content.
+            </p>
+        </div>
+
         <div class="admin-actions">
-            <a class="button button-primary" th:href="@{/admin/organiser-applications}">Review organiser applications <span th:if="${pendingOrganiserApplications != null}" th:text="${' (' + #lists.size(pendingOrganiserApplications) + ')'}"></span></a>
-            <a class="button button-secondary" th:href="@{/admin/users}">Manage users</a>
+
+            <a class="button button-primary"
+               th:href="@{/admin/organiser-applications}">
+
+                Review organiser applications
+
+                <span th:if="${pendingOrganiserApplications != null}"
+                      th:text="${' ('
+                        + #lists.size(pendingOrganiserApplications)
+                        + ')'}">
+                </span>
+            </a>
+
+            <a class="button button-secondary"
+               th:href="@{/admin/users}">
+                Manage users
+            </a>
         </div>
     </section>
+
 </main>
 
 <footer class="site-footer">
-    <div><a class="brand footer-brand" th:href="@{/}">TournamentTrail</a><p>Your tournaments, registrations, and travel activity in one place.</p></div>
-    <nav><a th:href="@{/about}">About</a><a th:href="@{/contact}">Contact</a><a th:href="@{/profile/edit}">Profile</a></nav>
+
+    <div>
+        <a class="brand footer-brand"
+           th:href="@{/}">
+            TournamentTrail
+        </a>
+
+        <p>
+            Your tournaments, registrations, and travel activity
+            in one place.
+        </p>
+    </div>
+
+    <nav>
+        <a th:href="@{/about}">About</a>
+        <a th:href="@{/contact}">Contact</a>
+        <a th:href="@{/profile/edit}">Profile</a>
+    </nav>
+
     <p>&copy; 2026 TournamentTrail</p>
 </footer>
+
 </body>
 </html>
