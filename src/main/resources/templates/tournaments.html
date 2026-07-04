@@ -283,8 +283,7 @@
 
     <!-- Only organisers and admins see this section -->
     <!-- Only organisers and admins see this section -->
-    <section id="create-tournament"
-             class="panel create-panel"
+    <section class="panel create-panel"
              sec:authorize="hasAnyRole('ORGANISER', 'ADMIN')">
 
         <div class="section-heading">
@@ -301,9 +300,8 @@
         <form class="create-form"
               method="post"
               th:action="@{/tournaments}"
-              th:object="${createTournamentRequest}">
+              th:object="${tournamentRequest}">
 
-            <!-- Global errors from @AssertTrue -->
             <div class="global-errors"
                  th:if="${#fields.hasGlobalErrors()}">
 
@@ -329,7 +327,7 @@
                         <span class="field-error"
                               th:if="${#fields.hasErrors('name')}"
                               th:errors="*{name}">
-                        </span>
+                    </span>
                     </div>
 
                     <div class="form-group">
@@ -343,7 +341,7 @@
                         <span class="field-error"
                               th:if="${#fields.hasErrors('venue')}"
                               th:errors="*{venue}">
-                        </span>
+                    </span>
                     </div>
 
                     <div class="form-group">
@@ -358,7 +356,7 @@
                         <span class="field-error"
                               th:if="${#fields.hasErrors('edition')}"
                               th:errors="*{edition}">
-                        </span>
+                    </span>
                     </div>
 
                     <div class="form-group">
@@ -372,7 +370,7 @@
                         <span class="field-error"
                               th:if="${#fields.hasErrors('country')}"
                               th:errors="*{country}">
-                        </span>
+                    </span>
                     </div>
 
                     <div class="form-group">
@@ -386,7 +384,7 @@
                         <span class="field-error"
                               th:if="${#fields.hasErrors('city')}"
                               th:errors="*{city}">
-                        </span>
+                    </span>
                     </div>
 
                     <div class="form-group full-width">
@@ -396,12 +394,12 @@
                                   rows="4"
                                   th:field="*{description}"
                                   placeholder="Describe the tournament">
-                        </textarea>
+                    </textarea>
 
                         <span class="field-error"
                               th:if="${#fields.hasErrors('description')}"
                               th:errors="*{description}">
-                        </span>
+                    </span>
                     </div>
                 </div>
             </div>
@@ -423,7 +421,7 @@
                         <span class="field-error"
                               th:if="${#fields.hasErrors('registrationDeadline')}"
                               th:errors="*{registrationDeadline}">
-                        </span>
+                    </span>
                     </div>
 
                     <div class="form-group">
@@ -436,7 +434,7 @@
                         <span class="field-error"
                               th:if="${#fields.hasErrors('startTime')}"
                               th:errors="*{startTime}">
-                        </span>
+                    </span>
                     </div>
 
                     <div class="form-group">
@@ -449,7 +447,7 @@
                         <span class="field-error"
                               th:if="${#fields.hasErrors('endTime')}"
                               th:errors="*{endTime}">
-                        </span>
+                    </span>
                     </div>
 
                     <div class="form-group">
@@ -471,7 +469,7 @@
                         <span class="field-error"
                               th:if="${#fields.hasErrors('timeControl')}"
                               th:errors="*{timeControl}">
-                        </span>
+                    </span>
                     </div>
 
                     <div class="form-group">
@@ -488,7 +486,7 @@
                         <span class="field-error"
                               th:if="${#fields.hasErrors('maximumParticipants')}"
                               th:errors="*{maximumParticipants}">
-                        </span>
+                    </span>
                     </div>
 
                     <div class="checkbox-group">
@@ -521,7 +519,7 @@
                         <span class="field-error"
                               th:if="${#fields.hasErrors('entryFee')}"
                               th:errors="*{entryFee}">
-                        </span>
+                    </span>
                     </div>
 
                     <div class="form-group">
@@ -543,7 +541,7 @@
                         <span class="field-error"
                               th:if="${#fields.hasErrors('currency')}"
                               th:errors="*{currency}">
-                        </span>
+                    </span>
                     </div>
 
                     <div class="form-group full-width">
@@ -555,12 +553,12 @@
                                   rows="4"
                                   th:field="*{participationRequirements}"
                                   placeholder="Rating limits, age requirements or other conditions">
-                        </textarea>
+                    </textarea>
 
                         <span class="field-error"
                               th:if="${#fields.hasErrors('participationRequirements')}"
                               th:errors="*{participationRequirements}">
-                        </span>
+                    </span>
                     </div>
 
                     <div class="form-group full-width">
@@ -572,12 +570,12 @@
                                   rows="4"
                                   th:field="*{paymentInstructions}"
                                   placeholder="Required only for paid tournaments">
-                        </textarea>
+                    </textarea>
 
                         <span class="field-error"
                               th:if="${#fields.hasErrors('paymentInstructions')}"
                               th:errors="*{paymentInstructions}">
-                        </span>
+                    </span>
                     </div>
                 </div>
             </div>

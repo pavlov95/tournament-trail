@@ -90,7 +90,7 @@
             </a>
 
             <a class="button button-secondary"
-               th:href="@{/tournaments#create-tournament}"
+               th:href="@{/tournaments}"
                sec:authorize="hasAuthority('TOURNAMENT_CREATE')">
                 Create tournament
             </a>
@@ -397,7 +397,7 @@
                 <h2>My organised tournaments</h2>
             </div>
 
-            <a th:href="@{/tournaments#create-tournament}">
+            <a th:href="@{/tournaments}">
                 Create tournament
             </a>
         </div>
@@ -416,7 +416,7 @@
             </p>
 
             <a class="button button-primary"
-               th:href="@{/tournaments#create-tournament}">
+               th:href="@{/tournaments}">
                 Create tournament
             </a>
         </div>

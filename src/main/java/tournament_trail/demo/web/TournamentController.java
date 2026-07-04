@@ -1,22 +1,20 @@
 package tournament_trail.demo.web;
 
 import jakarta.validation.Valid;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import tournament_trail.demo.entities.Tournament;
 import tournament_trail.demo.entities.enums.CurrencyCode;
 import tournament_trail.demo.entities.enums.TimeControl;
 import tournament_trail.demo.security.AuthenticationUserDetails;
 import tournament_trail.demo.services.TournamentService;
-import tournament_trail.demo.web.dtos.CreateTournamentRequest;
+import tournament_trail.demo.web.dtos.TournamentRequest;
 import tournament_trail.demo.web.dtos.TournamentSearchRequest;
-
 import java.util.UUID;
 
 @Controller
@@ -31,42 +29,116 @@ public class TournamentController {
 
     @GetMapping
     public ModelAndView getTournaments(@ModelAttribute("searchRequest")
-                                           TournamentSearchRequest searchRequest) {
+                                       TournamentSearchRequest searchRequest) {
         ModelAndView modelAndView = new ModelAndView("tournaments");
         modelAndView.addObject("tournaments",
                 tournamentService.searchTournaments(searchRequest));
 
-        modelAndView.addObject("createTournamentRequest", new CreateTournamentRequest());
+        modelAndView.addObject("tournamentRequest", new TournamentRequest());
         addCommonPageData(modelAndView);
 
         return modelAndView;
     }
 
     @PostMapping
-    public ModelAndView createTournament(@Valid @ModelAttribute("createTournamentRequest")
-            CreateTournamentRequest createTournamentRequest, BindingResult bindingResult,
+    @PreAuthorize("hasAuthority('TOURNAMENT_CREATE')")
+    public ModelAndView createTournament(
+            @Valid @ModelAttribute("tournamentRequest")
+            TournamentRequest tournamentRequest,
+            BindingResult bindingResult,
             @AuthenticationPrincipal AuthenticationUserDetails userDetails,
-                                         RedirectAttributes redirectAttributes) {
+            RedirectAttributes redirectAttributes
+    ) {
         if (bindingResult.hasErrors()) {
             ModelAndView modelAndView = new ModelAndView("tournaments");
 
-            modelAndView.addObject("tournaments", tournamentService.searchTournaments(
-                            new TournamentSearchRequest()));
+            modelAndView.addObject("tournaments",
+                    tournamentService.searchTournaments(new TournamentSearchRequest()));
+
             modelAndView.addObject("searchRequest", new TournamentSearchRequest());
             addCommonPageData(modelAndView);
+
             return modelAndView;
         }
 
-        UUID userId = userDetails.getId();
-        tournamentService.createTournament(createTournamentRequest, userId);
-        redirectAttributes.addFlashAttribute(
-                "successMessage", "Tournament created successfully.");
-        return new ModelAndView("redirect:/tournaments#create-tournament");
+        Tournament tournament = tournamentService.createTournament(tournamentRequest, userDetails.getId());
+
+        redirectAttributes.addFlashAttribute("successMessage",
+                "Tournament created successfully.");
+
+        return new ModelAndView ("redirect:/tournaments/" + tournament.getId());
     }
+    @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('TOURNAMENT_EDIT_OWN') or hasRole('ADMIN')")
+    public ModelAndView editTournament(
+            @PathVariable("id") UUID tournamentId,
+            @Valid @ModelAttribute("tournamentRequest")
+            TournamentRequest tournamentRequest,
+            BindingResult bindingResult,
+            @AuthenticationPrincipal AuthenticationUserDetails userDetails) {
+        Tournament tournament = tournamentService.findById(tournamentId);
+
+        if (bindingResult.hasErrors()) {
+            ModelAndView modelAndView = new ModelAndView("tournament-details");
+
+            modelAndView.addObject("tournament", tournament);
+            modelAndView.addObject("canEdit", true);
+            addCommonPageData(modelAndView);
+
+            return modelAndView;
+        }
+
+        tournamentService.editTournament(
+                tournamentRequest,
+                tournamentId,
+                userDetails.getId(),
+                userDetails.getRole());
+
+        return new ModelAndView("redirect:/tournaments/" + tournamentId);
+    }
+
+    @GetMapping("/{id}")
+    public ModelAndView getTournament(
+            @PathVariable UUID id,
+            @AuthenticationPrincipal AuthenticationUserDetails userDetails) {
+        Tournament tournament = tournamentService.findById(id);
+
+        ModelAndView modelAndView = new ModelAndView("tournament-details");
+        modelAndView.addObject("tournament", tournament);
+        modelAndView.addObject("tournamentRequest",
+                tournamentService.mapToTournamentRequest(tournament));
+        boolean canEdit = false;
+
+        if (userDetails != null) {
+            canEdit = tournamentService.canEditTournament(
+                    tournament,
+                    userDetails.getId(),
+                    userDetails.getRole());
+        }
+        modelAndView.addObject("canEdit", canEdit);
+        addCommonPageData(modelAndView);
+
+        return modelAndView;
+    }
+
+    @PatchMapping("/{id}")
+    @PreAuthorize("hasAuthority('TOURNAMENT_EDIT_OWN') or hasRole('ADMIN')")
+    public ModelAndView cancelTournament(@PathVariable UUID id,
+          @AuthenticationPrincipal AuthenticationUserDetails userDetails,
+          RedirectAttributes redirectAttributes) {
+
+        tournamentService.cancelTournament(id, userDetails.getId(), userDetails.getRole());
+        redirectAttributes.addFlashAttribute(
+                "successMessage", "Tournament cancelled successfully.");
+        return new ModelAndView("redirect:/tournaments/"+ id);
+    }
+
 
     private void addCommonPageData(ModelAndView modelAndView) {
         modelAndView.addObject("timeControls", TimeControl.values());
 
         modelAndView.addObject("currencies", CurrencyCode.values());
     }
+
+
 }
