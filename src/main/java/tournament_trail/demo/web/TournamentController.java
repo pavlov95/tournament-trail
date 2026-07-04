@@ -11,6 +11,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import tournament_trail.demo.entities.Tournament;
 import tournament_trail.demo.entities.enums.CurrencyCode;
 import tournament_trail.demo.entities.enums.TimeControl;
+import tournament_trail.demo.entities.enums.TournamentStatus;
 import tournament_trail.demo.security.AuthenticationUserDetails;
 import tournament_trail.demo.services.TournamentService;
 import tournament_trail.demo.web.dtos.TournamentRequest;
@@ -123,14 +124,34 @@ public class TournamentController {
 
     @PatchMapping("/{id}")
     @PreAuthorize("hasAuthority('TOURNAMENT_EDIT_OWN') or hasRole('ADMIN')")
-    public ModelAndView cancelTournament(@PathVariable UUID id,
-          @AuthenticationPrincipal AuthenticationUserDetails userDetails,
-          RedirectAttributes redirectAttributes) {
+    public ModelAndView updateTournamentStatus(
+            @PathVariable UUID id,
+            @RequestParam("status") TournamentStatus status,
+            @AuthenticationPrincipal AuthenticationUserDetails userDetails,
+            RedirectAttributes redirectAttributes
+    ) {
+        tournamentService.updateTournamentStatus(
+                id,
+                status,
+                userDetails.getId(),
+                userDetails.getRole()
+        );
 
-        tournamentService.cancelTournament(id, userDetails.getId(), userDetails.getRole());
-        redirectAttributes.addFlashAttribute(
-                "successMessage", "Tournament cancelled successfully.");
-        return new ModelAndView("redirect:/tournaments/"+ id);
+        if (status == TournamentStatus.PUBLISHED) {
+            redirectAttributes.addFlashAttribute(
+                    "successMessage",
+                    "Tournament published successfully."
+            );
+        }
+
+        if (status == TournamentStatus.CANCELLED) {
+            redirectAttributes.addFlashAttribute(
+                    "successMessage",
+                    "Tournament cancelled successfully."
+            );
+        }
+
+        return new ModelAndView("redirect:/tournaments/" + id);
     }
 
 

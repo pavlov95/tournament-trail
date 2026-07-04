@@ -137,29 +137,29 @@ public class TournamentService {
         return tournamentRepository.findById(id).orElseThrow(TournamentDoesNotExist::new);
     }
 
-
-    public void cancelTournament(UUID tournamentId, UUID userId, Role currentUserRole) {
+    @Transactional
+    public void updateTournamentStatus(UUID tournamentId, TournamentStatus requestedStatus,
+            UUID userId, Role role){
         Tournament tournament = findById(tournamentId);
-        boolean isAdmin = currentUserRole == Role.ADMIN;
-        boolean owner = tournament.getOrganiser()
-                .getId()
-                .equals(userId);
 
-        if (!isAdmin && !owner) {
-            throw new AccessDeniedException("You cannot cancel this tournament.");
+        boolean isOwner = tournament.getOrganiser().getId().equals(userId);
+        boolean isAdmin = role == Role.ADMIN;
+
+        if (!isOwner && !isAdmin) {
+            throw new AccessDeniedException("You are not allowed to change this tournament.");
         }
 
-        if (tournament.getStatus() == TournamentStatus.COMPLETED) {
-            throw new IllegalStateException("A completed tournament cannot be cancelled.");
+        if (requestedStatus == TournamentStatus.PUBLISHED) {
+            publishTournament(tournament);
+            return;
         }
 
-        if (tournament.getStatus() == TournamentStatus.CANCELLED) {
-            throw new IllegalStateException("The tournament is already cancelled.");
+        if (requestedStatus == TournamentStatus.CANCELLED) {
+            cancelTournament(tournament);
+            return;
         }
 
-        tournament.setStatus(TournamentStatus.CANCELLED);
-        tournament.setUpdatedOn(LocalDateTime.now());
-        tournamentRepository.save(tournament);
+        throw new IllegalArgumentException("This status cannot be changed manually.");
     }
 
     public void editTournament(TournamentRequest tournamentRequest, UUID tournamentId,
@@ -223,17 +223,46 @@ public class TournamentService {
         return request;
     }
 
-    public boolean canEditTournament(
-            Tournament tournament,
-            UUID userId,
-            Role role
-    ) {
+    private void publishTournament(Tournament tournament) {
+        if (tournament.getStatus() != TournamentStatus.DRAFT) {
+            throw new IllegalStateException("Only draft tournaments can be published.");
+        }
+
+        LocalDateTime now = LocalDateTime.now();
+
+        if (!tournament.getRegistrationDeadline().isAfter(now)) {
+            throw new IllegalStateException(
+                    "Cannot publish a tournament with an expired registration deadline.");
+        }
+
+        if (!tournament.getStartTime().isAfter(now)) {
+            throw new IllegalStateException("Cannot publish a tournament that has already started.");
+        }
+
+        if (!tournament.getEndTime().isAfter(tournament.getStartTime())) {
+            throw new InvalidTournamentTimeCriteria();
+        }
+
+        tournament.setStatus(TournamentStatus.PUBLISHED);
+        tournament.setUpdatedOn(now);
+    }
+
+    public boolean canEditTournament(Tournament tournament, UUID userId, Role role) {
         boolean isAdmin = role == Role.ADMIN;
-
-        boolean isOwner = tournament.getOrganiser()
-                .getId()
-                .equals(userId);
-
+        boolean isOwner = tournament.getOrganiser().getId().equals(userId);
         return isAdmin || isOwner;
+    }
+
+    private void cancelTournament(Tournament tournament) {
+        if (tournament.getStatus() == TournamentStatus.COMPLETED) {
+            throw new IllegalStateException("A completed tournament cannot be cancelled.");
+        }
+
+        if (tournament.getStatus() == TournamentStatus.CANCELLED) {
+            throw new IllegalStateException("The tournament is already cancelled.");
+        }
+
+        tournament.setStatus(TournamentStatus.CANCELLED);
+        tournament.setUpdatedOn(LocalDateTime.now());
     }
 }
