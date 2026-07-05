@@ -35,23 +35,29 @@ public class TournamentController {
         modelAndView.addObject("tournaments",
                 tournamentService.searchTournaments(searchRequest));
 
-        modelAndView.addObject("tournamentRequest", new TournamentRequest());
-        addCommonPageData(modelAndView);
-
         return modelAndView;
     }
 
-    @PostMapping
+    @GetMapping("/create")
+    @PreAuthorize("hasAuthority('TOURNAMENT_CREATE')")
+    public ModelAndView getCreateTournamentPage(){
+        ModelAndView modelAndView = new ModelAndView("tournament-create");
+        modelAndView.addObject("tournamentRequest", new TournamentRequest());
+        addCommonPageData(modelAndView);
+        return modelAndView;
+    }
+
+
+    @PostMapping("/create")
     @PreAuthorize("hasAuthority('TOURNAMENT_CREATE')")
     public ModelAndView createTournament(
             @Valid @ModelAttribute("tournamentRequest")
             TournamentRequest tournamentRequest,
             BindingResult bindingResult,
             @AuthenticationPrincipal AuthenticationUserDetails userDetails,
-            RedirectAttributes redirectAttributes
-    ) {
+            RedirectAttributes redirectAttributes) {
         if (bindingResult.hasErrors()) {
-            ModelAndView modelAndView = new ModelAndView("tournaments");
+            ModelAndView modelAndView = new ModelAndView("tournament-create");
 
             modelAndView.addObject("tournaments",
                     tournamentService.searchTournaments(new TournamentSearchRequest()));

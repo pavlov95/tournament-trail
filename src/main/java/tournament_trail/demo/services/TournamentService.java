@@ -1,5 +1,6 @@
 package tournament_trail.demo.services;
 
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -11,6 +12,7 @@ import tournament_trail.demo.entities.enums.TournamentStatus;
 import tournament_trail.demo.exceptions.InvalidTournamentTimeCriteria;
 import tournament_trail.demo.exceptions.TournamentDoesNotExist;
 import tournament_trail.demo.repositories.TournamentRepository;
+import tournament_trail.demo.web.dtos.TournamentOptionResponse;
 import tournament_trail.demo.web.dtos.TournamentRequest;
 import tournament_trail.demo.web.dtos.TournamentSearchRequest;
 import org.springframework.security.access.AccessDeniedException;
@@ -264,5 +266,27 @@ public class TournamentService {
 
         tournament.setStatus(TournamentStatus.CANCELLED);
         tournament.setUpdatedOn(LocalDateTime.now());
+    }
+    public List<TournamentOptionResponse> searchTournamentOptions(String query) {
+        if (query == null || query.trim().length() < 2) {
+            return List.of();
+        }
+
+        return tournamentRepository.searchTournamentOptions(
+                query.trim().toLowerCase(),
+                TournamentStatus.PUBLISHED,
+                LocalDateTime.now(),
+                PageRequest.of(0, 15)
+        );
+
+    }
+    public String getTournamentOptionLabel(UUID tournamentId) {
+        if (tournamentId == null) {
+            return "";
+        }
+
+        Tournament tournament = findById(tournamentId);
+
+        return tournament.getName();
     }
 }

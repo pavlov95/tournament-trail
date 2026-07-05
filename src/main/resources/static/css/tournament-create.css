@@ -1,0 +1,367 @@
+:root {
+    --primary: #2f5d50;
+    --primary-dark: #203f36;
+    --primary-soft: #e8f0ed;
+    --accent: #d5a84b;
+    --background: #f4f7f5;
+    --surface: #ffffff;
+    --text: #1f2933;
+    --muted: #667085;
+    --border: #d7e1dc;
+    --danger: #b42318;
+    --danger-soft: #fdecea;
+    --shadow: 0 14px 34px rgba(31, 41, 51, 0.09);
+    --radius: 16px;
+    --max-width: 1040px;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    font-family: Arial, Helvetica, sans-serif;
+    color: var(--text);
+    background: var(--background);
+    line-height: 1.6;
+}
+
+a {
+    color: var(--primary);
+    text-decoration: none;
+}
+
+a:hover {
+    color: var(--primary-dark);
+}
+
+button,
+input,
+select,
+textarea {
+    font: inherit;
+}
+
+.site-header {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: rgba(255, 255, 255, 0.96);
+    border-bottom: 1px solid var(--border);
+    backdrop-filter: blur(12px);
+}
+
+.navbar {
+    width: min(100% - 2rem, 1180px);
+    min-height: 74px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.brand {
+    margin-right: auto;
+    color: var(--primary-dark);
+    font-size: 1.35rem;
+    font-weight: 800;
+}
+
+.nav-links,
+.nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.nav-links a {
+    padding-bottom: 0.2rem;
+    font-weight: 700;
+}
+
+.nav-links a.active {
+    color: var(--primary-dark);
+    border-bottom: 2px solid var(--accent);
+}
+
+.nav-actions form {
+    margin: 0;
+}
+
+.container {
+    width: min(100% - 2rem, var(--max-width));
+    margin: 0 auto;
+    flex: 1;
+}
+
+.button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 0.7rem 1.1rem;
+    border: 1px solid transparent;
+    border-radius: 9px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.button:hover {
+    transform: translateY(-1px);
+}
+
+.button-primary {
+    color: #ffffff;
+    background: var(--primary);
+}
+
+.button-primary:hover {
+    color: #ffffff;
+    background: var(--primary-dark);
+}
+
+.button-secondary {
+    color: var(--primary-dark);
+    background: #ffffff;
+    border-color: var(--border);
+}
+
+.button-secondary:hover {
+    background: var(--primary-soft);
+}
+
+.page-heading {
+    padding: 3.5rem 0 2rem;
+}
+
+.back-link {
+    display: inline-flex;
+    margin-bottom: 1rem;
+    font-weight: 800;
+}
+
+.eyebrow {
+    margin: 0 0 0.45rem;
+    color: var(--primary);
+    font-size: 0.8rem;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+}
+
+.page-heading h1 {
+    margin: 0;
+    color: var(--primary-dark);
+    font-size: clamp(2.7rem, 6vw, 5rem);
+    line-height: 1.05;
+}
+
+.page-heading p:not(.eyebrow) {
+    max-width: 760px;
+    color: var(--muted);
+    font-size: 1.08rem;
+}
+
+.panel {
+    margin-bottom: 4rem;
+    padding: 1.5rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+    box-shadow: 0 6px 20px rgba(31, 41, 51, 0.06);
+}
+
+.create-form {
+    display: grid;
+    gap: 2rem;
+}
+
+.form-section {
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.form-section:last-of-type {
+    border-bottom: none;
+}
+
+.section-heading {
+    margin-bottom: 1.25rem;
+}
+
+.section-heading h2 {
+    margin: 0;
+    color: var(--primary-dark);
+    font-size: 1.45rem;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.form-group {
+    display: grid;
+    gap: 0.45rem;
+}
+
+.full-width {
+    grid-column: 1 / -1;
+}
+
+.form-group label,
+.checkbox-group label {
+    color: var(--primary-dark);
+    font-weight: 800;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    min-height: 46px;
+    padding: 0.7rem 0.8rem;
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    color: var(--text);
+    background: #ffffff;
+}
+
+.form-group textarea {
+    resize: vertical;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: 3px solid rgba(47, 93, 80, 0.14);
+    border-color: var(--primary);
+}
+
+.checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding-top: 1.95rem;
+}
+
+.checkbox-group input {
+    width: 18px;
+    height: 18px;
+}
+
+.field-error {
+    color: var(--danger);
+    font-size: 0.88rem;
+    font-weight: 800;
+}
+
+.global-errors {
+    padding: 0.85rem 1rem;
+    border: 1px solid rgba(180, 35, 24, 0.25);
+    border-radius: 10px;
+    color: var(--danger);
+    background: var(--danger-soft);
+    font-weight: 800;
+}
+
+.global-errors p {
+    margin: 0;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.8rem;
+}
+
+.site-footer {
+    padding: 2.5rem max(1rem, calc((100% - 1180px) / 2));
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    align-items: center;
+    gap: 2rem;
+    color: #dbe8e3;
+    background: var(--primary-dark);
+}
+
+.footer-brand {
+    display: inline-block;
+    margin-bottom: 0.4rem;
+    color: #ffffff;
+}
+
+.site-footer p {
+    margin: 0;
+}
+
+.site-footer nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.site-footer a {
+    color: #ffffff;
+}
+
+.site-footer a:hover {
+    color: var(--accent);
+}
+
+@media (max-width: 920px) {
+    .navbar {
+        padding: 1rem 0;
+        flex-wrap: wrap;
+    }
+
+    .brand {
+        width: 100%;
+    }
+
+    .nav-links,
+    .nav-actions {
+        flex-wrap: wrap;
+    }
+
+    .form-grid,
+    .site-footer {
+        grid-template-columns: 1fr;
+    }
+
+    .checkbox-group {
+        padding-top: 0;
+    }
+}
+
+@media (max-width: 620px) {
+    .container,
+    .navbar {
+        width: min(100% - 1rem, var(--max-width));
+    }
+
+    .nav-links,
+    .nav-actions {
+        width: 100%;
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .button {
+        width: 100%;
+    }
+
+    .panel {
+        padding: 1rem;
+    }
+
+    .form-actions {
+        flex-direction: column-reverse;
+    }
+}

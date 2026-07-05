@@ -24,8 +24,22 @@
 
         <nav class="navigation">
             <a th:href="@{/}">Home</a>
-            <a class="active" th:href="@{/tournaments}">
+
+            <a class="active"
+               th:href="@{/tournaments}">
                 Tournaments
+            </a>
+
+            <a th:href="@{/travel-groups}">
+                Travel groups
+            </a>
+
+            <a th:href="@{/about}">
+                About
+            </a>
+
+            <a th:href="@{/contact}">
+                Contact
             </a>
 
             <a sec:authorize="isAnonymous()"
@@ -46,11 +60,13 @@
 </header>
 
 <main class="container">
+
     <div class="alert alert-success"
          th:if="${successMessage != null}"
          th:text="${successMessage}">
-        Tournament created successfully. Email confirmation sent
+        Tournament created successfully.
     </div>
+
     <section class="page-heading">
         <div>
             <p class="eyebrow">Chess events across Europe</p>
@@ -62,9 +78,14 @@
                 time control and rating status.
             </p>
         </div>
+
+        <a class="primary-button"
+           th:href="@{/tournaments/create}"
+           sec:authorize="hasAuthority('TOURNAMENT_CREATE')">
+            Create tournament
+        </a>
     </section>
 
-    <!-- Search filters -->
     <section class="panel search-panel">
 
         <div class="section-heading">
@@ -119,6 +140,7 @@
                     <option th:each="control : ${timeControls}"
                             th:value="${control}"
                             th:text="${control}">
+                        RAPID
                     </option>
                 </select>
             </div>
@@ -149,7 +171,6 @@
         </form>
     </section>
 
-    <!-- Tournament results -->
     <section class="tournament-results">
 
         <div class="section-heading results-heading">
@@ -173,6 +194,12 @@
             <p>
                 Try changing or clearing some of the filters.
             </p>
+
+            <a class="primary-button"
+               th:href="@{/tournaments/create}"
+               sec:authorize="hasAuthority('TOURNAMENT_CREATE')">
+                Create tournament
+            </a>
         </div>
 
         <div class="tournament-grid"
@@ -279,314 +306,6 @@
                 </a>
             </article>
         </div>
-    </section>
-
-    <!-- Only organisers and admins see this section -->
-    <!-- Only organisers and admins see this section -->
-    <section class="panel create-panel"
-             sec:authorize="hasAnyRole('ORGANISER', 'ADMIN')">
-
-        <div class="section-heading">
-            <div>
-                <p class="eyebrow">Organiser tools</p>
-                <h2>Create a tournament</h2>
-
-                <p>
-                    Enter the tournament information below.
-                </p>
-            </div>
-        </div>
-
-        <form class="create-form"
-              method="post"
-              th:action="@{/tournaments}"
-              th:object="${tournamentRequest}">
-
-            <div class="global-errors"
-                 th:if="${#fields.hasGlobalErrors()}">
-
-                <p th:each="error : ${#fields.globalErrors()}"
-                   th:text="${error}">
-                    Validation error
-                </p>
-            </div>
-
-            <div class="form-section">
-                <h3>Basic information</h3>
-
-                <div class="form-grid">
-
-                    <div class="form-group full-width">
-                        <label for="name">Tournament name</label>
-
-                        <input id="name"
-                               type="text"
-                               th:field="*{name}"
-                               placeholder="European Chess Open">
-
-                        <span class="field-error"
-                              th:if="${#fields.hasErrors('name')}"
-                              th:errors="*{name}">
-                    </span>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="venue">Venue</label>
-
-                        <input id="venue"
-                               type="text"
-                               th:field="*{venue}"
-                               placeholder="National Palace of Culture">
-
-                        <span class="field-error"
-                              th:if="${#fields.hasErrors('venue')}"
-                              th:errors="*{venue}">
-                    </span>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="edition">Edition</label>
-
-                        <input id="edition"
-                               type="number"
-                               min="1"
-                               th:field="*{edition}"
-                               placeholder="1">
-
-                        <span class="field-error"
-                              th:if="${#fields.hasErrors('edition')}"
-                              th:errors="*{edition}">
-                    </span>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="country">Country</label>
-
-                        <input id="country"
-                               type="text"
-                               th:field="*{country}"
-                               placeholder="Bulgaria">
-
-                        <span class="field-error"
-                              th:if="${#fields.hasErrors('country')}"
-                              th:errors="*{country}">
-                    </span>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="city">City</label>
-
-                        <input id="city"
-                               type="text"
-                               th:field="*{city}"
-                               placeholder="Sofia">
-
-                        <span class="field-error"
-                              th:if="${#fields.hasErrors('city')}"
-                              th:errors="*{city}">
-                    </span>
-                    </div>
-
-                    <div class="form-group full-width">
-                        <label for="description">Description</label>
-
-                        <textarea id="description"
-                                  rows="4"
-                                  th:field="*{description}"
-                                  placeholder="Describe the tournament">
-                    </textarea>
-
-                        <span class="field-error"
-                              th:if="${#fields.hasErrors('description')}"
-                              th:errors="*{description}">
-                    </span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="form-section">
-                <h3>Schedule and format</h3>
-
-                <div class="form-grid">
-
-                    <div class="form-group">
-                        <label for="registration-deadline">
-                            Registration deadline
-                        </label>
-
-                        <input id="registration-deadline"
-                               type="datetime-local"
-                               th:field="*{registrationDeadline}">
-
-                        <span class="field-error"
-                              th:if="${#fields.hasErrors('registrationDeadline')}"
-                              th:errors="*{registrationDeadline}">
-                    </span>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="start-time">Start time</label>
-
-                        <input id="start-time"
-                               type="datetime-local"
-                               th:field="*{startTime}">
-
-                        <span class="field-error"
-                              th:if="${#fields.hasErrors('startTime')}"
-                              th:errors="*{startTime}">
-                    </span>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="end-time">End time</label>
-
-                        <input id="end-time"
-                               type="datetime-local"
-                               th:field="*{endTime}">
-
-                        <span class="field-error"
-                              th:if="${#fields.hasErrors('endTime')}"
-                              th:errors="*{endTime}">
-                    </span>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="time-control">Time control</label>
-
-                        <select id="time-control"
-                                th:field="*{timeControl}">
-
-                            <option value="">
-                                Select time control
-                            </option>
-
-                            <option th:each="control : ${timeControls}"
-                                    th:value="${control}"
-                                    th:text="${control}">
-                            </option>
-                        </select>
-
-                        <span class="field-error"
-                              th:if="${#fields.hasErrors('timeControl')}"
-                              th:errors="*{timeControl}">
-                    </span>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="maximum-participants">
-                            Maximum participants
-                        </label>
-
-                        <input id="maximum-participants"
-                               type="number"
-                               min="2"
-                               th:field="*{maximumParticipants}"
-                               placeholder="100">
-
-                        <span class="field-error"
-                              th:if="${#fields.hasErrors('maximumParticipants')}"
-                              th:errors="*{maximumParticipants}">
-                    </span>
-                    </div>
-
-                    <div class="checkbox-group">
-                        <input id="rated"
-                               type="checkbox"
-                               th:field="*{rated}">
-
-                        <label for="rated">
-                            This tournament is rated
-                        </label>
-                    </div>
-                </div>
-            </div>
-
-            <div class="form-section">
-                <h3>Payment and participation</h3>
-
-                <div class="form-grid">
-
-                    <div class="form-group">
-                        <label for="entry-fee">Entry fee</label>
-
-                        <input id="entry-fee"
-                               type="number"
-                               min="0"
-                               step="0.01"
-                               th:field="*{entryFee}"
-                               placeholder="0.00">
-
-                        <span class="field-error"
-                              th:if="${#fields.hasErrors('entryFee')}"
-                              th:errors="*{entryFee}">
-                    </span>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="currency">Currency</label>
-
-                        <select id="currency"
-                                th:field="*{currency}">
-
-                            <option value="">
-                                Select currency
-                            </option>
-
-                            <option th:each="currency : ${currencies}"
-                                    th:value="${currency}"
-                                    th:text="${currency}">
-                            </option>
-                        </select>
-
-                        <span class="field-error"
-                              th:if="${#fields.hasErrors('currency')}"
-                              th:errors="*{currency}">
-                    </span>
-                    </div>
-
-                    <div class="form-group full-width">
-                        <label for="participation-requirements">
-                            Participation requirements
-                        </label>
-
-                        <textarea id="participation-requirements"
-                                  rows="4"
-                                  th:field="*{participationRequirements}"
-                                  placeholder="Rating limits, age requirements or other conditions">
-                    </textarea>
-
-                        <span class="field-error"
-                              th:if="${#fields.hasErrors('participationRequirements')}"
-                              th:errors="*{participationRequirements}">
-                    </span>
-                    </div>
-
-                    <div class="form-group full-width">
-                        <label for="payment-instructions">
-                            Payment instructions
-                        </label>
-
-                        <textarea id="payment-instructions"
-                                  rows="4"
-                                  th:field="*{paymentInstructions}"
-                                  placeholder="Required only for paid tournaments">
-                    </textarea>
-
-                        <span class="field-error"
-                              th:if="${#fields.hasErrors('paymentInstructions')}"
-                              th:errors="*{paymentInstructions}">
-                    </span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="form-actions">
-                <button class="primary-button large-button"
-                        type="submit">
-                    Create tournament
-                </button>
-            </div>
-        </form>
     </section>
 
 </main>
