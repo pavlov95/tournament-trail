@@ -14,8 +14,11 @@ import tournament_trail.demo.entities.enums.TimeControl;
 import tournament_trail.demo.entities.enums.TournamentStatus;
 import tournament_trail.demo.security.AuthenticationUserDetails;
 import tournament_trail.demo.services.TournamentService;
+import tournament_trail.demo.web.dtos.TournamentOptionResponse;
 import tournament_trail.demo.web.dtos.TournamentRequest;
 import tournament_trail.demo.web.dtos.TournamentSearchRequest;
+
+import java.util.List;
 import java.util.UUID;
 
 @Controller
@@ -160,10 +163,15 @@ public class TournamentController {
         return new ModelAndView("redirect:/tournaments/" + id);
     }
 
+    @GetMapping("/autocomplete")
+    @ResponseBody
+    public List<TournamentOptionResponse> autocompleteTournaments(@RequestParam("query") String query) {
+        return tournamentService.searchTournamentOptions(query);
+    }
+
 
     private void addCommonPageData(ModelAndView modelAndView) {
         modelAndView.addObject("timeControls", TimeControl.values());
-
         modelAndView.addObject("currencies", CurrencyCode.values());
     }
 

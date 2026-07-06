@@ -123,8 +123,7 @@ public class TournamentService {
                             criteriaBuilder.equal(root.get("rated"), request.getRated()));
         }
 
-        return tournamentRepository.findAll(specification,
-                Sort.by(Sort.Direction.ASC, "startTime"));
+        return tournamentRepository.findAll(specification, Sort.by(Sort.Direction.ASC, "startTime"));
     }
 
     private void verifyTournamentTime(TournamentRequest tournamentRequest) {

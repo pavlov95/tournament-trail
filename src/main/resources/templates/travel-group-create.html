@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Create Travel Group | TournamentTrail</title>
+
+    <link rel="stylesheet"
+          th:href="@{/css/travel-group-create.css}">
+</head>
+
+<body>
+
+<header class="site-header">
+    <nav class="navbar">
+
+        <a class="brand"
+           th:href="@{/}">
+            TournamentTrail
+        </a>
+
+        <div class="nav-links">
+            <a th:href="@{/}">Home</a>
+            <a th:href="@{/tournaments}">Tournaments</a>
+            <a class="active"
+               th:href="@{/travel-groups}">
+                Travel groups
+            </a>
+            <a th:href="@{/about}">About</a>
+            <a th:href="@{/contact}">Contact</a>
+        </div>
+
+        <div class="nav-actions"
+             sec:authorize="isAuthenticated()">
+
+            <a class="button button-primary"
+               th:href="@{/home}">
+                Dashboard
+            </a>
+
+            <form th:action="@{/logout}"
+                  method="post">
+                <button class="button button-secondary"
+                        type="submit">
+                    Logout
+                </button>
+            </form>
+        </div>
+
+        <div class="nav-actions"
+             sec:authorize="isAnonymous()">
+
+            <a class="button button-secondary"
+               th:href="@{/login}">
+                Login
+            </a>
+
+            <a class="button button-primary"
+               th:href="@{/register}">
+                Register
+            </a>
+        </div>
+    </nav>
+</header>
+
+<main class="container">
+
+    <section class="page-heading">
+        <div>
+            <a class="back-link"
+               th:href="@{/travel-groups}">
+                ← Back to travel groups
+            </a>
+
+            <p class="eyebrow">Shared travel</p>
+
+            <h1>Create travel group</h1>
+
+            <p>
+                Select a published tournament and add the travel details for other players.
+            </p>
+        </div>
+    </section>
+
+    <section class="panel create-panel"
+             sec:authorize="hasAuthority('TRAVEL_GROUP_CREATE')">
+
+        <div class="section-heading">
+            <div>
+                <h2>Travel group information</h2>
+
+                <p>
+                    Start by typing the tournament name. Select one of the suggestions before submitting.
+                </p>
+            </div>
+        </div>
+
+        <form class="create-form"
+              method="post"
+              th:action="@{/travel-groups}"
+              th:object="${travelGroupRequest}">
+
+            <div class="global-errors"
+                 th:if="${#fields.hasGlobalErrors()}">
+
+                <p th:each="error : ${#fields.globalErrors()}"
+                   th:text="${error}">
+                    Validation error
+                </p>
+            </div>
+
+            <div class="form-section">
+                <h3>Tournament</h3>
+
+                <div class="form-group full-width autocomplete-wrapper">
+                    <label for="tournamentSearch">
+                        Tournament name
+                    </label>
+
+                    <input id="tournamentSearch"
+                           type="text"
+                           th:value="${selectedTournamentLabel}"
+                           placeholder="Start typing tournament name"
+                           autocomplete="off">
+
+                    <input id="tournamentId"
+                           type="hidden"
+                           th:field="*{tournamentId}">
+
+                    <div id="tournamentOptions"
+                         class="autocomplete-options">
+                    </div>
+
+                    <span class="field-error"
+                          th:if="${#fields.hasErrors('tournamentId')}"
+                          th:errors="*{tournamentId}">
+                        Tournament error
+                    </span>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3>Basic information</h3>
+
+                <div class="form-grid">
+
+                    <div class="form-group full-width">
+                        <label for="name">Group name</label>
+
+                        <input id="name"
+                               type="text"
+                               th:field="*{name}"
+                               placeholder="Sofia players car group">
+
+                        <span class="field-error"
+                              th:if="${#fields.hasErrors('name')}"
+                              th:errors="*{name}">
+                            Name error
+                        </span>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="description">Description</label>
+
+                        <textarea id="description"
+                                  rows="4"
+                                  th:field="*{description}"
+                                  placeholder="Describe the travel plan, who can join, and any useful details">
+                        </textarea>
+
+                        <span class="field-error"
+                              th:if="${#fields.hasErrors('description')}"
+                              th:errors="*{description}">
+                            Description error
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3>Departure details</h3>
+
+                <div class="form-grid">
+
+                    <div class="form-group">
+                        <label for="departureCountry">
+                            Departure country
+                        </label>
+
+                        <input id="departureCountry"
+                               type="text"
+                               th:field="*{departureCountry}"
+                               placeholder="Bulgaria">
+
+                        <span class="field-error"
+                              th:if="${#fields.hasErrors('departureCountry')}"
+                              th:errors="*{departureCountry}">
+                            Departure country error
+                        </span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="departureCity">
+                            Departure city
+                        </label>
+
+                        <input id="departureCity"
+                               type="text"
+                               th:field="*{departureCity}"
+                               placeholder="Sofia">
+
+                        <span class="field-error"
+                              th:if="${#fields.hasErrors('departureCity')}"
+                              th:errors="*{departureCity}">
+                            Departure city error
+                        </span>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="meetingPoint">
+                            Meeting point
+                        </label>
+
+                        <input id="meetingPoint"
+                               type="text"
+                               th:field="*{meetingPoint}"
+                               placeholder="National Palace of Culture main entrance">
+
+                        <span class="field-error"
+                              th:if="${#fields.hasErrors('meetingPoint')}"
+                              th:errors="*{meetingPoint}">
+                            Meeting point error
+                        </span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="departureTime">
+                            Departure time
+                        </label>
+
+                        <input id="departureTime"
+                               type="datetime-local"
+                               th:field="*{departureTime}">
+
+                        <span class="field-error"
+                              th:if="${#fields.hasErrors('departureTime')}"
+                              th:errors="*{departureTime}">
+                            Departure time error
+                        </span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="transportationType">
+                            Transportation type
+                        </label>
+
+                        <select id="transportationType"
+                                th:field="*{transportationType}">
+
+                            <option value="">
+                                Choose transportation
+                            </option>
+
+                            <option th:each="type : ${transportationTypes}"
+                                    th:value="${type}"
+                                    th:text="${type}">
+                                CAR
+                            </option>
+                        </select>
+
+                        <span class="field-error"
+                              th:if="${#fields.hasErrors('transportationType')}"
+                              th:errors="*{transportationType}">
+                            Transportation type error
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3>Capacity and cost</h3>
+
+                <div class="form-grid">
+
+                    <div class="form-group">
+                        <label for="maximumMembers">
+                            Maximum members
+                        </label>
+
+                        <input id="maximumMembers"
+                               type="number"
+                               min="1"
+                               th:field="*{maximumMembers}"
+                               placeholder="4">
+
+                        <span class="field-error"
+                              th:if="${#fields.hasErrors('maximumMembers')}"
+                              th:errors="*{maximumMembers}">
+                            Maximum members error
+                        </span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="estimatedCost">
+                            Estimated cost
+                        </label>
+
+                        <input id="estimatedCost"
+                               type="number"
+                               min="0"
+                               step="0.01"
+                               th:field="*{estimatedCost}"
+                               placeholder="45.00">
+
+                        <span class="field-error"
+                              th:if="${#fields.hasErrors('estimatedCost')}"
+                              th:errors="*{estimatedCost}">
+                            Estimated cost error
+                        </span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="currency">
+                            Currency
+                        </label>
+
+                        <select id="currency"
+                                th:field="*{currency}">
+
+                            <option value="">
+                                Choose currency
+                            </option>
+
+                            <option th:each="currency : ${currencies}"
+                                    th:value="${currency}"
+                                    th:text="${currency}">
+                                EUR
+                            </option>
+                        </select>
+
+                        <span class="field-error"
+                              th:if="${#fields.hasErrors('currency')}"
+                              th:errors="*{currency}">
+                            Currency error
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <a class="button button-secondary"
+                   th:href="@{/travel-groups}">
+                    Cancel
+                </a>
+
+                <button class="button button-primary"
+                        type="submit">
+                    Create travel group
+                </button>
+            </div>
+        </form>
+    </section>
+
+    <section class="access-panel"
+             sec:authorize="!hasAuthority('TRAVEL_GROUP_CREATE')">
+
+        <h2>Access denied</h2>
+
+        <p>
+            You do not have permission to create travel groups.
+        </p>
+
+        <a class="button button-primary"
+           th:href="@{/travel-groups}">
+            Back to travel groups
+        </a>
+    </section>
+</main>
+
+<footer class="site-footer">
+    <div>
+        <a class="brand footer-brand"
+           th:href="@{/}">
+            TournamentTrail
+        </a>
+
+        <p>
+            Chess tournaments, registrations, and shared travel in one platform.
+        </p>
+    </div>
+
+    <nav>
+        <a th:href="@{/tournaments}">Tournaments</a>
+        <a th:href="@{/travel-groups}">Travel groups</a>
+        <a th:href="@{/about}">About</a>
+        <a th:href="@{/contact}">Contact</a>
+    </nav>
+
+    <p>&copy; 2026 TournamentTrail</p>
+</footer>
+
+<script>
+    const tournamentSearchInput =
+        document.getElementById("tournamentSearch");
+
+    const tournamentIdInput =
+        document.getElementById("tournamentId");
+
+    const tournamentOptionsBox =
+        document.getElementById("tournamentOptions");
+
+    let tournamentSearchTimeoutId;
+
+    if (tournamentSearchInput) {
+        tournamentSearchInput.addEventListener("input", function () {
+            clearTimeout(tournamentSearchTimeoutId);
+
+            const query = tournamentSearchInput.value.trim();
+
+            tournamentIdInput.value = "";
+
+            if (query.length < 2) {
+                tournamentOptionsBox.innerHTML = "";
+                return;
+            }
+
+            tournamentSearchTimeoutId = setTimeout(() => {
+                fetch(`/tournaments/autocomplete?query=${encodeURIComponent(query)}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error("Failed to fetch tournaments");
+                        }
+
+                        return response.json();
+                    })
+                    .then(tournaments => {
+                        tournamentOptionsBox.innerHTML = "";
+
+                        if (tournaments.length === 0) {
+                            tournamentOptionsBox.innerHTML =
+                                `<div class="autocomplete-empty">
+                                    No tournaments found
+                                 </div>`;
+                            return;
+                        }
+
+                        tournaments.forEach(tournament => {
+                            const option =
+                                document.createElement("button");
+
+                            option.type = "button";
+                            option.className = "autocomplete-option";
+                            option.textContent = tournament.label;
+
+                            option.addEventListener("click", function () {
+                                tournamentSearchInput.value =
+                                    tournament.label;
+
+                                tournamentIdInput.value =
+                                    tournament.id;
+
+                                tournamentOptionsBox.innerHTML = "";
+                            });
+
+                            tournamentOptionsBox.appendChild(option);
+                        });
+                    })
+                    .catch(() => {
+                        tournamentOptionsBox.innerHTML =
+                            `<div class="autocomplete-empty">
+                                Could not load tournaments
+                             </div>`;
+                    });
+            }, 300);
+        });
+
+        document.addEventListener("click", function (event) {
+            if (!event.target.closest(".autocomplete-wrapper")) {
+                tournamentOptionsBox.innerHTML = "";
+            }
+        });
+    }
+</script>
+
+</body>
+</html>
