@@ -39,7 +39,7 @@ public class TravelGroupRequest {
     @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
     private LocalDateTime departureTime;
 
-    @NotBlank(message = "Transportation Type is required")
+    @NotNull(message = "Transportation Type is required")
     private TransportationType transportationType;
 
     @NotNull(message = "Members are required")

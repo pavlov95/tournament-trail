@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
+import tournament_trail.demo.entities.enums.CurrencyCode;
+import tournament_trail.demo.entities.enums.TransportationType;
 import tournament_trail.demo.services.TravelGroupService;
 import tournament_trail.demo.web.dtos.TravelGroupSearchRequest;
 import jakarta.validation.Valid;
@@ -56,7 +58,7 @@ public class TravelGroupController {
         TravelGroupRequest travelGroupRequest = new TravelGroupRequest();
 
         travelGroupRequest.setTournamentId(tournamentId);
-
+        addCommonData(modelAndView);
         modelAndView.addObject("travelGroupRequest", travelGroupRequest);
 
         modelAndView.addObject("selectedTournamentLabel",
@@ -65,17 +67,16 @@ public class TravelGroupController {
         return modelAndView;
     }
 
-    @PostMapping
+    @PostMapping("/create")
     @PreAuthorize("hasAuthority('TRAVEL_GROUP_CREATE')")
     public ModelAndView createTravelGroup(@Valid @ModelAttribute("travelGroupRequest")
             TravelGroupRequest travelGroupRequest, BindingResult bindingResult,
             @AuthenticationPrincipal AuthenticationUserDetails userDetails) {
         if (bindingResult.hasErrors()) {
             ModelAndView modelAndView = new ModelAndView("travel-group-create");
-
             modelAndView.addObject("selectedTournamentLabel",
                     tournamentService.getTournamentOptionLabel(travelGroupRequest.getTournamentId()));
-
+            addCommonData(modelAndView);
             return modelAndView;
         }
 
@@ -92,8 +93,38 @@ public class TravelGroupController {
         ModelAndView modelAndView = new ModelAndView("travel-group-details");
 
         modelAndView.addObject("travelGroup", travelGroup);
+        modelAndView.addObject("travelGroupRequest",
+                travelGroupService.mapToTravelGroupRequest(travelGroup));
+        addCommonData(modelAndView);
 
         return modelAndView;
+    }
+
+    @PatchMapping("/{id}")
+    public ModelAndView cancelTravelGroup(@PathVariable UUID id,
+             @AuthenticationPrincipal AuthenticationUserDetails userDetails){
+
+        travelGroupService.cancel(id, userDetails.getId(), userDetails.getRole());
+
+        return new ModelAndView("redirect:/travel-groups");
+    }
+
+    @PutMapping("/{id}")
+    public ModelAndView updateTravelGroup(@PathVariable UUID id, @Valid TravelGroupRequest travelGroupRequest
+            , BindingResult bindingResult, @AuthenticationPrincipal AuthenticationUserDetails userDetails){
+            ModelAndView modelAndView = new ModelAndView("travel-group-details");
+            if(bindingResult.hasErrors()){
+                modelAndView.addObject("travelGroup", travelGroupService.findById(id));
+                addCommonData(modelAndView);
+                return modelAndView;
+            }
+            travelGroupService.updateTravelGroup(id, travelGroupRequest, userDetails.getId(), userDetails.getRole());
+            return new ModelAndView("redirect:/travel-groups/" + id);
+    }
+
+    private void addCommonData(ModelAndView modelAndView){
+        modelAndView.addObject("currencies",CurrencyCode.values());
+        modelAndView.addObject("transportationTypes", TransportationType.values());
     }
 }
 
