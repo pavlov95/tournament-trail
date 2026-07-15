@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title th:text="${travelGroup.name + ' | TournamentTrail'}">
+        Travel Group | TournamentTrail
+    </title>
+
+    <link rel="stylesheet"
+          th:href="@{/css/travel-group-details.css}">
+</head>
+
+<body>
+
+<header class="site-header">
+    <nav class="navbar">
+
+        <a class="brand"
+           th:href="@{/}">
+            TournamentTrail
+        </a>
+
+        <div class="nav-links">
+            <a th:href="@{/}">Home</a>
+            <a th:href="@{/tournaments}">Tournaments</a>
+            <a class="active"
+               th:href="@{/travel-groups}">
+                Travel groups
+            </a>
+            <a th:href="@{/about}">About</a>
+            <a th:href="@{/contacts}">Contacts</a>
+        </div>
+
+        <div class="nav-actions"
+             sec:authorize="isAuthenticated()">
+
+            <a class="button button-primary"
+               th:href="@{/home}">
+                Dashboard
+            </a>
+
+            <form th:action="@{/logout}"
+                  method="post">
+                <button class="button button-secondary"
+                        type="submit">
+                    Logout
+                </button>
+            </form>
+        </div>
+
+        <div class="nav-actions"
+             sec:authorize="isAnonymous()">
+
+            <a class="button button-secondary"
+               th:href="@{/login}">
+                Login
+            </a>
+
+            <a class="button button-primary"
+               th:href="@{/register}">
+                Register
+            </a>
+        </div>
+    </nav>
+</header>
+
+<main class="container">
+
+    <section class="page-heading">
+        <div>
+            <a class="back-link"
+               th:href="@{/travel-groups}">
+                ← Back to travel groups
+            </a>
+
+            <p class="eyebrow">Travel group details</p>
+
+            <div class="title-row">
+                <h1 th:text="${travelGroup.name}">
+                    Sofia car group
+                </h1>
+
+                <span class="status-badge"
+                      th:classappend="${travelGroup.status.name() == 'OPEN'} ? ' status-open' :
+                                      (${travelGroup.status.name() == 'FULL'} ? ' status-full' :
+                                      (${travelGroup.status.name() == 'CANCELLED'} ? ' status-cancelled' : ''))"
+                      th:text="${travelGroup.status}">
+                    OPEN
+                </span>
+            </div>
+
+            <p th:text="${travelGroup.description}">
+                Shared travel group description.
+            </p>
+        </div>
+    </section>
+
+    <section class="details-layout">
+
+        <article class="panel main-panel">
+
+            <div class="section-heading">
+                <div>
+                    <h2>Trip overview</h2>
+
+                    <p>
+                        Main travel details for this group.
+                    </p>
+                </div>
+            </div>
+
+            <div class="details-grid">
+
+                <div class="detail-card">
+                    <span class="detail-label">Tournament</span>
+
+                    <a class="detail-value detail-link"
+                       th:href="@{/tournaments/{id}(id=${travelGroup.tournament.id})}"
+                       th:text="${travelGroup.tournament.name}">
+                        Tournament name
+                    </a>
+                </div>
+
+                <div class="detail-card">
+                    <span class="detail-label">Owner</span>
+
+                    <span class="detail-value"
+                          th:text="${travelGroup.owner.username}">
+                        owner
+                    </span>
+                </div>
+
+                <div class="detail-card">
+                    <span class="detail-label">Departure country</span>
+
+                    <span class="detail-value"
+                          th:text="${travelGroup.departureCountry}">
+                        Bulgaria
+                    </span>
+                </div>
+
+                <div class="detail-card">
+                    <span class="detail-label">Departure city</span>
+
+                    <span class="detail-value"
+                          th:text="${travelGroup.departureCity}">
+                        Sofia
+                    </span>
+                </div>
+
+                <div class="detail-card full-width">
+                    <span class="detail-label">Meeting point</span>
+
+                    <span class="detail-value"
+                          th:text="${travelGroup.meetingPoint}">
+                        National Palace of Culture
+                    </span>
+                </div>
+
+                <div class="detail-card">
+                    <span class="detail-label">Departure time</span>
+
+                    <span class="detail-value"
+                          th:text="${#temporals.format(travelGroup.departureTime, 'dd MMM yyyy, HH:mm')}">
+                        20 Jul 2026, 08:00
+                    </span>
+                </div>
+
+                <div class="detail-card">
+                    <span class="detail-label">Transportation</span>
+
+                    <span class="detail-value"
+                          th:text="${travelGroup.transportationType}">
+                        CAR
+                    </span>
+                </div>
+
+                <div class="detail-card">
+                    <span class="detail-label">Maximum members</span>
+
+                    <span class="detail-value"
+                          th:text="${travelGroup.maximumMembers}">
+                        4
+                    </span>
+                </div>
+
+                <div class="detail-card">
+                    <span class="detail-label">Estimated cost</span>
+
+                    <span class="detail-value">
+                        <span th:text="${#numbers.formatDecimal(travelGroup.estimatedCost, 1, 2)}">
+                            45.00
+                        </span>
+                        <span th:text="${travelGroup.currency}">
+                            EUR
+                        </span>
+                    </span>
+                </div>
+
+                <div class="detail-card">
+                    <span class="detail-label">Created on</span>
+
+                    <span class="detail-value"
+                          th:text="${#temporals.format(travelGroup.createdOn, 'dd MMM yyyy, HH:mm')}">
+                        15 Jul 2026, 12:00
+                    </span>
+                </div>
+
+                <div class="detail-card">
+                    <span class="detail-label">Updated on</span>
+
+                    <span class="detail-value"
+                          th:text="${#temporals.format(travelGroup.updatedOn, 'dd MMM yyyy, HH:mm')}">
+                        15 Jul 2026, 12:00
+                    </span>
+                </div>
+            </div>
+
+            <div class="action-row"
+                 sec:authorize="isAuthenticated()">
+
+                <a class="button button-secondary"
+                   th:href="@{/travel-groups}">
+                    Browse groups
+                </a>
+
+                <form th:if="${travelGroup.status.name() != 'CANCELLED'}"
+                      th:action="@{/travel-groups/{id}(id=${travelGroup.id})}"
+                      method="post"
+                      sec:authorize="hasAuthority('TRAVEL_GROUP_MANAGE_OWN') or hasRole('ADMIN')">
+
+                    <input type="hidden"
+                           name="_method"
+                           value="patch">
+
+                    <button class="button button-danger"
+                            type="submit"
+                            onclick="return confirm('Are you sure you want to cancel this travel group?')">
+                        Cancel group
+                    </button>
+                </form>
+            </div>
+        </article>
+
+        <aside class="panel side-panel">
+
+            <h2>Group status</h2>
+
+            <p>
+                Use cancellation for normal business flow. Delete only if you later add a strict delete requirement.
+            </p>
+
+            <div class="mini-list">
+                <div>
+                    <span>Current status</span>
+                    <strong th:text="${travelGroup.status}">OPEN</strong>
+                </div>
+
+                <div>
+                    <span>Tournament status</span>
+                    <strong th:text="${travelGroup.tournament.status}">PUBLISHED</strong>
+                </div>
+
+                <div>
+                    <span>Currency</span>
+                    <strong th:text="${travelGroup.currency}">EUR</strong>
+                </div>
+            </div>
+        </aside>
+    </section>
+
+    <section class="panel edit-panel"
+             sec:authorize="hasAuthority('TRAVEL_GROUP_MANAGE_OWN') or hasRole('ADMIN')">
+
+        <div class="section-heading">
+            <div>
+                <h2>Edit travel group</h2>
+
+                <p>
+                    Update the group details. The selected tournament is preserved.
+                </p>
+            </div>
+        </div>
+
+        <form class="edit-form"
+              method="post"
+              th:action="@{/travel-groups/{id}(id=${travelGroup.id})}"
+              th:object="${travelGroupRequest}">
+
+            <input type="hidden"
+                   name="_method"
+                   value="put">
+
+            <input type="hidden"
+                   th:field="*{tournamentId}">
+
+            <div class="global-errors"
+                 th:if="${#fields.hasGlobalErrors()}">
+
+                <p th:each="error : ${#fields.globalErrors()}"
+                   th:text="${error}">
+                    Validation error
+                </p>
+            </div>
+
+            <div class="form-section">
+                <h3>Basic information</h3>
+
+                <div class="form-grid">
+
+                    <div class="form-group full-width">
+                        <label for="name">Group name</label>
+
+                        <input id="name"
+                               type="text"
+                               th:field="*{name}">
+
+                        <span class="field-error"
+                              th:if="${#fields.hasErrors('name')}"
+                              th:errors="*{name}">
+                            Name error
+                        </span>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="description">Description</label>
+
+                        <textarea id="description"
+                                  rows="4"
+                                  th:field="*{description}">
+                        </textarea>
+
+                        <span class="field-error"
+                              th:if="${#fields.hasErrors('description')}"
+                              th:errors="*{description}">
+                            Description error
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3>Departure details</h3>
+
+                <div class="form-grid">
+
+                    <div class="form-group">
+                        <label for="departureCountry">Departure country</label>
+
+                        <input id="departureCountry"
+                               type="text"
+                               th:field="*{departureCountry}">
+
+                        <span class="field-error"
+                              th:if="${#fields.hasErrors('departureCountry')}"
+                              th:errors="*{departureCountry}">
+                            Departure country error
+                        </span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="departureCity">Departure city</label>
+
+                        <input id="departureCity"
+                               type="text"
+                               th:field="*{departureCity}">
+
+                        <span class="field-error"
+                              th:if="${#fields.hasErrors('departureCity')}"
+                              th:errors="*{departureCity}">
+                            Departure city error
+                        </span>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="meetingPoint">Meeting point</label>
+
+                        <input id="meetingPoint"
+                               type="text"
+                               th:field="*{meetingPoint}">
+
+                        <span class="field-error"
+                              th:if="${#fields.hasErrors('meetingPoint')}"
+                              th:errors="*{meetingPoint}">
+                            Meeting point error
+                        </span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="departureTime">Departure time</label>
+
+                        <input id="departureTime"
+                               type="datetime-local"
+                               th:field="*{departureTime}">
+
+                        <span class="field-error"
+                              th:if="${#fields.hasErrors('departureTime')}"
+                              th:errors="*{departureTime}">
+                            Departure time error
+                        </span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="transportationType">Transportation type</label>
+
+                        <select id="transportationType"
+                                th:field="*{transportationType}">
+
+                            <option value="">Choose transportation</option>
+
+                            <option th:each="type : ${transportationTypes}"
+                                    th:value="${type}"
+                                    th:text="${type}">
+                                CAR
+                            </option>
+                        </select>
+
+                        <span class="field-error"
+                              th:if="${#fields.hasErrors('transportationType')}"
+                              th:errors="*{transportationType}">
+                            Transportation type error
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3>Capacity and cost</h3>
+
+                <div class="form-grid">
+
+                    <div class="form-group">
+                        <label for="maximumMembers">Maximum members</label>
+
+                        <input id="maximumMembers"
+                               type="number"
+                               min="1"
+                               th:field="*{maximumMembers}">
+
+                        <span class="field-error"
+                              th:if="${#fields.hasErrors('maximumMembers')}"
+                              th:errors="*{maximumMembers}">
+                            Maximum members error
+                        </span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="estimatedCost">Estimated cost</label>
+
+                        <input id="estimatedCost"
+                               type="number"
+                               min="0"
+                               step="0.01"
+                               th:field="*{estimatedCost}">
+
+                        <span class="field-error"
+                              th:if="${#fields.hasErrors('estimatedCost')}"
+                              th:errors="*{estimatedCost}">
+                            Estimated cost error
+                        </span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="currency">Currency</label>
+
+                        <select id="currency"
+                                th:field="*{currency}">
+
+                            <option value="">Choose currency</option>
+
+                            <option th:each="currency : ${currencies}"
+                                    th:value="${currency}"
+                                    th:text="${currency}">
+                                EUR
+                            </option>
+                        </select>
+
+                        <span class="field-error"
+                              th:if="${#fields.hasErrors('currency')}"
+                              th:errors="*{currency}">
+                            Currency error
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button class="button button-primary"
+                        type="submit">
+                    Save changes
+                </button>
+            </div>
+        </form>
+    </section>
+</main>
+
+<footer class="site-footer">
+    <div>
+        <a class="brand footer-brand"
+           th:href="@{/}">
+            TournamentTrail
+        </a>
+
+        <p>
+            Chess tournaments, registrations, and shared travel in one platform.
+        </p>
+    </div>
+
+    <nav>
+        <a th:href="@{/tournaments}">Tournaments</a>
+        <a th:href="@{/travel-groups}">Travel groups</a>
+        <a th:href="@{/about}">About</a>
+        <a th:href="@{/contacts}">Contacts</a>
+    </nav>
+
+    <p>&copy; 2026 TournamentTrail</p>
+</footer>
+
+</body>
+</html>

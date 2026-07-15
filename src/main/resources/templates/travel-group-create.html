@@ -10,8 +10,7 @@
 
     <title>Create Travel Group | TournamentTrail</title>
 
-    <link rel="stylesheet"
-          th:href="@{/css/travel-group-create.css}">
+    <link rel="stylesheet" th:href="@{/css/travel-group-create.css}">
 </head>
 
 <body>
@@ -102,7 +101,7 @@
 
         <form class="create-form"
               method="post"
-              th:action="@{/travel-groups}"
+              th:action="@{/travel-groups/create}"
               th:object="${travelGroupRequest}">
 
             <div class="global-errors"
@@ -358,7 +357,7 @@
                     Cancel
                 </a>
 
-                <button class="button button-primary"
+                <button  class="button button-primary"
                         type="submit">
                     Create travel group
                 </button>
