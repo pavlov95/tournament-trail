@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title th:text="${registration.tournament.name + ' Registration | TournamentTrail'}">
+        Registration | TournamentTrail
+    </title>
+
+    <link rel="stylesheet"
+          th:href="@{/css/tournament-registration.css}">
+</head>
+
+<body>
+
+<header class="site-header">
+    <nav class="navbar">
+
+        <a class="brand"
+           th:href="@{/}">
+            TournamentTrail
+        </a>
+
+        <div class="nav-links">
+            <a th:href="@{/}">Home</a>
+            <a th:href="@{/tournaments}">Tournaments</a>
+            <a th:href="@{/travel-groups}">Travel groups</a>
+            <a class="active"
+               th:href="@{/registrations}">
+                My registrations
+            </a>
+            <a th:href="@{/about}">About</a>
+            <a th:href="@{/contacts}">Contacts</a>
+        </div>
+
+        <div class="nav-actions"
+             sec:authorize="isAuthenticated()">
+
+            <a class="button button-primary"
+               th:href="@{/home}">
+                Dashboard
+            </a>
+
+            <form th:action="@{/logout}"
+                  method="post">
+                <button class="button button-secondary"
+                        type="submit">
+                    Logout
+                </button>
+            </form>
+        </div>
+    </nav>
+</header>
+
+<main class="container">
+
+    <section class="page-heading">
+        <div>
+            <a class="back-link"
+               th:href="@{/registrations}">
+                ← Back to my registrations
+            </a>
+
+            <p class="eyebrow">Registration details</p>
+
+            <div class="title-row">
+                <h1 th:text="${registration.tournament.name}">
+                    Tournament name
+                </h1>
+
+                <span class="status-badge"
+                      th:classappend="${registration.registrationStatus.name() == 'CONFIRMED'} ? ' status-confirmed' :
+                                      (${registration.registrationStatus.name() == 'PENDING_PAYMENT'} ? ' status-pending' :
+                                      (${registration.registrationStatus.name() == 'REJECTED'} ? ' status-rejected' :
+                                      (${registration.registrationStatus.name() == 'CANCELLED_BY_ADMIN'} ? ' status-cancelled' :
+                                      (${registration.registrationStatus.name() == 'CANCELLED'} ? ' status-cancelled' : ''))))"
+                      th:text="${registration.registrationStatus}">
+                    PENDING_PAYMENT
+                </span>
+            </div>
+
+            <p th:text="${registration.tournament.venue + ' · ' + registration.tournament.city + ', ' + registration.tournament.country}">
+                Venue · City, country
+            </p>
+        </div>
+    </section>
+
+    <section class="details-layout">
+
+        <article class="panel main-panel">
+
+            <div class="section-heading">
+                <div>
+                    <h2>Registration overview</h2>
+
+                    <p>
+                        Current status and payment information for this registration.
+                    </p>
+                </div>
+            </div>
+
+            <div class="details-grid">
+
+                <div class="detail-card">
+                    <span class="detail-label">Registration status</span>
+
+                    <span class="detail-value"
+                          th:text="${registration.registrationStatus}">
+                        PENDING_PAYMENT
+                    </span>
+                </div>
+
+                <div class="detail-card">
+                    <span class="detail-label">Payment status</span>
+
+                    <span class="detail-value"
+                          th:text="${registration.paymentStatus}">
+                        PENDING
+                    </span>
+                </div>
+
+                <div class="detail-card">
+                    <span class="detail-label">Player</span>
+
+                    <span class="detail-value"
+                          th:text="${registration.player.username}">
+                        player
+                    </span>
+                </div>
+
+                <div class="detail-card">
+                    <span class="detail-label">Organiser</span>
+
+                    <span class="detail-value"
+                          th:text="${registration.tournament.organiser.username}">
+                        organiser
+                    </span>
+                </div>
+
+                <div class="detail-card">
+                    <span class="detail-label">Registered on</span>
+
+                    <span class="detail-value"
+                          th:text="${#temporals.format(registration.registeredOn, 'dd MMM yyyy, HH:mm')}">
+                        16 Jul 2026, 12:00
+                    </span>
+                </div>
+
+                <div class="detail-card">
+                    <span class="detail-label">Updated on</span>
+
+                    <span class="detail-value"
+                          th:text="${#temporals.format(registration.updatedOn, 'dd MMM yyyy, HH:mm')}">
+                        16 Jul 2026, 12:00
+                    </span>
+                </div>
+
+                <div class="detail-card"
+                     th:if="${registration.reservedUntil != null}">
+                    <span class="detail-label">Reserved until</span>
+
+                    <span class="detail-value"
+                          th:text="${#temporals.format(registration.reservedUntil, 'dd MMM yyyy, HH:mm')}">
+                        16 Jul 2026, 13:00
+                    </span>
+                </div>
+
+                <div class="detail-card"
+                     th:if="${registration.cancelledOn != null}">
+                    <span class="detail-label">Cancelled on</span>
+
+                    <span class="detail-value"
+                          th:text="${#temporals.format(registration.cancelledOn, 'dd MMM yyyy, HH:mm')}">
+                        16 Jul 2026, 13:00
+                    </span>
+                </div>
+
+                <div class="detail-card"
+                     th:if="${registration.paymentSubmittedOn != null}">
+                    <span class="detail-label">Payment submitted on</span>
+
+                    <span class="detail-value"
+                          th:text="${#temporals.format(registration.paymentSubmittedOn, 'dd MMM yyyy, HH:mm')}">
+                        16 Jul 2026, 13:00
+                    </span>
+                </div>
+
+                <div class="detail-card full-width"
+                     th:if="${registration.paymentReference != null}">
+                    <span class="detail-label">Payment reference</span>
+
+                    <span class="detail-value"
+                          th:text="${registration.paymentReference}">
+                        REVOLUT-123
+                    </span>
+                </div>
+
+                <div class="detail-card full-width"
+                     th:if="${registration.organiserNote != null}">
+                    <span class="detail-label">Organiser note</span>
+
+                    <span class="detail-value"
+                          th:text="${registration.organiserNote}">
+                        Note
+                    </span>
+                </div>
+            </div>
+
+            <div class="action-row">
+
+                <a class="button button-secondary"
+                   th:href="@{/tournaments/{id}(id=${registration.tournament.id})}">
+                    View tournament
+                </a>
+
+                <form th:if="${registration.registrationStatus.name() == 'PENDING_PAYMENT'
+                          or registration.registrationStatus.name() == 'CONFIRMED'}"
+                      th:action="@{/registrations/{id}/cancel(id=${registration.id})}"
+                      method="post">
+
+                    <input type="hidden"
+                           name="_method"
+                           value="patch">
+
+                    <button class="button button-danger"
+                            type="submit"
+                            onclick="return confirm('Cancel this registration?')">
+                        Cancel registration
+                    </button>
+                </form>
+
+                <form th:if="${registration.registrationStatus.name() == 'CANCELLED'
+                          or registration.registrationStatus.name() == 'REJECTED'
+                          or registration.registrationStatus.name() == 'CANCELLED_BY_ADMIN'}"
+                      th:action="@{/registrations/{id}(id=${registration.id})}"
+                      method="post">
+
+                    <input type="hidden"
+                           name="_method"
+                           value="delete">
+
+                    <button class="button button-secondary"
+                            type="submit"
+                            onclick="return confirm('Hide this registration from your list?')">
+                        Hide from my list
+                    </button>
+                </form>
+            </div>
+        </article>
+
+        <aside class="panel side-panel">
+
+            <h2>Tournament summary</h2>
+
+            <div class="mini-list">
+
+                <div>
+                    <span>Tournament</span>
+
+                    <strong>
+                        <a th:href="@{/tournaments/{id}(id=${registration.tournament.id})}"
+                           th:text="${registration.tournament.name}">
+                            Tournament name
+                        </a>
+                    </strong>
+                </div>
+
+                <div>
+                    <span>Status</span>
+
+                    <strong th:text="${registration.tournament.status}">
+                        PUBLISHED
+                    </strong>
+                </div>
+
+                <div>
+                    <span>Venue</span>
+
+                    <strong th:text="${registration.tournament.venue}">
+                        Venue
+                    </strong>
+                </div>
+
+                <div>
+                    <span>Location</span>
+
+                    <strong th:text="${registration.tournament.city + ', ' + registration.tournament.country}">
+                        City, country
+                    </strong>
+                </div>
+
+                <div>
+                    <span>Time control</span>
+
+                    <strong th:text="${registration.tournament.timeControl}">
+                        RAPID
+                    </strong>
+                </div>
+
+                <div>
+                    <span>Edition</span>
+
+                    <strong th:text="${registration.tournament.edition}">
+                        1
+                    </strong>
+                </div>
+
+                <div>
+                    <span>Rated</span>
+
+                    <strong th:text="${registration.tournament.rated ? 'Rated' : 'Unrated'}">
+                        Rated
+                    </strong>
+                </div>
+
+                <div>
+                    <span>Capacity</span>
+
+                    <strong th:text="${registration.tournament.maximumParticipants}">
+                        100
+                    </strong>
+                </div>
+
+                <div>
+                    <span>Starts</span>
+
+                    <strong th:text="${#temporals.format(registration.tournament.startTime, 'dd MMM yyyy, HH:mm')}">
+                        20 Jul 2026, 10:00
+                    </strong>
+                </div>
+
+                <div>
+                    <span>Ends</span>
+
+                    <strong th:text="${#temporals.format(registration.tournament.endTime, 'dd MMM yyyy, HH:mm')}">
+                        20 Jul 2026, 18:00
+                    </strong>
+                </div>
+
+                <div>
+                    <span>Registration deadline</span>
+
+                    <strong th:text="${#temporals.format(registration.tournament.registrationDeadline, 'dd MMM yyyy, HH:mm')}">
+                        19 Jul 2026, 18:00
+                    </strong>
+                </div>
+
+                <div>
+                    <span>Entry fee</span>
+
+                    <strong>
+                        <span th:if="${registration.tournament.free}">
+                            Free
+                        </span>
+
+                        <span th:if="${!registration.tournament.free}">
+                            <span th:text="${#numbers.formatDecimal(registration.tournament.entryFee, 1, 2)}">
+                                40.00
+                            </span>
+                            <span th:text="${registration.tournament.currency}">
+                                EUR
+                            </span>
+                        </span>
+                    </strong>
+                </div>
+            </div>
+        </aside>
+    </section>
+
+    <section class="panel requirements-panel"
+             th:if="${registration.tournament.participationRequirements != null}">
+
+        <div class="section-heading">
+            <div>
+                <h2>Participation requirements</h2>
+
+                <p>
+                    Requirements set by the tournament organiser.
+                </p>
+            </div>
+        </div>
+
+        <div class="info-box">
+            <p th:text="${registration.tournament.participationRequirements}">
+                Participation requirements.
+            </p>
+        </div>
+    </section>
+
+    <section class="panel payment-panel"
+             th:if="${registration.registrationStatus.name() == 'PENDING_PAYMENT'}">
+
+        <div class="section-heading">
+            <div>
+                <h2>Payment instructions</h2>
+
+                <p>
+                    Your spot is reserved until the deadline shown above. Submit payment details once payment reference support is implemented.
+                </p>
+            </div>
+        </div>
+
+        <div class="info-box">
+            <p th:if="${registration.tournament.paymentInstructions != null}"
+               th:text="${registration.tournament.paymentInstructions}">
+                Payment instructions.
+            </p>
+
+            <p th:if="${registration.tournament.paymentInstructions == null}">
+                Contact the organiser for payment instructions.
+            </p>
+        </div>
+    </section>
+</main>
+
+<footer class="site-footer">
+    <div>
+        <a class="brand footer-brand"
+           th:href="@{/}">
+            TournamentTrail
+        </a>
+
+        <p>
+            Chess tournaments, registrations, and shared travel in one platform.
+        </p>
+    </div>
+
+    <nav>
+        <a th:href="@{/tournaments}">Tournaments</a>
+        <a th:href="@{/travel-groups}">Travel groups</a>
+        <a th:href="@{/registrations}">My registrations</a>
+        <a th:href="@{/about}">About</a>
+    </nav>
+
+    <p>&copy; 2026 TournamentTrail</p>
+</footer>
+
+</body>
+</html>
