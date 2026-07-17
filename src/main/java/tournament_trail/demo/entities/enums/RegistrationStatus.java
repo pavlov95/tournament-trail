@@ -1,8 +1,13 @@
 package tournament_trail.demo.entities.enums;
 
 public enum RegistrationStatus {
-    PENDING,
+    PENDING_PAYMENT,
+    EXPIRED,
     CONFIRMED,
     REJECTED,
-    CANCELLED;
+    CANCELLED,
+    CANCELLED_BY_ADMIN;
+
+
+
 }

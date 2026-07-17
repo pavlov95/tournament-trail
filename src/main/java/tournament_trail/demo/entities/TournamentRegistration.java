@@ -55,4 +55,11 @@ public class TournamentRegistration {
 
     private LocalDateTime cancelledOn;
 
+    @Column(nullable = false)
+    private boolean hidden;
+
+    private LocalDateTime reservedUntil;
+
+    private LocalDateTime paymentSubmittedOn;
+
 }
