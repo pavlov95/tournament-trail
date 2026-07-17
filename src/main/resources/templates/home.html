@@ -25,8 +25,9 @@
         </a>
 
         <div class="nav-links">
-            <a th:href="@{/home}">Home</a>
+            <a th:href="@{/home}" class="active" >Home</a>
             <a th:href="@{/tournaments}">Tournaments</a>
+            <a th:href="@{/registrations}">My registrations</a>
             <a th:href="@{/travel-groups}">Travel groups</a>
             <a th:href="@{/about}">About</a>
             <a th:href="@{/contact}">Contact</a>
@@ -518,9 +519,12 @@
     </div>
 
     <nav>
+        <a th:href="@{/home}" class="active" >Home</a>
+        <a th:href="@{/tournaments}">Tournaments</a>
+        <a th:href="@{/registrations}" >My registrations</a>
+        <a th:href="@{/travel-groups}">Travel groups</a>
         <a th:href="@{/about}">About</a>
         <a th:href="@{/contact}">Contact</a>
-        <a th:href="@{/profile/edit}">Profile</a>
     </nav>
 
     <p>&copy; 2026 TournamentTrail</p>

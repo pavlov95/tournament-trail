@@ -1,100 +1,196 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
     <title>Login | TournamentTrail</title>
-    <link rel="stylesheet" th:href="@{/css/login.css}">
+
+    <link rel="stylesheet"
+          th:href="@{/css/login.css}">
 </head>
+
 <body>
+
 <header class="site-header">
     <nav class="navbar">
-        <a class="brand" th:href="@{/}">TournamentTrail</a>
+
+        <a class="brand"
+           th:href="@{/}">
+            TournamentTrail
+        </a>
+
         <div class="nav-links">
             <a th:href="@{/}">Home</a>
             <a th:href="@{/tournaments}">Tournaments</a>
+            <a th:href="@{/registrations}">My registrations</a>
+            <a th:href="@{/travel-groups}">Travel groups</a>
             <a th:href="@{/about}">About</a>
             <a th:href="@{/contact}">Contact</a>
         </div>
-        <a class="button button-secondary" th:href="@{/register}">Create account</a>
+
+        <div class="nav-actions"
+             sec:authorize="isAnonymous()">
+
+            <a class="button button-secondary secondary-button"
+               th:href="@{/login}">
+                Login
+            </a>
+
+            <a class="button button-primary primary-button"
+               th:href="@{/register}">
+                Create account
+            </a>
+        </div>
+
+        <div class="nav-actions"
+             sec:authorize="isAuthenticated()">
+
+            <a class="button button-primary primary-button"
+               th:href="@{/home}">
+                Dashboard
+            </a>
+
+            <form th:action="@{/logout}"
+                  method="post">
+                <button class="button button-secondary secondary-button logout-button"
+                        type="submit">
+                    Logout
+                </button>
+            </form>
+        </div>
     </nav>
 </header>
 
 <main class="auth-layout">
+
     <section class="auth-introduction">
-        <p class="eyebrow">Welcome back</p>
-        <h1>Continue your TournamentTrail journey.</h1>
-        <p>Access your tournament registrations, travel groups, organiser tools, and personal dashboard.</p>
+
+        <p class="eyebrow">
+            Welcome back
+        </p>
+
+        <h1>
+            Log in to TournamentTrail
+        </h1>
+
+        <p>
+            Access your tournament registrations, travel groups,
+            and dashboard activity.
+        </p>
+
         <ul>
-            <li>Track tournament registrations</li>
-            <li>Manage shared travel groups</li>
-            <li>Review payment and participation status</li>
+            <li>Track tournament registration and payment status</li>
+            <li>Review your upcoming chess events</li>
+            <li>Manage travel groups and shared journeys</li>
         </ul>
     </section>
 
     <section class="auth-card">
+
         <div class="auth-card-heading">
-            <p class="eyebrow">Account access</p>
-            <h2>Login</h2>
-            <p>Enter your username and password.</p>
+            <p class="eyebrow">
+                Account access
+            </p>
+
+            <h2>
+                Login
+            </h2>
+
+            <p>
+                Enter your username and password.
+            </p>
         </div>
 
-        <div class="message message-error" th:if="${param.error}">
+        <div class="message message-error"
+             th:if="${param.error}">
             Invalid username or password.
         </div>
 
-        <div class="message message-success" th:if="${param.verified}">
-            Your account was verified successfully. You can now log in.
+        <div class="message message-success"
+             th:if="${param.logout}">
+            You have been logged out.
         </div>
 
-        <div class="message message-success" th:if="${param.registered}">
-            Registration completed. Check your email to verify your account.
+        <div class="message message-success"
+             th:if="${param.verified}">
+            Account verified successfully. You can now log in.
         </div>
 
-        <div class="message message-info" th:if="${param.logout}">
-            You have been logged out successfully.
-        </div>
+        <form class="auth-form"
+              th:action="@{/login}"
+              method="post">
 
-        <form class="auth-form" th:action="@{/login}" method="post">
             <div class="form-group">
-                <label for="username">Username</label>
+                <label for="username">
+                    Username
+                </label>
+
                 <input id="username"
-                       name="username"
                        type="text"
+                       name="username"
                        autocomplete="username"
-                       placeholder="Enter your username"
-                       required
-                       autofocus>
-            </div>
-
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input id="password"
-                       name="password"
-                       type="password"
-                       autocomplete="current-password"
-                       placeholder="Enter your password"
                        required>
             </div>
 
-            <button class="button button-primary submit-button" type="submit">Login</button>
+            <div class="form-group">
+                <label for="password">
+                    Password
+                </label>
+
+                <input id="password"
+                       type="password"
+                       name="password"
+                       autocomplete="current-password"
+                       required>
+            </div>
+
+            <button class="button button-primary submit-button"
+                    type="submit">
+                Login
+            </button>
         </form>
 
         <p class="auth-switch">
             Do not have an account?
-            <a th:href="@{/register}">Create one</a>
+            <a th:href="@{/register}">
+                Create one
+            </a>
         </p>
 
-        <a class="back-link" th:href="@{/}">Return to the public page</a>
+        <a class="back-link"
+           th:href="@{/tournaments}">
+            Browse tournaments without logging in
+        </a>
     </section>
 </main>
 
 <footer class="site-footer">
-    <p>&copy; 2026 TournamentTrail</p>
+    <div>
+        <a class="brand footer-brand"
+           th:href="@{/}">
+            TournamentTrail
+        </a>
+
+        <p>
+            Chess tournaments, registrations, and shared travel in one platform.
+        </p>
+    </div>
+
     <nav>
+        <a th:href="@{/tournaments}">Tournaments</a>
+        <a th:href="@{/registrations}">My registrations</a>
+        <a th:href="@{/travel-groups}">Travel groups</a>
         <a th:href="@{/about}">About</a>
         <a th:href="@{/contact}">Contact</a>
     </nav>
+
+    <p>&copy; 2026 TournamentTrail</p>
 </footer>
+
 </body>
 </html>

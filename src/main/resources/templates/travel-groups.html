@@ -16,6 +16,7 @@
 
 <body>
 
+
 <header class="site-header">
     <nav class="navbar">
 
@@ -27,46 +28,28 @@
         <div class="nav-links">
             <a th:href="@{/}">Home</a>
             <a th:href="@{/tournaments}">Tournaments</a>
-            <a class="active"
-               th:href="@{/travel-groups}">
-                Travel groups
-            </a>
+            <a th:href="@{/registrations}" sec:authorize="isAuthenticated()">My registrations</a>
+            <a class="active" th:href="@{/travel-groups}">Travel groups</a>
             <a th:href="@{/about}">About</a>
             <a th:href="@{/contact}">Contact</a>
         </div>
 
-        <div class="nav-actions"
-             sec:authorize="isAnonymous()">
-
-            <a class="button button-secondary"
-               th:href="@{/login}">
-                Login
-            </a>
-
-            <a class="button button-primary"
-               th:href="@{/register}">
-                Create account
-            </a>
+        <div class="nav-actions" sec:authorize="isAnonymous()">
+            <a class="button button-secondary secondary-button" th:href="@{/login}">Login</a>
+            <a class="button button-primary primary-button" th:href="@{/register}">Create account</a>
         </div>
 
-        <div class="nav-actions"
-             sec:authorize="isAuthenticated()">
-
-            <a class="button button-primary"
-               th:href="@{/home}">
-                Dashboard
-            </a>
-
-            <form th:action="@{/logout}"
-                  method="post">
-                <button class="button button-secondary"
-                        type="submit">
-                    Logout
+        <div class="nav-actions" sec:authorize="isAuthenticated()">
+            <a class="button button-primary primary-button" th:href="@{/home}">Dashboard</a>
+            <form th:action="@{/logout}" method="post">
+                <button class="button button-secondary secondary-button logout-button"
+                        type="submit">Logout
                 </button>
             </form>
         </div>
     </nav>
 </header>
+
 
 <main class="container">
 
@@ -100,9 +83,7 @@
             <div>
                 <p class="eyebrow">Search</p>
                 <h2>Find a travel group</h2>
-                <p>
-                    Filter by group name or departure location.
-                </p>
+                <p>Filter by group name or departure location.</p>
             </div>
         </div>
 
@@ -159,10 +140,7 @@
                 <h2>Open travel groups</h2>
 
                 <p th:if="${travelGroups != null}">
-                    <span th:text="${#lists.size(travelGroups)}">
-                        0
-                    </span>
-                    group(s) found
+                    <span th:text="${#lists.size(travelGroups)}">0</span>group(s) found
                 </p>
             </div>
         </div>
@@ -242,10 +220,7 @@
                     <div class="detail-row">
                         <span class="detail-label">Departure time</span>
 
-                        <span th:text="${#temporals.format(
-                                group.departureTime,
-                                'dd MMM yyyy, HH:mm'
-                        )}">
+                        <span th:text="${#temporals.format(group.departureTime, 'dd MMM yyyy, HH:mm')}">
                             15 Jul 2026, 08:00
                         </span>
                     </div>
@@ -288,6 +263,7 @@
     </section>
 </main>
 
+
 <footer class="site-footer">
     <div>
         <a class="brand footer-brand"
@@ -302,6 +278,7 @@
 
     <nav>
         <a th:href="@{/tournaments}">Tournaments</a>
+        <a th:href="@{/registrations}" sec:authorize="isAuthenticated()">My registrations</a>
         <a th:href="@{/travel-groups}">Travel groups</a>
         <a th:href="@{/about}">About</a>
         <a th:href="@{/contact}">Contact</a>
@@ -309,6 +286,7 @@
 
     <p>&copy; 2026 TournamentTrail</p>
 </footer>
+
 
 </body>
 </html>

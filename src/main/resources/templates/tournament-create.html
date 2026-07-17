@@ -26,10 +26,8 @@
 
         <div class="nav-links">
             <a th:href="@{/}">Home</a>
-            <a class="active"
-               th:href="@{/tournaments}">
-                Tournaments
-            </a>
+            <a class="active" th:href="@{/tournaments}">Tournaments</a>
+            <a th:href="@{/registrations}" >My registrations</a>
             <a th:href="@{/travel-groups}">Travel groups</a>
             <a th:href="@{/about}">About</a>
             <a th:href="@{/contact}">Contact</a>
@@ -38,17 +36,10 @@
         <div class="nav-actions"
              sec:authorize="isAuthenticated()">
 
-            <a class="button button-primary"
-               th:href="@{/home}">
-                Dashboard
-            </a>
+            <a class="button button-primary" th:href="@{/home}">Dashboard</a>
 
-            <form th:action="@{/logout}"
-                  method="post">
-                <button class="button button-secondary"
-                        type="submit">
-                    Logout
-                </button>
+            <form th:action="@{/logout}" method="post">
+                <button class="button button-secondary" type="submit">Logout</button>
             </form>
         </div>
     </nav>
@@ -58,10 +49,7 @@
 
     <section class="page-heading">
         <div>
-            <a class="back-link"
-               th:href="@{/tournaments}">
-                ← Back to tournaments
-            </a>
+            <a class="back-link" th:href="@{/tournaments}">← Back to tournaments</a>
 
             <p class="eyebrow">Organiser tools</p>
 
@@ -81,13 +69,9 @@
               th:action="@{/tournaments}"
               th:object="${tournamentRequest}">
 
-            <div class="global-errors"
-                 th:if="${#fields.hasGlobalErrors()}">
+            <div class="global-errors" th:if="${#fields.hasGlobalErrors()}">
 
-                <p th:each="error : ${#fields.globalErrors()}"
-                   th:text="${error}">
-                    Validation error
-                </p>
+                <p th:each="error : ${#fields.globalErrors()}" th:text="${error}">Validation error</p>
             </div>
 
             <div class="form-section">

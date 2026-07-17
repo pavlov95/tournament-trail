@@ -28,10 +28,8 @@
 
         <div class="nav-links">
             <a th:href="@{/}">Home</a>
-            <a class="active"
-               th:href="@{/tournaments}">
-                Tournaments
-            </a>
+            <a class="active" th:href="@{/tournaments}">Tournaments</a>
+            <a th:href="@{/registrations}" >My registrations</a>
             <a th:href="@{/travel-groups}">Travel groups</a>
             <a th:href="@{/about}">About</a>
             <a th:href="@{/contact}">Contact</a>
@@ -113,13 +111,20 @@
                     Login to register
                 </a>
 
-                <button class="button button-secondary"
-                        type="button"
-                        sec:authorize="isAuthenticated()"
-                        th:if="${tournament.status.name() == 'PUBLISHED'}"
-                        disabled>
-                    Registration coming soon
-                </button>
+                <form th:action="@{/registrations}"
+                      method="post"
+                      sec:authorize="isAuthenticated()"
+                      th:if="${tournament.status.name() == 'PUBLISHED'}">
+
+                    <input type="hidden"
+                           name="tournamentId"
+                           th:value="${tournament.id}">
+
+                    <button class="button button-primary"
+                            type="submit">
+                        Register for tournament
+                    </button>
+                </form>
             </div>
         </div>
 

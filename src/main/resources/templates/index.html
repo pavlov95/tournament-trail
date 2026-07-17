@@ -4,132 +4,479 @@
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
     <title>TournamentTrail | Chess Tournaments and Shared Travel</title>
-    <link rel="stylesheet" th:href="@{/css/index.css}">
+
+    <link rel="stylesheet"
+          th:href="@{/css/index.css}">
 </head>
+
 <body>
+
 <header class="site-header">
     <nav class="navbar">
-        <a class="brand" th:href="@{/}">TournamentTrail</a>
+
+        <a class="brand"
+           th:href="@{/}">
+            TournamentTrail
+        </a>
+
         <div class="nav-links">
             <a th:href="@{/tournaments}">Tournaments</a>
+            <a th:href="@{/registrations}">My registrations</a>
             <a th:href="@{/travel-groups}">Travel groups</a>
             <a th:href="@{/about}">About</a>
             <a th:href="@{/contact}">Contact</a>
         </div>
-        <div class="nav-actions" sec:authorize="isAnonymous()">
-            <a class="button button-secondary" th:href="@{/login}">Login</a>
-            <a class="button button-primary" th:href="@{/register}">Create account</a>
+
+        <div class="nav-actions"
+             sec:authorize="isAnonymous()">
+
+            <a class="button button-secondary"
+               th:href="@{/login}">
+                Login
+            </a>
+
+            <a class="button button-primary"
+               th:href="@{/register}">
+                Create account
+            </a>
         </div>
-        <div class="nav-actions" sec:authorize="isAuthenticated()">
-            <a class="button button-primary" th:href="@{/home}">Open dashboard</a>
-            <form th:action="@{/logout}" method="post">
-                <button class="button button-secondary" type="submit">Logout</button>
+
+        <div class="nav-actions"
+             sec:authorize="isAuthenticated()">
+
+            <a class="button button-primary"
+               th:href="@{/home}">
+                Open dashboard
+            </a>
+
+            <form th:action="@{/logout}"
+                  method="post">
+
+                <button class="button button-secondary"
+                        type="submit">
+                    Logout
+                </button>
             </form>
         </div>
     </nav>
 </header>
 
 <main>
+
     <section class="hero">
         <div class="hero-content">
-            <p class="eyebrow">Chess tournaments. Shared journeys.</p>
-            <h1>Discover tournaments and travel together.</h1>
+
+            <p class="eyebrow">
+                Chess tournaments. Shared journeys.
+            </p>
+
+            <h1>
+                Discover tournaments and travel together.
+            </h1>
+
             <p class="hero-description">
                 Browse upcoming chess events, register to participate,
                 create travel groups, and reduce the cost of competing away from home.
             </p>
+
             <div class="hero-actions">
-                <a class="button button-primary" th:href="@{/tournaments}">Browse tournaments</a>
-                <a class="button button-secondary" th:href="@{/register}" sec:authorize="isAnonymous()">Join TournamentTrail</a>
-                <a class="button button-secondary" th:href="@{/home}" sec:authorize="isAuthenticated()">View my activity</a>
+
+                <a class="button button-primary"
+                   th:href="@{/tournaments}">
+                    Browse tournaments
+                </a>
+
+                <a class="button button-secondary"
+                   th:href="@{/register}"
+                   sec:authorize="isAnonymous()">
+                    Join TournamentTrail
+                </a>
+
+                <a class="button button-secondary"
+                   th:href="@{/registrations}"
+                   sec:authorize="isAuthenticated()">
+                    My registrations
+                </a>
+
+                <a class="button button-secondary"
+                   th:href="@{/home}"
+                   sec:authorize="isAuthenticated()">
+                    View my activity
+                </a>
             </div>
         </div>
+
         <div class="hero-panel">
-            <div class="hero-stat"><strong>01</strong><span>Find tournaments by location, date, and time control</span></div>
-            <div class="hero-stat"><strong>02</strong><span>Track registrations, requirements, and payment status</span></div>
-            <div class="hero-stat"><strong>03</strong><span>Create or join travel groups with other players</span></div>
+
+            <div class="hero-stat">
+                <strong>01</strong>
+                <span>Find tournaments by location, date, and time control</span>
+            </div>
+
+            <div class="hero-stat">
+                <strong>02</strong>
+                <span>Track registrations, requirements, and payment status</span>
+            </div>
+
+            <div class="hero-stat">
+                <strong>03</strong>
+                <span>Create or join travel groups with other players</span>
+            </div>
         </div>
     </section>
 
     <section class="search-section">
         <div>
-            <p class="eyebrow">Find your next event</p>
-            <h2>Search upcoming tournaments</h2>
+            <p class="eyebrow">
+                Find your next event
+            </p>
+
+            <h2>
+                Search upcoming tournaments
+            </h2>
         </div>
-        <form class="search-form" th:action="@{/tournaments}" method="get">
-            <label>Country<input type="text" name="country" placeholder="Bulgaria"></label>
-            <label>City<input type="text" name="city" placeholder="Sofia"></label>
-            <label>Time control
+
+        <form class="search-form"
+              th:action="@{/tournaments}"
+              method="get">
+
+            <label>
+                Country
+                <input type="text"
+                       name="country"
+                       placeholder="Bulgaria">
+            </label>
+
+            <label>
+                City
+                <input type="text"
+                       name="city"
+                       placeholder="Sofia">
+            </label>
+
+            <label>
+                Time control
+
                 <select name="timeControl">
-                    <option value="">All formats</option>
-                    <option value="BLITZ">Blitz</option>
-                    <option value="RAPID">Rapid</option>
-                    <option value="CLASSICAL">Classical</option>
+                    <option value="">
+                        All formats
+                    </option>
+
+                    <option value="BLITZ">
+                        Blitz
+                    </option>
+
+                    <option value="RAPID">
+                        Rapid
+                    </option>
+
+                    <option value="CLASSICAL">
+                        Classical
+                    </option>
                 </select>
             </label>
-            <button class="button button-primary" type="submit">Search</button>
+
+            <button class="button button-primary"
+                    type="submit">
+                Search
+            </button>
         </form>
     </section>
 
-    <section class="content-section">
+    <section class="content-section"
+             sec:authorize="isAuthenticated()">
+
         <div class="section-heading">
-            <div><p class="eyebrow">Upcoming events</p><h2>Recently published tournaments</h2></div>
-            <a th:href="@{/tournaments}">View all tournaments</a>
+            <div>
+                <p class="eyebrow">
+                    My tournament activity
+                </p>
+
+                <h2>
+                    Registration tracking
+                </h2>
+            </div>
+
+            <a th:href="@{/registrations}">
+                View my registrations
+            </a>
         </div>
-        <div class="empty-state" th:if="${upcomingTournaments == null or #lists.isEmpty(upcomingTournaments)}">
-            <h3>No tournaments have been published yet.</h3>
-            <p>Check again soon for newly announced chess events.</p>
+
+        <div class="steps-grid">
+            <article>
+                <span>1</span>
+
+                <h3>Reserved places</h3>
+
+                <p>
+                    Check whether your spot is pending payment, confirmed, cancelled, or rejected.
+                </p>
+            </article>
+
+            <article>
+                <span>2</span>
+
+                <h3>Payment status</h3>
+
+                <p>
+                    Review payment requirements, payment instructions, and reservation deadlines.
+                </p>
+            </article>
+
+            <article>
+                <span>3</span>
+
+                <h3>Registration history</h3>
+
+                <p>
+                    Keep cancelled or rejected registrations visible until you decide to hide them.
+                </p>
+            </article>
         </div>
-        <div class="card-grid" th:if="${upcomingTournaments != null and !#lists.isEmpty(upcomingTournaments)}">
-            <article class="tournament-card" th:each="tournament : ${upcomingTournaments}">
+
+        <div class="hero-actions">
+            <a class="button button-primary"
+               th:href="@{/registrations}">
+                Open my registrations
+            </a>
+
+            <a class="button button-secondary"
+               th:href="@{/tournaments}">
+                Register for another tournament
+            </a>
+        </div>
+    </section>
+
+    <section class="content-section">
+
+        <div class="section-heading">
+            <div>
+                <p class="eyebrow">
+                    Upcoming events
+                </p>
+
+                <h2>
+                    Recently published tournaments
+                </h2>
+            </div>
+
+            <a th:href="@{/tournaments}">
+                View all tournaments
+            </a>
+        </div>
+
+        <div class="empty-state"
+             th:if="${upcomingTournaments == null or #lists.isEmpty(upcomingTournaments)}">
+
+            <h3>
+                No tournaments have been published yet.
+            </h3>
+
+            <p>
+                Check again soon for newly announced chess events.
+            </p>
+        </div>
+
+        <div class="card-grid"
+             th:if="${upcomingTournaments != null and !#lists.isEmpty(upcomingTournaments)}">
+
+            <article class="tournament-card"
+                     th:each="tournament : ${upcomingTournaments}">
+
                 <div class="card-topline">
-                    <span class="badge" th:text="${tournament.timeControl}">Rapid</span>
-                    <span th:text="${tournament.rated ? 'Rated' : 'Unrated'}">Rated</span>
+                    <span class="badge"
+                          th:text="${tournament.timeControl}">
+                        Rapid
+                    </span>
+
+                    <span th:text="${tournament.rated ? 'Rated' : 'Unrated'}">
+                        Rated
+                    </span>
                 </div>
-                <h3 th:text="${tournament.name}">Sofia Summer Open</h3>
-                <p class="location"><span th:text="${tournament.city}">Sofia</span>, <span th:text="${tournament.country}">Bulgaria</span></p>
+
+                <h3 th:text="${tournament.name}">
+                    Sofia Summer Open
+                </h3>
+
+                <p class="location">
+                    <span th:text="${tournament.city}">
+                        Sofia
+                    </span>,
+                    <span th:text="${tournament.country}">
+                        Bulgaria
+                    </span>
+                </p>
+
                 <dl>
-                    <div><dt>Starts</dt><dd th:text="${#temporals.format(tournament.startTime, 'dd MMM yyyy, HH:mm')}">12 Aug 2026</dd></div>
-                    <div><dt>Entry fee</dt><dd><span th:text="${tournament.entryFee}">50.00</span> <span th:text="${tournament.currency}">BGN</span></dd></div>
-                    <div><dt>Registration closes</dt><dd th:text="${#temporals.format(tournament.registrationDeadline, 'dd MMM yyyy')}">5 Aug 2026</dd></div>
+                    <div>
+                        <dt>Starts</dt>
+
+                        <dd th:text="${#temporals.format(tournament.startTime, 'dd MMM yyyy, HH:mm')}">
+                            12 Aug 2026
+                        </dd>
+                    </div>
+
+                    <div>
+                        <dt>Entry fee</dt>
+
+                        <dd>
+                            <span th:if="${tournament.free}">
+                                Free
+                            </span>
+
+                            <span th:if="${!tournament.free}">
+                                <span th:text="${#numbers.formatDecimal(tournament.entryFee, 1, 2)}">
+                                    50.00
+                                </span>
+                                <span th:text="${tournament.currency}">
+                                    EUR
+                                </span>
+                            </span>
+                        </dd>
+                    </div>
+
+                    <div>
+                        <dt>Registration closes</dt>
+
+                        <dd th:text="${#temporals.format(tournament.registrationDeadline, 'dd MMM yyyy')}">
+                            5 Aug 2026
+                        </dd>
+                    </div>
                 </dl>
-                <a class="card-link" th:href="@{/tournaments/{id}(id=${tournament.id})}">View tournament</a>
+
+                <a class="card-link"
+                   th:href="@{/tournaments/{id}(id=${tournament.id})}">
+                    View tournament
+                </a>
             </article>
         </div>
     </section>
 
     <section class="steps-section">
-        <div class="section-heading"><div><p class="eyebrow">How it works</p><h2>From discovery to tournament day</h2></div></div>
+        <div class="section-heading">
+            <div>
+                <p class="eyebrow">
+                    How it works
+                </p>
+
+                <h2>
+                    From discovery to tournament day
+                </h2>
+            </div>
+        </div>
+
         <div class="steps-grid">
-            <article><span>1</span><h3>Discover</h3><p>Browse tournaments by country, city, date, entry fee, and time control.</p></article>
-            <article><span>2</span><h3>Register</h3><p>Review requirements and track registration and payment status.</p></article>
-            <article><span>3</span><h3>Travel together</h3><p>Create or join a private group and coordinate the trip with other players.</p></article>
+
+            <article>
+                <span>1</span>
+
+                <h3>Discover</h3>
+
+                <p>
+                    Browse tournaments by country, city, date, entry fee, and time control.
+                </p>
+            </article>
+
+            <article>
+                <span>2</span>
+
+                <h3>Register</h3>
+
+                <p>
+                    Review requirements and track registration and payment status.
+                </p>
+            </article>
+
+            <article>
+                <span>3</span>
+
+                <h3>Travel together</h3>
+
+                <p>
+                    Create or join a private group and coordinate the trip with other players.
+                </p>
+            </article>
         </div>
     </section>
 
     <section class="split-section">
+
         <article class="feature-panel">
-            <p class="eyebrow">For players</p>
-            <h2>Reduce the cost of tournament travel.</h2>
-            <p>Find players travelling from your city, request to join, discuss arrangements privately, and track shared expenses.</p>
-            <a class="button button-primary" th:href="@{/travel-groups}">Browse travel groups</a>
+            <p class="eyebrow">
+                For players
+            </p>
+
+            <h2>
+                Reduce the cost of tournament travel.
+            </h2>
+
+            <p>
+                Find players travelling from your city, request to join,
+                discuss arrangements privately, and track shared expenses.
+            </p>
+
+            <a class="button button-primary"
+               th:href="@{/travel-groups}">
+                Browse travel groups
+            </a>
         </article>
+
         <article class="feature-panel">
-            <p class="eyebrow">For organisers</p>
-            <h2>Publish and manage chess tournaments.</h2>
-            <p>Create tournament pages, manage registrations, confirm payments, and keep participants informed.</p>
-            <a class="button button-primary" th:href="@{/organiser-applications/create}" sec:authorize="isAuthenticated()">Apply to become an organiser</a>
-            <a class="button button-primary" th:href="@{/register}" sec:authorize="isAnonymous()">Create an account</a>
+            <p class="eyebrow">
+                For organisers
+            </p>
+
+            <h2>
+                Publish and manage chess tournaments.
+            </h2>
+
+            <p>
+                Create tournament pages, manage registrations,
+                confirm payments, and keep participants informed.
+            </p>
+
+            <a class="button button-primary"
+               th:href="@{/organiser-applications/create}"
+               sec:authorize="isAuthenticated()">
+                Apply to become an organiser
+            </a>
+
+            <a class="button button-primary"
+               th:href="@{/register}"
+               sec:authorize="isAnonymous()">
+                Create an account
+            </a>
         </article>
     </section>
 </main>
 
 <footer class="site-footer">
-    <div><a class="brand footer-brand" th:href="@{/}">TournamentTrail</a><p>Chess tournaments, registrations, and shared travel in one platform.</p></div>
-    <nav><a th:href="@{/tournaments}">Tournaments</a><a th:href="@{/travel-groups}">Travel groups</a><a class="active" th:href="@{/about}">About</a><a th:href="@{/contact}">Contact</a></nav>
+
+    <div>
+        <a class="brand footer-brand"
+           th:href="@{/}">
+            TournamentTrail
+        </a>
+
+        <p>
+            Chess tournaments, registrations, and shared travel in one platform.
+        </p>
+    </div>
+
+    <nav>
+        <a th:href="@{/tournaments}">Tournaments</a>
+        <a th:href="@{/registrations}">My registrations</a>
+        <a th:href="@{/travel-groups}">Travel groups</a>
+        <a th:href="@{/about}">About</a>
+        <a th:href="@{/contact}">Contact</a>
+    </nav>
+
     <p>&copy; 2026 TournamentTrail</p>
 </footer>
+
 </body>
 </html>

@@ -20,52 +20,27 @@
 
 <header class="site-header">
     <nav class="navbar">
-
-        <a class="brand"
-           th:href="@{/}">
-            TournamentTrail
-        </a>
-
+        <a class="brand" th:href="@{/}">TournamentTrail</a>
         <div class="nav-links">
             <a th:href="@{/}">Home</a>
             <a th:href="@{/tournaments}">Tournaments</a>
-            <a class="active"
-               th:href="@{/travel-groups}">
-                Travel groups
-            </a>
+            <a th:href="@{/registrations}" sec:authorize="isAuthenticated()">My registrations</a>
+            <a class="active" th:href="@{/travel-groups}">Travel groups</a>
             <a th:href="@{/about}">About</a>
             <a th:href="@{/contacts}">Contacts</a>
         </div>
 
-        <div class="nav-actions"
-             sec:authorize="isAuthenticated()">
+        <div class="nav-actions" sec:authorize="isAuthenticated()">
+            <a class="button button-primary" th:href="@{/home}">Dashboard</a>
 
-            <a class="button button-primary"
-               th:href="@{/home}">
-                Dashboard
-            </a>
-
-            <form th:action="@{/logout}"
-                  method="post">
-                <button class="button button-secondary"
-                        type="submit">
-                    Logout
-                </button>
+            <form th:action="@{/logout}" method="post">
+                <button class="button button-secondary" type="submit">Logout</button>
             </form>
         </div>
 
-        <div class="nav-actions"
-             sec:authorize="isAnonymous()">
-
-            <a class="button button-secondary"
-               th:href="@{/login}">
-                Login
-            </a>
-
-            <a class="button button-primary"
-               th:href="@{/register}">
-                Register
-            </a>
+        <div class="nav-actions" sec:authorize="isAnonymous()">
+            <a class="button button-secondary" th:href="@{/login}">Login</a>
+            <a class="button button-primary" th:href="@{/register}">Register</a>
         </div>
     </nav>
 </header>
@@ -74,17 +49,10 @@
 
     <section class="page-heading">
         <div>
-            <a class="back-link"
-               th:href="@{/travel-groups}">
-                ← Back to travel groups
-            </a>
-
+            <a class="back-link" th:href="@{/travel-groups}">← Back to travel groups</a>
             <p class="eyebrow">Travel group details</p>
-
             <div class="title-row">
-                <h1 th:text="${travelGroup.name}">
-                    Sofia car group
-                </h1>
+                <h1 th:text="${travelGroup.name}">Sofia car group</h1>
 
                 <span class="status-badge"
                       th:classappend="${travelGroup.status.name() == 'OPEN'} ? ' status-open' :
@@ -108,10 +76,7 @@
             <div class="section-heading">
                 <div>
                     <h2>Trip overview</h2>
-
-                    <p>
-                        Main travel details for this group.
-                    </p>
+                    <p>Main travel details for this group.</p>
                 </div>
             </div>
 
@@ -130,19 +95,13 @@
                 <div class="detail-card">
                     <span class="detail-label">Owner</span>
 
-                    <span class="detail-value"
-                          th:text="${travelGroup.owner.username}">
-                        owner
-                    </span>
+                    <span class="detail-value" th:text="${travelGroup.owner.username}">owner</span>
                 </div>
 
                 <div class="detail-card">
                     <span class="detail-label">Departure country</span>
 
-                    <span class="detail-value"
-                          th:text="${travelGroup.departureCountry}">
-                        Bulgaria
-                    </span>
+                    <span class="detail-value" th:text="${travelGroup.departureCountry}">Bulgaria</span>
                 </div>
 
                 <div class="detail-card">
@@ -222,25 +181,18 @@
                 </div>
             </div>
 
-            <div class="action-row"
-                 sec:authorize="isAuthenticated()">
+            <div class="action-row" sec:authorize="isAuthenticated()">
 
-                <a class="button button-secondary"
-                   th:href="@{/travel-groups}">
-                    Browse groups
-                </a>
+                <a class="button button-secondary" th:href="@{/travel-groups}">Browse groups</a>
 
                 <form th:if="${travelGroup.status.name() != 'CANCELLED'}"
                       th:action="@{/travel-groups/{id}(id=${travelGroup.id})}"
                       method="post"
                       sec:authorize="hasAuthority('TRAVEL_GROUP_MANAGE_OWN') or hasRole('ADMIN')">
 
-                    <input type="hidden"
-                           name="_method"
-                           value="patch">
+                    <input type="hidden" name="_method" value="patch">
 
-                    <button class="button button-danger"
-                            type="submit"
+                    <button class="button button-danger" type="submit"
                             onclick="return confirm('Are you sure you want to cancel this travel group?')">
                         Cancel group
                     </button>
@@ -261,7 +213,6 @@
                     <span>Current status</span>
                     <strong th:text="${travelGroup.status}">OPEN</strong>
                 </div>
-
                 <div>
                     <span>Tournament status</span>
                     <strong th:text="${travelGroup.tournament.status}">PUBLISHED</strong>
@@ -275,30 +226,21 @@
         </aside>
     </section>
 
-    <section class="panel edit-panel"
-             sec:authorize="hasAuthority('TRAVEL_GROUP_MANAGE_OWN') or hasRole('ADMIN')">
+    <section class="panel edit-panel" sec:authorize="hasAuthority('TRAVEL_GROUP_MANAGE_OWN') or hasRole('ADMIN')">
 
         <div class="section-heading">
             <div>
                 <h2>Edit travel group</h2>
-
-                <p>
-                    Update the group details. The selected tournament is preserved.
-                </p>
+                <p>Update the group details. The selected tournament is preserved.</p>
             </div>
         </div>
 
-        <form class="edit-form"
-              method="post"
-              th:action="@{/travel-groups/{id}(id=${travelGroup.id})}"
+        <form class="edit-form" method="post" th:action="@{/travel-groups/{id}(id=${travelGroup.id})}"
               th:object="${travelGroupRequest}">
 
-            <input type="hidden"
-                   name="_method"
-                   value="put">
+            <input type="hidden" name="_method" value="put">
 
-            <input type="hidden"
-                   th:field="*{tournamentId}">
+            <input type="hidden" th:field="*{tournamentId}">
 
             <div class="global-errors"
                  th:if="${#fields.hasGlobalErrors()}">
@@ -331,10 +273,7 @@
                     <div class="form-group full-width">
                         <label for="description">Description</label>
 
-                        <textarea id="description"
-                                  rows="4"
-                                  th:field="*{description}">
-                        </textarea>
+                        <textarea id="description" rows="4" th:field="*{description}"></textarea>
 
                         <span class="field-error"
                               th:if="${#fields.hasErrors('description')}"
@@ -367,9 +306,7 @@
                     <div class="form-group">
                         <label for="departureCity">Departure city</label>
 
-                        <input id="departureCity"
-                               type="text"
-                               th:field="*{departureCity}">
+                        <input id="departureCity" type="text" th:field="*{departureCity}">
 
                         <span class="field-error"
                               th:if="${#fields.hasErrors('departureCity')}"
@@ -409,14 +346,10 @@
                     <div class="form-group">
                         <label for="transportationType">Transportation type</label>
 
-                        <select id="transportationType"
-                                th:field="*{transportationType}">
-
+                        <select id="transportationType" th:field="*{transportationType}">
                             <option value="">Choose transportation</option>
 
-                            <option th:each="type : ${transportationTypes}"
-                                    th:value="${type}"
-                                    th:text="${type}">
+                            <option th:each="type : ${transportationTypes}" th:value="${type}" th:text="${type}">
                                 CAR
                             </option>
                         </select>
@@ -469,11 +402,8 @@
                     <div class="form-group">
                         <label for="currency">Currency</label>
 
-                        <select id="currency"
-                                th:field="*{currency}">
-
+                        <select id="currency" th:field="*{currency}">
                             <option value="">Choose currency</option>
-
                             <option th:each="currency : ${currencies}"
                                     th:value="${currency}"
                                     th:text="${currency}">
@@ -491,10 +421,7 @@
             </div>
 
             <div class="form-actions">
-                <button class="button button-primary"
-                        type="submit">
-                    Save changes
-                </button>
+                <button class="button button-primary" type="submit">Save changes</button>
             </div>
         </form>
     </section>
@@ -502,18 +429,13 @@
 
 <footer class="site-footer">
     <div>
-        <a class="brand footer-brand"
-           th:href="@{/}">
-            TournamentTrail
-        </a>
-
-        <p>
-            Chess tournaments, registrations, and shared travel in one platform.
-        </p>
+        <a class="brand footer-brand" th:href="@{/}">TournamentTrail</a>
+        <p>Chess tournaments, registrations, and shared travel in one platform.</p>
     </div>
 
     <nav>
         <a th:href="@{/tournaments}">Tournaments</a>
+        <a th:href="@{/registrations}" sec:authorize="isAuthenticated()">My registrations</a>
         <a th:href="@{/travel-groups}">Travel groups</a>
         <a th:href="@{/about}">About</a>
         <a th:href="@{/contacts}">Contacts</a>

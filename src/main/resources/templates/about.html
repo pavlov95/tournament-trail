@@ -4,37 +4,41 @@
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
     <title>About | TournamentTrail</title>
-    <link rel="stylesheet" th:href="@{/css/about.css}">
+
+    <link rel="stylesheet"
+          th:href="@{/css/about.css}">
 </head>
 <body>
-
 <header class="site-header">
     <nav class="navbar">
         <a class="brand" th:href="@{/}">TournamentTrail</a>
-
         <div class="nav-links">
             <a th:href="@{/}">Home</a>
             <a th:href="@{/tournaments}">Tournaments</a>
+            <a th:href="@{/registrations}" >My registrations</a>
             <a th:href="@{/travel-groups}">Travel groups</a>
             <a class="active" th:href="@{/about}">About</a>
             <a th:href="@{/contact}">Contact</a>
         </div>
-
         <div class="nav-actions" sec:authorize="isAnonymous()">
-            <a class="button button-secondary" th:href="@{/login}">Login</a>
-            <a class="button button-primary" th:href="@{/register}">Create account</a>
+            <a class="button button-secondary secondary-button" th:href="@{/login}">Login</a>
+            <a class="button button-primary primary-button" th:href="@{/register}">Create account</a>
         </div>
-
         <div class="nav-actions" sec:authorize="isAuthenticated()">
-            <a class="button button-primary" th:href="@{/home}">Dashboard</a>
+            <a class="button button-primary primary-button" th:href="@{/home}">Dashboard</a>
             <form th:action="@{/logout}" method="post">
-                <button class="button button-secondary" type="submit">Logout</button>
+                <button class="button button-secondary secondary-button logout-button"
+                        type="submit">Logout
+                </button>
             </form>
         </div>
     </nav>
 </header>
+
 
 <main>
     <section class="hero-section">
@@ -89,7 +93,7 @@
                 <p>
                     TournamentTrail provides one place where players can browse events,
                     review participation requirements, register for tournaments,
-                    and track their status.
+                    and track their status through My registrations.
                 </p>
                 <p>
                     Players can also create or join travel groups connected to a specific
@@ -144,30 +148,6 @@
         </div>
     </section>
 
-    <section class="roles-section">
-        <div class="section-heading">
-            <p class="eyebrow">Different roles</p>
-            <h2>One platform, several responsibilities</h2>
-        </div>
-
-        <div class="roles-grid">
-            <article>
-                <h3>Players</h3>
-                <p>Browse events, register, create travel groups, and manage personal activity.</p>
-            </article>
-
-            <article>
-                <h3>Organisers</h3>
-                <p>Publish tournaments, update details, and manage registrations.</p>
-            </article>
-
-            <article>
-                <h3>Administrators</h3>
-                <p>Review organiser applications, manage roles, and moderate content.</p>
-            </article>
-        </div>
-    </section>
-
     <section class="mission-section">
         <div>
             <p class="eyebrow">Our goal</p>
@@ -179,28 +159,55 @@
         </div>
 
         <div class="mission-actions">
-            <a class="button button-primary" th:href="@{/tournaments}">Browse tournaments</a>
-            <a class="button button-secondary" th:href="@{/register}" sec:authorize="isAnonymous()">Create account</a>
-            <a class="button button-secondary" th:href="@{/home}" sec:authorize="isAuthenticated()">Open dashboard</a>
+            <a class="button button-primary"
+               th:href="@{/tournaments}">
+                Browse tournaments
+            </a>
+
+            <a class="button button-secondary"
+               th:href="@{/registrations}"
+               sec:authorize="isAuthenticated()">
+                My registrations
+            </a>
+
+            <a class="button button-secondary"
+               th:href="@{/register}"
+               sec:authorize="isAnonymous()">
+                Create account
+            </a>
+
+            <a class="button button-secondary"
+               th:href="@{/home}"
+               sec:authorize="isAuthenticated()">
+                Open dashboard
+            </a>
         </div>
     </section>
 </main>
 
+
 <footer class="site-footer">
     <div>
-        <a class="brand footer-brand" th:href="@{/}">TournamentTrail</a>
-        <p>Chess tournaments, registrations, and shared travel in one platform.</p>
+        <a class="brand footer-brand"
+           th:href="@{/}">
+            TournamentTrail
+        </a>
+
+        <p>
+            Chess tournaments, registrations, and shared travel in one platform.
+        </p>
     </div>
 
     <nav>
+        <a th:href="@{/}">Home</a>
         <a th:href="@{/tournaments}">Tournaments</a>
+        <a th:href="@{/registrations}" >My registrations</a>
         <a th:href="@{/travel-groups}">Travel groups</a>
         <a class="active" th:href="@{/about}">About</a>
-        <a th:href="@{/contact}">Contact</a>
+        <a  th:href="@{/contact}">Contact</a>
     </nav>
 
     <p>&copy; 2026 TournamentTrail</p>
 </footer>
-
 </body>
 </html>

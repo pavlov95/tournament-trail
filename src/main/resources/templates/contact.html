@@ -4,9 +4,13 @@
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
     <title>Contact and FAQ | TournamentTrail</title>
-    <link rel="stylesheet" th:href="@{/css/contact.css}">
+
+    <link rel="stylesheet"
+          th:href="@{/css/contact.css}">
 </head>
 <body>
 <header class="site-header">
@@ -15,22 +19,26 @@
         <div class="nav-links">
             <a th:href="@{/}">Home</a>
             <a th:href="@{/tournaments}">Tournaments</a>
+            <a th:href="@{/registrations}">My registrations</a>
             <a th:href="@{/travel-groups}">Travel groups</a>
             <a th:href="@{/about}">About</a>
             <a class="active" th:href="@{/contact}">Contact</a>
         </div>
         <div class="nav-actions" sec:authorize="isAnonymous()">
-            <a class="button button-secondary" th:href="@{/login}">Login</a>
-            <a class="button button-primary" th:href="@{/register}">Create account</a>
+            <a class="button button-secondary secondary-button" th:href="@{/login}">Login</a>
+            <a class="button button-primary primary-button" th:href="@{/register}">Create account</a>
         </div>
         <div class="nav-actions" sec:authorize="isAuthenticated()">
-            <a class="button button-primary" th:href="@{/home}">Dashboard</a>
+            <a class="button button-primary primary-button" th:href="@{/home}">Dashboard</a>
             <form th:action="@{/logout}" method="post">
-                <button class="button button-secondary" type="submit">Logout</button>
+                <button class="button button-secondary secondary-button logout-button"
+                        type="submit">Logout
+                </button>
             </form>
         </div>
     </nav>
 </header>
+
 
 <main>
     <section class="hero-section">
@@ -47,7 +55,8 @@
             <p class="eyebrow">Further questions</p>
             <h2>Contact TournamentTrail</h2>
             <p>If your question is not answered below, send an email to:</p>
-            <a class="email-link" href="mailto:support@tournamenttrail.com">
+            <a class="email-link"
+               href="mailto:support@tournamenttrail.com">
                 support@tournamenttrail.com
             </a>
             <p class="contact-note">
@@ -79,7 +88,17 @@
                 <p>
                     Open the tournament details page and select <strong>Register for tournament</strong>.
                     You must be logged in and meet any requirements listed by the organiser.
-                    Your registration and payment status will then appear on your dashboard.
+                    Your registration and payment status will then appear under
+                    <strong>My registrations</strong>.
+                </p>
+            </details>
+
+            <details>
+                <summary>Where can I see my tournament registrations?</summary>
+                <p>
+                    Log in and open <strong>My registrations</strong> from the navigation menu.
+                    There you can view registration status, payment status, reservation deadlines,
+                    cancellations, and hidden registrations.
                 </p>
             </details>
 
@@ -98,55 +117,6 @@
                     Only approved organisers and administrators can create tournaments.
                     A regular player must first submit an organiser application and receive
                     administrator approval.
-                </p>
-            </details>
-
-            <details>
-                <summary>How do I become an organiser?</summary>
-                <p>
-                    Create an account, log in, and submit an organiser application. An
-                    administrator will review it. If approved, your account receives organiser
-                    permissions and you can create and manage tournaments.
-                </p>
-            </details>
-
-            <details>
-                <summary>Are travel-group comments and budgets private?</summary>
-                <p>
-                    Yes. Private comments, member information, meeting details, budgets, and
-                    expenses should be visible only to accepted group members, the group owner,
-                    and authorised administrators when moderation is required.
-                </p>
-            </details>
-
-            <details>
-                <summary>Will the site help me if my travel group cheated me of money?</summary>
-                <p>
-                    TournamentTrail can provide platform records and allow you to report users
-                    or suspicious activity, but it does not hold payments and cannot guarantee
-                    reimbursement. Avoid sending money without clear agreement and proof. For
-                    suspected fraud, contact your payment provider and, when appropriate, the
-                    relevant authorities.
-                </p>
-            </details>
-
-            <details>
-                <summary>How do I become a GM?</summary>
-                <p>
-                    Grandmaster is an official chess title awarded by FIDE. TournamentTrail
-                    cannot grant it. It normally requires meeting FIDE rating and performance
-                    requirements in eligible rated events. Consult the current FIDE title
-                    regulations and your national chess federation for the exact process.
-                </p>
-            </details>
-
-            <details>
-                <summary>What do I need to bring if this is my first rated tournament?</summary>
-                <p>
-                    Check the organiser's instructions before travelling. You may need
-                    identification, your federation or player number, proof of registration or
-                    payment, and any equipment specifically requested by the organiser. Arrive
-                    early and confirm the venue, starting time, time control, and tournament rules.
                 </p>
             </details>
 
@@ -189,18 +159,30 @@
     </section>
 </main>
 
+
 <footer class="site-footer">
     <div>
-        <a class="brand footer-brand" th:href="@{/}">TournamentTrail</a>
-        <p>Chess tournaments, registrations, and shared travel in one platform.</p>
+        <a class="brand footer-brand"
+           th:href="@{/}">
+            TournamentTrail
+        </a>
+
+        <p>
+            Chess tournaments, registrations, and shared travel in one platform.
+        </p>
     </div>
+
     <nav>
         <a th:href="@{/tournaments}">Tournaments</a>
+        <a th:href="@{/registrations}">My registrations</a>
         <a th:href="@{/travel-groups}">Travel groups</a>
         <a th:href="@{/about}">About</a>
-        <a class="active" th:href="@{/contact}">Contact</a>
+        <a th:href="@{/contact}" class="active" >Contact</a>
     </nav>
+
     <p>&copy; 2026 TournamentTrail</p>
 </footer>
+
+
 </body>
 </html>

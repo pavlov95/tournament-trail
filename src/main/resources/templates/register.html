@@ -13,6 +13,7 @@
         <div class="nav-links">
             <a th:href="@{/}">Home</a>
             <a th:href="@{/tournaments}">Tournaments</a>
+            <a th:href="@{/registrations}" >My registrations</a>
             <a th:href="@{/about}">About</a>
             <a th:href="@{/contact}">Contact</a>
         </div>
@@ -108,9 +109,11 @@
 <footer class="site-footer">
     <p>&copy; 2026 TournamentTrail</p>
     <nav>
+        <a th:href="@{/}">Home</a>
+        <a th:href="@{/tournaments}">Tournaments</a>
+        <a th:href="@{/registrations}" >My registrations</a>
         <a th:href="@{/about}">About</a>
-        <a th:href="@{/contact}">Contact</a>
-    </nav>
+        <a th:href="@{/contact}">Contact</a>    </nav>
 </footer>
 </body>
 </html>
