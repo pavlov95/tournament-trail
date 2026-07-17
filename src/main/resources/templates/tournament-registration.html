@@ -56,6 +56,12 @@
 
 <main class="container">
 
+    <div class="flash-message success"
+         th:if="${successMessage != null}"
+         th:text="${successMessage}">
+        Payment reference submitted successfully.
+    </div>
+
     <section class="page-heading">
         <div>
             <a class="back-link"
@@ -72,10 +78,11 @@
 
                 <span class="status-badge"
                       th:classappend="${registration.registrationStatus.name() == 'CONFIRMED'} ? ' status-confirmed' :
-                                      (${registration.registrationStatus.name() == 'PENDING_PAYMENT'} ? ' status-pending' :
-                                      (${registration.registrationStatus.name() == 'REJECTED'} ? ' status-rejected' :
-                                      (${registration.registrationStatus.name() == 'CANCELLED_BY_ADMIN'} ? ' status-cancelled' :
-                                      (${registration.registrationStatus.name() == 'CANCELLED'} ? ' status-cancelled' : ''))))"
+                (${registration.registrationStatus.name() == 'PENDING_PAYMENT'} ? ' status-pending' :
+                (${registration.registrationStatus.name() == 'REJECTED'} ? ' status-rejected' :
+                (${registration.registrationStatus.name() == 'CANCELLED_BY_ADMIN'} ? ' status-cancelled' :
+                (${registration.registrationStatus.name() == 'CANCELLED'} ? ' status-cancelled' :
+                (${registration.registrationStatus.name() == 'EXPIRED'} ? ' status-expired' : '')))))"
                       th:text="${registration.registrationStatus}">
                     PENDING_PAYMENT
                 </span>
@@ -95,9 +102,7 @@
                 <div>
                     <h2>Registration overview</h2>
 
-                    <p>
-                        Current status and payment information for this registration.
-                    </p>
+                    <p>Current status and payment information for this registration.</p>
                 </div>
             </div>
 
@@ -191,8 +196,7 @@
                      th:if="${registration.paymentReference != null}">
                     <span class="detail-label">Payment reference</span>
 
-                    <span class="detail-value"
-                          th:text="${registration.paymentReference}">
+                    <span class="detail-value" th:text="${registration.paymentReference}">
                         REVOLUT-123
                     </span>
                 </div>
@@ -215,9 +219,11 @@
                     View tournament
                 </a>
 
-                <form th:if="${registration.registrationStatus.name() == 'PENDING_PAYMENT'
-                          or registration.registrationStatus.name() == 'CONFIRMED'}"
-                      th:action="@{/registrations/{id}/cancel(id=${registration.id})}"
+                <form th:if="${registration.registrationStatus.name() == 'CANCELLED'
+                      or registration.registrationStatus.name() == 'REJECTED'
+                      or registration.registrationStatus.name() == 'CANCELLED_BY_ADMIN'
+                      or registration.registrationStatus.name() == 'EXPIRED'}"
+                      th:action="@{/registrations/{id}(id=${registration.id})}"
                       method="post">
 
                     <input type="hidden"
@@ -278,54 +284,30 @@
                 <div>
                     <span>Venue</span>
 
-                    <strong th:text="${registration.tournament.venue}">
-                        Venue
-                    </strong>
+                    <strong th:text="${registration.tournament.venue}">Venue</strong>
                 </div>
 
                 <div>
                     <span>Location</span>
-
                     <strong th:text="${registration.tournament.city + ', ' + registration.tournament.country}">
-                        City, country
-                    </strong>
+                        City, country</strong>
                 </div>
 
                 <div>
-                    <span>Time control</span>
+                    <span>Time control / Rated</span>
 
-                    <strong th:text="${registration.tournament.timeControl}">
+                    <strong th:text="${registration.tournament.timeControl} +' / ' +${registration.tournament.rated ? 'Rated' : 'Unrated'} ">
                         RAPID
-                    </strong>
-                </div>
-
-                <div>
-                    <span>Edition</span>
-
-                    <strong th:text="${registration.tournament.edition}">
-                        1
-                    </strong>
-                </div>
-
-                <div>
-                    <span>Rated</span>
-
-                    <strong th:text="${registration.tournament.rated ? 'Rated' : 'Unrated'}">
-                        Rated
                     </strong>
                 </div>
 
                 <div>
                     <span>Capacity</span>
 
-                    <strong th:text="${registration.tournament.maximumParticipants}">
-                        100
-                    </strong>
+                    <strong th:text="${registration.tournament.maximumParticipants}">100</strong>
                 </div>
-
                 <div>
                     <span>Starts</span>
-
                     <strong th:text="${#temporals.format(registration.tournament.startTime, 'dd MMM yyyy, HH:mm')}">
                         20 Jul 2026, 10:00
                     </strong>
@@ -351,17 +333,12 @@
                     <span>Entry fee</span>
 
                     <strong>
-                        <span th:if="${registration.tournament.free}">
-                            Free
-                        </span>
+                        <span th:if="${registration.tournament.free}">Free</span>
 
                         <span th:if="${!registration.tournament.free}">
                             <span th:text="${#numbers.formatDecimal(registration.tournament.entryFee, 1, 2)}">
-                                40.00
-                            </span>
-                            <span th:text="${registration.tournament.currency}">
-                                EUR
-                            </span>
+                                40.00</span>
+                            <span th:text="${registration.tournament.currency}">EUR</span>
                         </span>
                     </strong>
                 </div>
@@ -375,13 +352,9 @@
         <div class="section-heading">
             <div>
                 <h2>Participation requirements</h2>
-
-                <p>
-                    Requirements set by the tournament organiser.
-                </p>
+                <p>Requirements set by the tournament organiser.</p>
             </div>
         </div>
-
         <div class="info-box">
             <p th:text="${registration.tournament.participationRequirements}">
                 Participation requirements.
@@ -397,7 +370,8 @@
                 <h2>Payment instructions</h2>
 
                 <p>
-                    Your spot is reserved until the deadline shown above. Submit payment details once payment reference support is implemented.
+                    Your spot is reserved until the deadline shown above. Send the payment to the organiser,
+                    then paste the payment reference below.
                 </p>
             </div>
         </div>
@@ -410,6 +384,49 @@
 
             <p th:if="${registration.tournament.paymentInstructions == null}">
                 Contact the organiser for payment instructions.
+            </p>
+        </div>
+
+        <form class="payment-form"
+              th:if="${registration.paymentStatus.name() == 'PENDING'
+                   or registration.paymentStatus.name() == 'REJECTED'}"
+              th:action="@{/registrations/{id}/payment(id=${registration.id})}"
+              th:object="${paymentRequest}"
+              method="post">
+
+            <input type="hidden"
+                   name="_method"
+                   value="patch">
+
+            <div class="form-group"
+                 th:classappend="${#fields.hasErrors('paymentReference')} ? ' has-error'">
+
+                <label for="paymentReference">
+                    Payment reference
+                </label>
+
+                <input id="paymentReference"
+                       type="text"
+                       th:field="*{paymentReference}"
+                       placeholder="Example: REVOLUT-123456 or bank transfer reference">
+
+                <p class="field-error"
+                   th:if="${#fields.hasErrors('paymentReference')}"
+                   th:errors="*{paymentReference}">
+                    Payment reference error
+                </p>
+            </div>
+
+            <button class="button button-primary"
+                    type="submit">
+                Submit payment reference
+            </button>
+        </form>
+
+        <div class="info-box payment-submitted-box"
+             th:if="${registration.paymentStatus.name() == 'SUBMITTED'}">
+            <p>
+                Your payment reference was submitted. The organiser must review and confirm it.
             </p>
         </div>
     </section>
@@ -428,10 +445,12 @@
     </div>
 
     <nav>
+        <a th:href="@{/}">Home</a>
         <a th:href="@{/tournaments}">Tournaments</a>
+        <a class="active" th:href="@{/registrations}" >My registrations</a>
         <a th:href="@{/travel-groups}">Travel groups</a>
-        <a th:href="@{/registrations}">My registrations</a>
         <a th:href="@{/about}">About</a>
+        <a th:href="@{/contacts}">Contacts</a>
     </nav>
 
     <p>&copy; 2026 TournamentTrail</p>

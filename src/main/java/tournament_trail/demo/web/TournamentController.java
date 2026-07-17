@@ -137,27 +137,17 @@ public class TournamentController {
             @PathVariable UUID id,
             @RequestParam("status") TournamentStatus status,
             @AuthenticationPrincipal AuthenticationUserDetails userDetails,
-            RedirectAttributes redirectAttributes
-    ) {
-        tournamentService.updateTournamentStatus(
-                id,
-                status,
-                userDetails.getId(),
-                userDetails.getRole()
-        );
+            RedirectAttributes redirectAttributes) {
+        tournamentService.updateTournamentStatus(id, status, userDetails.getId(), userDetails.getRole());
 
         if (status == TournamentStatus.PUBLISHED) {
-            redirectAttributes.addFlashAttribute(
-                    "successMessage",
-                    "Tournament published successfully."
-            );
+            redirectAttributes.addFlashAttribute("successMessage",
+                    "Tournament published successfully.");
         }
 
         if (status == TournamentStatus.CANCELLED) {
-            redirectAttributes.addFlashAttribute(
-                    "successMessage",
-                    "Tournament cancelled successfully."
-            );
+            redirectAttributes.addFlashAttribute("successMessage",
+                    "Tournament cancelled successfully.");
         }
 
         return new ModelAndView("redirect:/tournaments/" + id);

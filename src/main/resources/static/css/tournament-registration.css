@@ -235,6 +235,10 @@ textarea {
     font-weight: 900;
     letter-spacing: 0.06em;
 }
+.status-expired {
+    color: #92400e;
+    background: #fef3c7;
+}
 
 .status-confirmed {
     color: var(--success);
@@ -472,4 +476,62 @@ textarea {
     .action-row {
         flex-direction: column;
     }
+}
+.flash-message {
+    margin: 1.5rem 0 0;
+    padding: 0.9rem 1rem;
+    border-radius: 10px;
+    font-weight: 700;
+}
+
+.flash-message.success {
+    color: #087443;
+    background: #e7f6ee;
+    border: 1px solid rgba(8, 116, 67, 0.22);
+}
+
+.payment-form {
+    margin-top: 1.2rem;
+    display: grid;
+    gap: 1rem;
+}
+
+.form-group {
+    display: grid;
+    gap: 0.45rem;
+}
+
+.form-group label {
+    color: var(--primary-dark);
+    font-weight: 800;
+}
+
+.form-group input {
+    width: 100%;
+    min-height: 48px;
+    padding: 0.75rem 0.85rem;
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    color: var(--text);
+    background: #ffffff;
+}
+
+.form-group input:focus {
+    outline: 3px solid rgba(47, 93, 80, 0.14);
+    border-color: var(--primary);
+}
+
+.form-group.has-error input {
+    border-color: var(--danger);
+}
+
+.field-error {
+    margin: 0;
+    color: var(--danger);
+    font-size: 0.88rem;
+    font-weight: 800;
+}
+
+.payment-submitted-box {
+    margin-top: 1.2rem;
 }
