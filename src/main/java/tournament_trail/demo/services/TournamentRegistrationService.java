@@ -8,7 +8,6 @@ import tournament_trail.demo.entities.TournamentRegistration;
 import tournament_trail.demo.entities.enums.PaymentStatus;
 import tournament_trail.demo.entities.enums.RegistrationStatus;
 import tournament_trail.demo.entities.enums.Role;
-import tournament_trail.demo.entities.enums.TournamentStatus;
 import tournament_trail.demo.exceptions.*;
 import tournament_trail.demo.repositories.TournamentRegistrationRepository;
 import tournament_trail.demo.web.dtos.PaymentRequest;
@@ -23,7 +22,9 @@ public class TournamentRegistrationService {
     private final TournamentRegistrationRepository tournamentRegistrationRepository;
     private final TournamentService tournamentService;
     private final UserService userService;
-
+    private static final String APPROVED_PAYMENT_MESSAGE =
+            "Your payment has been confirmed. We look forward to seeing you at ";
+    private static final String REJECTED_PAYMENT_MESSAGE = "Your registration has been declined by the organiser.";
 
     public TournamentRegistrationService(TournamentRegistrationRepository tournamentRegistrationRepository, TournamentService tournamentService, UserService userService) {
         this.tournamentRegistrationRepository = tournamentRegistrationRepository;
@@ -53,16 +54,18 @@ public class TournamentRegistrationService {
             TournamentRegistration registration = existingRegistration.get();
 
             if (registration.getRegistrationStatus() == RegistrationStatus.CANCELLED) {
-                validateTournamentConditions(tournament, now);
+                tournamentService.validateTournamentConditions(tournament, now);
+                tournamentService.validateTournamentNotFull(tournament.getMaximumParticipants()
+                        ,countAllCurrentRegistrations(tournamentId));
 
                 return reactivateCancelledRegistration(registration, tournament, now);
             }
 
             throw new AlreadyRegisteredException();
         }
-
-        validateTournamentConditions(tournament, now);
-        validateTournamentNotFull(tournament);
+        tournamentService.validateTournamentConditions(tournament, now);
+        tournamentService.validateTournamentNotFull(tournament.getMaximumParticipants(),
+                countAllCurrentRegistrations(tournamentId));
 
         TournamentRegistration.TournamentRegistrationBuilder builder = TournamentRegistration.builder()
                 .tournament(tournament)
@@ -152,16 +155,25 @@ public class TournamentRegistrationService {
         if (!isOwner) {
             throw new AccessDeniedException("You are not allowed to make a payment on behalf of another player");
         }
+        if (registration.getRegistrationStatus() != RegistrationStatus.PENDING_PAYMENT) {
+            throw new IllegalStateException("Payment can only be submitted for pending payment registrations.");
+        }
+        if (registration.getPaymentStatus() != PaymentStatus.PENDING &&
+                registration.getPaymentStatus() != PaymentStatus.REJECTED) {
+            throw new IllegalStateException("Payment reference cannot be submitted for this payment status.");
+        }
+        if (registration.getReservedUntil() == null
+                || !registration.getReservedUntil().isAfter(LocalDateTime.now())) {
+            registration.setRegistrationStatus(RegistrationStatus.EXPIRED);
+            registration.setPaymentStatus(PaymentStatus.EXPIRED);
+            registration.setUpdatedOn(LocalDateTime.now());
 
-        validateTournamentConditions(registration.getTournament(), LocalDateTime.now());
-
-        if (!registration.getReservedUntil().isAfter(LocalDateTime.now()) ||
-                registration.getRegistrationStatus() == RegistrationStatus.EXPIRED) {
             throw new RegistrationReservationExpiredException();
         }
 
+
         registration.setPaymentStatus(PaymentStatus.SUBMITTED);
-        registration.setPaymentReference(paymentRequest.getPaymentReference());
+        registration.setPaymentReference(paymentRequest.getPaymentReference().trim());
         registration.setPaymentSubmittedOn(LocalDateTime.now());
         registration.setUpdatedOn(LocalDateTime.now());
 
@@ -182,7 +194,52 @@ public class TournamentRegistrationService {
         }
     }
 
-    
+    public List<TournamentRegistration> getRegistrationsForTournamentManagement(UUID tournamentId, UUID userId, Role role) {
+        Tournament tournament = tournamentService.findById(tournamentId);
+        boolean isAdmin = checkIfAdmin(role);
+        boolean isOrganiser = tournament.getOrganiser().getId().equals(userId);
+        if (!isAdmin && !isOrganiser) {
+            throw new AccessDeniedException("You are not allowed to view this information");
+        }
+        return tournamentRegistrationRepository.findAllByTournamentIdOrderByRegisteredOnDesc(tournament.getId());
+    }
+
+    @Transactional
+    public void approvePayment(UUID registrationId, UUID userId, Role role) {
+        TournamentRegistration registration = verifyRoleForPayment(registrationId, userId, role);
+
+        registration.setRegistrationStatus(RegistrationStatus.CONFIRMED);
+        registration.setPaymentStatus(PaymentStatus.CONFIRMED);
+        registration.setUpdatedOn(LocalDateTime.now());
+        registration.setOrganiserNote(APPROVED_PAYMENT_MESSAGE + registration.getTournament().getName() + ".");
+    }
+
+    @Transactional
+    public void rejectPayment(UUID registrationId, UUID userId, Role role, String organiserNote) {
+        TournamentRegistration registration = verifyRoleForPayment(registrationId, userId, role);
+
+        registration.setPaymentStatus(PaymentStatus.REJECTED);
+        registration.setRegistrationStatus(RegistrationStatus.REJECTED);
+        registration.setUpdatedOn(LocalDateTime.now());
+        if (organiserNote == null || organiserNote.isBlank()) {
+            registration.setOrganiserNote(REJECTED_PAYMENT_MESSAGE);
+        } else {
+            registration.setOrganiserNote(organiserNote.trim());
+        }
+    }
+
+    private TournamentRegistration verifyRoleForPayment(UUID registrationId, UUID userId, Role role) {
+        TournamentRegistration registration = findById(registrationId);
+        boolean isAdmin = checkIfAdmin(role);
+        boolean isOrganiser = registration.getTournament().getOrganiser().getId().equals(userId);
+        if (!isAdmin && !isOrganiser) {
+            throw new AccessDeniedException("You are not allowed to review this payment.");
+        }
+        if (registration.getPaymentStatus() != PaymentStatus.SUBMITTED) {
+            throw new IllegalStateException("Only submitted payments can be reviewed.");
+        }
+        return registration;
+    }
 
     private boolean checkOwnership(TournamentRegistration registration, UUID userId) {
         return registration.getPlayer().getId().equals(userId);
@@ -201,39 +258,6 @@ public class TournamentRegistrationService {
                 && status != RegistrationStatus.CONFIRMED;
     }
 
-    private void validateTournamentConditions(Tournament tournament, LocalDateTime now) {
-        TournamentStatus status = tournament.getStatus();
-        LocalDateTime startTime = tournament.getStartTime();
-        LocalDateTime registrationDeadline = tournament.getRegistrationDeadline();
-
-        if (status == TournamentStatus.CANCELLED) {
-            throw new TournamentCancelledException();
-        }
-        if (status == TournamentStatus.REGISTRATION_CLOSED) {
-            throw new AccessDeniedException("Registration is closed for this tournament.");
-        }
-        if (status != TournamentStatus.PUBLISHED) {
-            throw new AccessDeniedException("You are only allowed to register for Published tournaments");
-        }
-        if (!startTime.isAfter(now)) {
-            throw new TournamentHasAlreadyStartedException();
-        }
-        if (!registrationDeadline.isAfter(now)) {
-            throw new AccessDeniedException("Registration has ended");
-        }
-
-    }
-
-    private void validateTournamentNotFull(Tournament tournament) {
-        int maximumParticipants = tournament.getMaximumParticipants();
-        int currentRegistrations = tournamentRegistrationRepository
-                .countByTournamentIdAndRegistrationStatusIn(tournament.getId(),
-                        List.of(RegistrationStatus.PENDING_PAYMENT, RegistrationStatus.CONFIRMED));
-
-        if (maximumParticipants <= currentRegistrations) {
-            throw new TournamentFullException();
-        }
-    }
 
     private TournamentRegistration reactivateCancelledRegistration(TournamentRegistration registration
             , Tournament tournament, LocalDateTime now) {
@@ -257,6 +281,12 @@ public class TournamentRegistrationService {
         }
 
         return registration;
+    }
+
+    private int countAllCurrentRegistrations(UUID tournamentId) {
+        return  tournamentRegistrationRepository
+                .countByTournamentIdAndRegistrationStatusIn(tournamentId,
+                        List.of(RegistrationStatus.PENDING_PAYMENT, RegistrationStatus.CONFIRMED));
     }
 
 }

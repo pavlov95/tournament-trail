@@ -9,8 +9,7 @@ import tournament_trail.demo.entities.Tournament;
 import tournament_trail.demo.entities.User;
 import tournament_trail.demo.entities.enums.Role;
 import tournament_trail.demo.entities.enums.TournamentStatus;
-import tournament_trail.demo.exceptions.InvalidTournamentTimeCriteria;
-import tournament_trail.demo.exceptions.TournamentDoesNotExist;
+import tournament_trail.demo.exceptions.*;
 import tournament_trail.demo.repositories.TournamentRepository;
 import tournament_trail.demo.web.dtos.TournamentOptionResponse;
 import tournament_trail.demo.web.dtos.TournamentRequest;
@@ -252,6 +251,35 @@ public class TournamentService {
         boolean isAdmin = role == Role.ADMIN;
         boolean isOwner = tournament.getOrganiser().getId().equals(userId);
         return isAdmin || isOwner;
+    }
+
+    public void validateTournamentConditions(Tournament tournament, LocalDateTime now) {
+        TournamentStatus status = tournament.getStatus();
+        LocalDateTime startTime = tournament.getStartTime();
+        LocalDateTime registrationDeadline = tournament.getRegistrationDeadline();
+
+        if (status == TournamentStatus.CANCELLED) {
+            throw new TournamentCancelledException();
+        }
+        if (status == TournamentStatus.REGISTRATION_CLOSED) {
+            throw new AccessDeniedException("Registration is closed for this tournament.");
+        }
+        if (status != TournamentStatus.PUBLISHED) {
+            throw new AccessDeniedException("You are only allowed to register for Published tournaments");
+        }
+        if (!startTime.isAfter(now)) {
+            throw new TournamentHasAlreadyStartedException();
+        }
+        if (!registrationDeadline.isAfter(now)) {
+            throw new AccessDeniedException("Registration has ended");
+        }
+
+    }
+
+    public void validateTournamentNotFull(int tournamentCapacity, int currentRegistrations){
+        if (tournamentCapacity <= currentRegistrations) {
+            throw new TournamentFullException();
+        }
     }
 
     private void cancelTournament(Tournament tournament) {

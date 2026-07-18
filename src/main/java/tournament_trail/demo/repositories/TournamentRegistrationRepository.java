@@ -25,5 +25,5 @@ public interface TournamentRegistrationRepository extends JpaRepository<Tourname
     List<TournamentRegistration> findAllByRegistrationStatusAndPaymentStatusAndReservedUntilBefore(
             RegistrationStatus registrationStatus, PaymentStatus paymentStatus, LocalDateTime now);
 
-    
+    List<TournamentRegistration> findAllByTournamentIdOrderByRegisteredOnDesc(UUID id);
 }
