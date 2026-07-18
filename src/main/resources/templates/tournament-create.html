@@ -66,7 +66,7 @@
 
         <form class="create-form"
               method="post"
-              th:action="@{/tournaments}"
+              th:action="@{/tournaments/create}"
               th:object="${tournamentRequest}">
 
             <div class="global-errors" th:if="${#fields.hasGlobalErrors()}">
@@ -376,10 +376,7 @@
             </div>
 
             <div class="form-actions">
-                <a class="button button-secondary"
-                   th:href="@{/tournaments}">
-                    Cancel
-                </a>
+                <a class="button button-secondary" th:href="@{/tournaments}">Cancel</a>
 
                 <button class="button button-primary"
                         type="submit">

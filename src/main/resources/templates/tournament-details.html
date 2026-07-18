@@ -125,6 +125,10 @@
                         Register for tournament
                     </button>
                 </form>
+                <a class="button button-secondary"
+                   th:href="@{/tournaments/{tournamentId}/registrations(tournamentId=${tournament.id})}">
+                    Manage registrations
+                </a>
             </div>
         </div>
 
