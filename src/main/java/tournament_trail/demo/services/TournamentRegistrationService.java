@@ -1,6 +1,5 @@
 package tournament_trail.demo.services;
 
-import jakarta.validation.Valid;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -173,7 +172,8 @@ public class TournamentRegistrationService {
     public void expirePendingTournamentRegistrations() {
         LocalDateTime now = LocalDateTime.now();
         List<TournamentRegistration> expiredRegistrations = tournamentRegistrationRepository
-                .findAllByRegistrationStatusAndReservedUntilBefore(RegistrationStatus.PENDING_PAYMENT, now);
+                .findAllByRegistrationStatusAndPaymentStatusAndReservedUntilBefore
+                        (RegistrationStatus.PENDING_PAYMENT, PaymentStatus.PENDING, now);
 
         for (TournamentRegistration registration : expiredRegistrations) {
             registration.setRegistrationStatus(RegistrationStatus.EXPIRED);
@@ -181,6 +181,8 @@ public class TournamentRegistrationService {
             registration.setUpdatedOn(now);
         }
     }
+
+    
 
     private boolean checkOwnership(TournamentRegistration registration, UUID userId) {
         return registration.getPlayer().getId().equals(userId);
@@ -256,6 +258,5 @@ public class TournamentRegistrationService {
 
         return registration;
     }
-
 
 }
