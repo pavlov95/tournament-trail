@@ -43,7 +43,7 @@ public class TravelGroupRequest {
     private TransportationType transportationType;
 
     @NotNull(message = "Members are required")
-    @Positive(message = "Members can not be 0 or less")
+    @Min(2)
     private Integer maximumMembers;
 
     @NotNull(message = "Estimated cost is required. Later you can change it")

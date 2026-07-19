@@ -10,4 +10,8 @@ import java.util.UUID;
 @Repository
 public interface TravelRequestRepository extends JpaRepository<TravelRequest, UUID> {
     List<TravelRequest> findAllByApplicantIdAndStatus(UUID userId, TravelRequestStatus approved);
+
+    int countByTravelGroupIdAndStatus(UUID travelGroupId, TravelRequestStatus travelRequestStatus);
+
+    boolean existsByTravelGroupIdAndApplicantId(UUID travelGroupId, UUID userId);
 }

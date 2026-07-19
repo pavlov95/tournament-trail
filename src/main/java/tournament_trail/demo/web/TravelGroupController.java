@@ -1,14 +1,16 @@
 package tournament_trail.demo.web;
 
 import org.springframework.stereotype.Controller;
-
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import tournament_trail.demo.entities.enums.CurrencyCode;
 import tournament_trail.demo.entities.enums.TransportationType;
+import tournament_trail.demo.entities.enums.TravelGroupStatus;
 import tournament_trail.demo.services.TravelGroupService;
+import tournament_trail.demo.services.TravelRequestService;
 import tournament_trail.demo.web.dtos.TravelGroupSearchRequest;
 import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -19,6 +21,7 @@ import tournament_trail.demo.entities.TravelGroup;
 import tournament_trail.demo.security.AuthenticationUserDetails;
 import tournament_trail.demo.services.TournamentService;
 import tournament_trail.demo.web.dtos.TravelGroupRequest;
+import tournament_trail.demo.web.dtos.TravelJoinRequest;
 
 import java.util.List;
 import java.util.UUID;
@@ -29,16 +32,18 @@ public class TravelGroupController {
 
     private final TravelGroupService travelGroupService;
     private final TournamentService tournamentService;
+    private final TravelRequestService travelRequestService;
 
-    public TravelGroupController(TravelGroupService travelGroupService,
-                                 TournamentService tournamentService) {
+    public TravelGroupController(TravelGroupService travelGroupService, TournamentService tournamentService
+            , TravelRequestService travelRequestService) {
         this.travelGroupService = travelGroupService;
         this.tournamentService = tournamentService;
+        this.travelRequestService = travelRequestService;
     }
 
     @GetMapping
     public ModelAndView getTravelGroups(@ModelAttribute("searchRequest")
-            TravelGroupSearchRequest searchRequest) {
+                                        TravelGroupSearchRequest searchRequest) {
         ModelAndView modelAndView = new ModelAndView("travel-groups");
 
         List<TravelGroup> travelGroups = travelGroupService.searchTravelGroups(searchRequest);
@@ -52,7 +57,7 @@ public class TravelGroupController {
     @GetMapping("/create")
     @PreAuthorize("hasAuthority('TRAVEL_GROUP_CREATE')")
     public ModelAndView getCreateTravelGroupPage(@RequestParam(value = "tournamentId", required = false)
-            UUID tournamentId) {
+                                                 UUID tournamentId) {
         ModelAndView modelAndView = new ModelAndView("travel-group-create");
 
         TravelGroupRequest travelGroupRequest = new TravelGroupRequest();
@@ -70,8 +75,9 @@ public class TravelGroupController {
     @PostMapping("/create")
     @PreAuthorize("hasAuthority('TRAVEL_GROUP_CREATE')")
     public ModelAndView createTravelGroup(@Valid @ModelAttribute("travelGroupRequest")
-            TravelGroupRequest travelGroupRequest, BindingResult bindingResult,
-            @AuthenticationPrincipal AuthenticationUserDetails userDetails) {
+                                          TravelGroupRequest travelGroupRequest, BindingResult bindingResult,
+                                          @AuthenticationPrincipal AuthenticationUserDetails userDetails) {
+
         if (bindingResult.hasErrors()) {
             ModelAndView modelAndView = new ModelAndView("travel-group-create");
             modelAndView.addObject("selectedTournamentLabel",
@@ -81,28 +87,29 @@ public class TravelGroupController {
         }
 
         TravelGroup travelGroup = travelGroupService.createTravelGroup(travelGroupRequest,
-                        userDetails.getId());
+                userDetails.getId());
 
         return new ModelAndView("redirect:/travel-groups/" + travelGroup.getId());
     }
 
     @GetMapping("/{id}")
-    public ModelAndView getTravelGroup(@PathVariable UUID id) {
-        TravelGroup travelGroup = travelGroupService.findById(id);
+    @PreAuthorize("isAuthenticated()")
+    public ModelAndView getTravelGroup(@PathVariable UUID id
+            , @AuthenticationPrincipal AuthenticationUserDetails userDetails) {
 
         ModelAndView modelAndView = new ModelAndView("travel-group-details");
 
-        modelAndView.addObject("travelGroup", travelGroup);
-        modelAndView.addObject("travelGroupRequest",
-                travelGroupService.mapToTravelGroupRequest(travelGroup));
-        addCommonData(modelAndView);
+        TravelGroup travelGroup = travelGroupService.findById(id);
+        addTravelGroupDetailsData(modelAndView, travelGroup, userDetails
+                , travelGroupService.mapToTravelGroupRequest(travelGroup), new TravelJoinRequest());
 
         return modelAndView;
     }
 
     @PatchMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
     public ModelAndView cancelTravelGroup(@PathVariable UUID id,
-             @AuthenticationPrincipal AuthenticationUserDetails userDetails){
+                                          @AuthenticationPrincipal AuthenticationUserDetails userDetails) {
 
         travelGroupService.cancel(id, userDetails.getId(), userDetails.getRole());
 
@@ -110,21 +117,81 @@ public class TravelGroupController {
     }
 
     @PutMapping("/{id}")
-    public ModelAndView updateTravelGroup(@PathVariable UUID id, @Valid TravelGroupRequest travelGroupRequest
-            , BindingResult bindingResult, @AuthenticationPrincipal AuthenticationUserDetails userDetails){
+    @PreAuthorize("isAuthenticated()")
+    public ModelAndView updateTravelGroup(@PathVariable UUID id
+            , @Valid @ModelAttribute("travelGroupRequest") TravelGroupRequest travelGroupRequest
+            , BindingResult bindingResult, @AuthenticationPrincipal AuthenticationUserDetails userDetails) {
+
+
+        if (bindingResult.hasErrors()) {
             ModelAndView modelAndView = new ModelAndView("travel-group-details");
-            if(bindingResult.hasErrors()){
-                modelAndView.addObject("travelGroup", travelGroupService.findById(id));
-                addCommonData(modelAndView);
-                return modelAndView;
-            }
-            travelGroupService.updateTravelGroup(id, travelGroupRequest, userDetails.getId(), userDetails.getRole());
-            return new ModelAndView("redirect:/travel-groups/" + id);
+            TravelGroup travelGroup = travelGroupService.findById(id);
+
+            modelAndView.addObject("travelGroup", travelGroup);
+            modelAndView.addObject("travelGroupRequest", travelGroupRequest);
+            modelAndView.addObject("travelJoinRequest", new TravelJoinRequest());
+            modelAndView.addObject("isOwner", travelGroup.getOwner().getId().equals(userDetails.getId()));
+            modelAndView.addObject("availableSpots", travelRequestService.countAvailableSpots(travelGroup));
+            modelAndView.addObject("canSendJoinRequest", false);
+            addCommonData(modelAndView);
+            return modelAndView;
+        }
+        travelGroupService.updateTravelGroup(id, travelGroupRequest, userDetails.getId(), userDetails.getRole());
+        return new ModelAndView("redirect:/travel-groups/" + id);
     }
 
-    private void addCommonData(ModelAndView modelAndView){
-        modelAndView.addObject("currencies",CurrencyCode.values());
+    @PostMapping("/{id}/send-request")
+    @PreAuthorize("isAuthenticated()")
+    public ModelAndView sendTravelGroupRequest(@PathVariable UUID id
+            , @Valid @ModelAttribute("travelJoinRequest") TravelJoinRequest travelJoinRequest, BindingResult bindingResult
+            , @AuthenticationPrincipal AuthenticationUserDetails userDetails, RedirectAttributes redirectAttributes) {
+
+        TravelGroup travelGroup = travelGroupService.findById(id);
+
+        if (bindingResult.hasErrors()) {
+            ModelAndView modelAndView = new ModelAndView("travel-group-details");
+
+            addTravelGroupDetailsData(modelAndView, travelGroup, userDetails
+                    , travelGroupService.mapToTravelGroupRequest(travelGroup), travelJoinRequest);
+
+            return modelAndView;
+        }
+        travelRequestService.createTravelRequest(travelGroup, userDetails.getId(), travelJoinRequest.getMessage());
+        redirectAttributes.addFlashAttribute("successMessage", "Request sent successfully");
+
+        return new ModelAndView("redirect:/travel-groups/" + id);
+    }
+
+    private void addCommonData(ModelAndView modelAndView) {
+        modelAndView.addObject("currencies", CurrencyCode.values());
         modelAndView.addObject("transportationTypes", TransportationType.values());
+    }
+    private void addTravelGroupDetailsData(ModelAndView modelAndView,
+                                           TravelGroup travelGroup,
+                                           AuthenticationUserDetails userDetails,
+                                           TravelGroupRequest travelGroupRequest,
+                                           TravelJoinRequest travelJoinRequest) {
+        boolean isOwner = travelGroup.getOwner().getId().equals(userDetails.getId());
+        int availableSpots = travelRequestService.countAvailableSpots(travelGroup);
+        boolean hasAlreadyRequested = travelRequestService.hasRequestFromUser(
+                travelGroup.getId(),
+                userDetails.getId()
+        );
+
+        boolean canSendJoinRequest =
+                !isOwner
+                        && availableSpots > 0
+                        && !hasAlreadyRequested
+                        && travelGroup.getStatus() == TravelGroupStatus.OPEN;
+
+        modelAndView.addObject("travelGroup", travelGroup);
+        modelAndView.addObject("travelGroupRequest", travelGroupRequest);
+        modelAndView.addObject("travelJoinRequest", travelJoinRequest);
+        modelAndView.addObject("isOwner", isOwner);
+        modelAndView.addObject("availableSpots", Math.max(availableSpots, 0));
+        modelAndView.addObject("canSendJoinRequest", canSendJoinRequest);
+
+        addCommonData(modelAndView);
     }
 }
 

@@ -33,6 +33,7 @@ public class TravelRequest {
     @JoinColumn(name = "applicant_id", nullable = false)
     private User applicant;
 
+    @Column(length = 500)
     private String message;
 
     @Enumerated(EnumType.STRING)
