@@ -42,8 +42,7 @@ public class TravelGroupController {
     }
 
     @GetMapping
-    public ModelAndView getTravelGroups(@ModelAttribute("searchRequest")
-                                        TravelGroupSearchRequest searchRequest) {
+    public ModelAndView getTravelGroups(@ModelAttribute("searchRequest") TravelGroupSearchRequest searchRequest) {
         ModelAndView modelAndView = new ModelAndView("travel-groups");
 
         List<TravelGroup> travelGroups = travelGroupService.searchTravelGroups(searchRequest);
@@ -55,9 +54,9 @@ public class TravelGroupController {
     }
 
     @GetMapping("/create")
-    @PreAuthorize("hasAuthority('TRAVEL_GROUP_CREATE')")
+    @PreAuthorize("isAuthenticated()")
     public ModelAndView getCreateTravelGroupPage(@RequestParam(value = "tournamentId", required = false)
-                                                 UUID tournamentId) {
+                                                     UUID tournamentId) {
         ModelAndView modelAndView = new ModelAndView("travel-group-create");
 
         TravelGroupRequest travelGroupRequest = new TravelGroupRequest();
@@ -73,7 +72,7 @@ public class TravelGroupController {
     }
 
     @PostMapping("/create")
-    @PreAuthorize("hasAuthority('TRAVEL_GROUP_CREATE')")
+    @PreAuthorize("isAuthenticated()")
     public ModelAndView createTravelGroup(@Valid @ModelAttribute("travelGroupRequest")
                                           TravelGroupRequest travelGroupRequest, BindingResult bindingResult,
                                           @AuthenticationPrincipal AuthenticationUserDetails userDetails) {
@@ -108,8 +107,8 @@ public class TravelGroupController {
 
     @PatchMapping("/{id}")
     @PreAuthorize("isAuthenticated()")
-    public ModelAndView cancelTravelGroup(@PathVariable UUID id,
-                                          @AuthenticationPrincipal AuthenticationUserDetails userDetails) {
+    public ModelAndView cancelTravelGroup(@PathVariable UUID id
+            , @AuthenticationPrincipal AuthenticationUserDetails userDetails) {
 
         travelGroupService.cancel(id, userDetails.getId(), userDetails.getRole());
 

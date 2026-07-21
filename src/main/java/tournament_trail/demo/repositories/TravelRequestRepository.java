@@ -5,6 +5,7 @@ import org.springframework.stereotype.Repository;
 import tournament_trail.demo.entities.enums.TravelRequestStatus;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -14,4 +15,9 @@ public interface TravelRequestRepository extends JpaRepository<TravelRequest, UU
     int countByTravelGroupIdAndStatus(UUID travelGroupId, TravelRequestStatus travelRequestStatus);
 
     boolean existsByTravelGroupIdAndApplicantId(UUID travelGroupId, UUID userId);
+
+    List<TravelRequest> findAllByTravelGroupIdAndStatusOrderByRequestedOnDesc(UUID travelGroupId
+            , TravelRequestStatus status);
+
+    Optional<TravelRequest> findByIdAndTravelGroupId(UUID requestId, UUID travelGroupId);
 }

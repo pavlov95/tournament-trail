@@ -14,6 +14,7 @@ import tournament_trail.demo.repositories.TravelRequestRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -66,6 +67,7 @@ public class TravelRequestService {
         int confirmedRequests = countAllConfirmedRequests(travelGroup.getId(), TravelRequestStatus.APPROVED);
         return maximumMembers - confirmedRequests - 1;
     }
+
     public boolean hasRequestFromUser(UUID travelGroupId, UUID userId) {
         return travelRequestRepository.existsByTravelGroupIdAndApplicantId(travelGroupId, userId);
     }
@@ -79,5 +81,48 @@ public class TravelRequestService {
 
     }
 
+    public List<TravelRequest> getAllPendingRequests(UUID travelGroupId, TravelRequestStatus status) {
+        return travelRequestRepository.findAllByTravelGroupIdAndStatusOrderByRequestedOnDesc(travelGroupId, status);
+    }
 
+    @Transactional
+    public void acceptTravelRequest(UUID travelGroupId, UUID travelRequestId, UUID userId, int availableSpots) {
+
+        TravelRequest travelRequest = findByIdAndGroupId(travelRequestId, travelGroupId);
+        if (!travelRequest.getTravelGroup().getOwner().getId().equals(userId)) {
+            throw new AccessDeniedException("You are not allowed to manage this group");
+        }
+        if(travelRequest.getTravelGroup().getStatus() != TravelGroupStatus.OPEN){
+            throw new AccessDeniedException("Travel requests can only be accepted by travel groups that are open");
+        }
+
+        if (travelRequest.getStatus() != TravelRequestStatus.PENDING) {
+            throw new AccessDeniedException("Only Pending requests can be approved");
+        }
+        if(availableSpots<=0){
+            throw new TravelGroupFullException();
+        }
+        travelRequest.setStatus(TravelRequestStatus.APPROVED);
+        travelRequest.setRespondedOn(LocalDateTime.now());
+        travelRequestRepository.save(travelRequest);
+    }
+
+    @Transactional
+    public void rejectTravelRequest(UUID travelGroupId, UUID travelRequestId, UUID userId) {
+        TravelRequest travelRequest = findByIdAndGroupId(travelRequestId, travelGroupId);
+        if (!travelRequest.getTravelGroup().getOwner().getId().equals(userId)) {
+            throw new AccessDeniedException("You are not allowed to view this information");
+        }
+
+        if (travelRequest.getStatus() != TravelRequestStatus.PENDING) {
+            throw new AccessDeniedException("Only Pending registrations can be rejected");
+        }
+
+        travelRequest.setStatus(TravelRequestStatus.REJECTED);
+        travelRequest.setRespondedOn(LocalDateTime.now());
+        travelRequestRepository.save(travelRequest);
+    }
+    private TravelRequest findByIdAndGroupId(UUID requestId, UUID travelGroupId){
+        return travelRequestRepository.findByIdAndTravelGroupId(requestId, travelGroupId).orElseThrow();
+    }
 }
