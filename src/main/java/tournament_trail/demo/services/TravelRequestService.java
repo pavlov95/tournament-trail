@@ -14,7 +14,6 @@ import tournament_trail.demo.repositories.TravelRequestRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -125,4 +124,10 @@ public class TravelRequestService {
     private TravelRequest findByIdAndGroupId(UUID requestId, UUID travelGroupId){
         return travelRequestRepository.findByIdAndTravelGroupId(requestId, travelGroupId).orElseThrow();
     }
+
+    public List<TravelRequest> getApprovedApplicantsForTravelGroup(UUID travelGroupId) {
+        return travelRequestRepository.findAllByTravelGroupIdAndStatusOrderByRespondedOnDesc(
+                travelGroupId, TravelRequestStatus.APPROVED);
+    }
+
 }

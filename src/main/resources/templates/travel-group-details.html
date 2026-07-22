@@ -218,7 +218,58 @@
                 </div>
             </dl>
         </article>
+        <article class="details-card full-width travelers-card">
+            <div class="section-heading">
+                <div>
+                    <p class="eyebrow">Group members</p>
+                    <h2>Accepted travelers</h2>
+                </div>
 
+                <span class="member-count"
+                      th:text="${#lists.size(approvedApplicants)} + ' accepted'">
+            0 accepted
+        </span>
+            </div>
+
+            <p class="muted"
+               th:if="${#lists.isEmpty(approvedApplicants)}">
+                No accepted travelers yet. Approved applicants will appear here.
+            </p>
+
+            <div class="travelers-list"
+                 th:unless="${#lists.isEmpty(approvedApplicants)}">
+
+                <article class="traveler-item"
+                         th:each="request : ${approvedApplicants}">
+
+                    <div class="traveler-avatar"
+                         th:text="${#strings.substring(request.applicant.username, 0, 1).toUpperCase()}">
+                        D
+                    </div>
+
+                    <div class="traveler-info">
+                        <h3 th:text="${request.applicant.username}">
+                            username
+                        </h3>
+
+                        <p>
+                            Accepted traveler
+                        </p>
+                    </div>
+
+                    <div class="traveler-meta">
+                <span th:if="${request.respondedOn != null}"
+                      th:text="${#temporals.format(request.respondedOn, 'dd MMM yyyy, HH:mm')}">
+                    22 Jul 2026, 14:20
+                </span>
+
+                        <span th:if="${request.respondedOn == null}">
+                    Approved
+                </span>
+                    </div>
+                </article>
+            </div>
+        </article>
         <article class="details-card full-width">
             <h2>Tournament</h2>
 

@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import tournament_trail.demo.entities.TravelRequest;
 import tournament_trail.demo.entities.enums.CurrencyCode;
 import tournament_trail.demo.entities.enums.TransportationType;
 import tournament_trail.demo.entities.enums.TravelGroupStatus;
@@ -22,7 +23,6 @@ import tournament_trail.demo.security.AuthenticationUserDetails;
 import tournament_trail.demo.services.TournamentService;
 import tournament_trail.demo.web.dtos.TravelGroupRequest;
 import tournament_trail.demo.web.dtos.TravelJoinRequest;
-
 import java.util.List;
 import java.util.UUID;
 
@@ -56,7 +56,7 @@ public class TravelGroupController {
     @GetMapping("/create")
     @PreAuthorize("isAuthenticated()")
     public ModelAndView getCreateTravelGroupPage(@RequestParam(value = "tournamentId", required = false)
-                                                     UUID tournamentId) {
+                                                 UUID tournamentId) {
         ModelAndView modelAndView = new ModelAndView("travel-group-create");
 
         TravelGroupRequest travelGroupRequest = new TravelGroupRequest();
@@ -101,7 +101,6 @@ public class TravelGroupController {
         TravelGroup travelGroup = travelGroupService.findById(id);
         addTravelGroupDetailsData(modelAndView, travelGroup, userDetails
                 , travelGroupService.mapToTravelGroupRequest(travelGroup), new TravelJoinRequest());
-
         return modelAndView;
     }
 
@@ -126,13 +125,8 @@ public class TravelGroupController {
             ModelAndView modelAndView = new ModelAndView("travel-group-details");
             TravelGroup travelGroup = travelGroupService.findById(id);
 
-            modelAndView.addObject("travelGroup", travelGroup);
-            modelAndView.addObject("travelGroupRequest", travelGroupRequest);
-            modelAndView.addObject("travelJoinRequest", new TravelJoinRequest());
-            modelAndView.addObject("isOwner", travelGroup.getOwner().getId().equals(userDetails.getId()));
-            modelAndView.addObject("availableSpots", travelRequestService.countAvailableSpots(travelGroup));
-            modelAndView.addObject("canSendJoinRequest", false);
-            addCommonData(modelAndView);
+            addTravelGroupDetailsData(modelAndView, travelGroup, userDetails, travelGroupRequest
+                    , new TravelJoinRequest());
             return modelAndView;
         }
         travelGroupService.updateTravelGroup(id, travelGroupRequest, userDetails.getId(), userDetails.getRole());
@@ -165,20 +159,24 @@ public class TravelGroupController {
         modelAndView.addObject("currencies", CurrencyCode.values());
         modelAndView.addObject("transportationTypes", TransportationType.values());
     }
-    private void addTravelGroupDetailsData(ModelAndView modelAndView,
-                                           TravelGroup travelGroup,
-                                           AuthenticationUserDetails userDetails,
-                                           TravelGroupRequest travelGroupRequest,
-                                           TravelJoinRequest travelJoinRequest) {
+
+    private void addTravelGroupDetailsData(ModelAndView modelAndView, TravelGroup travelGroup
+            , AuthenticationUserDetails userDetails, TravelGroupRequest travelGroupRequest
+            , TravelJoinRequest travelJoinRequest) {
+
         boolean isOwner = travelGroup.getOwner().getId().equals(userDetails.getId());
+
+
+        List<TravelRequest> approvedApplicants = travelRequestService.getApprovedApplicantsForTravelGroup(
+                travelGroup.getId());
+
         int availableSpots = travelRequestService.countAvailableSpots(travelGroup);
         boolean hasAlreadyRequested = travelRequestService.hasRequestFromUser(
                 travelGroup.getId(),
                 userDetails.getId()
         );
 
-        boolean canSendJoinRequest =
-                !isOwner
+        boolean canSendJoinRequest = !isOwner
                         && availableSpots > 0
                         && !hasAlreadyRequested
                         && travelGroup.getStatus() == TravelGroupStatus.OPEN;
@@ -189,6 +187,7 @@ public class TravelGroupController {
         modelAndView.addObject("isOwner", isOwner);
         modelAndView.addObject("availableSpots", Math.max(availableSpots, 0));
         modelAndView.addObject("canSendJoinRequest", canSendJoinRequest);
+        modelAndView.addObject("approvedApplicants", approvedApplicants);
 
         addCommonData(modelAndView);
     }

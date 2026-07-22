@@ -105,6 +105,7 @@ button, input, select, textarea { font: inherit; }
     background: var(--surface);
     border-color: var(--border);
 }
+
 .button-secondary:hover { color: var(--primary-dark); background: var(--primary-soft); }
 
 .button-danger { color: #ffffff; background: var(--danger); }
@@ -192,6 +193,7 @@ main {
     flex-wrap: wrap;
     gap: 0.8rem;
 }
+
 .hero-actions form { margin: 0; }
 
 .summary-card, .details-card, .management-panel {
@@ -218,6 +220,7 @@ dl div {
 }
 
 dl div:last-child { border-bottom: 0; }
+
 dt { color: var(--muted); }
 
 dd {
@@ -239,7 +242,9 @@ dd {
 }
 
 .details-card p { color: var(--muted); }
+
 .full-width { grid-column: 1 / -1; }
+
 .muted { color: var(--muted); }
 
 .request-card {
@@ -276,7 +281,11 @@ dd {
 }
 
 .cancel-form { margin: 0; }
-.edit-form, .join-form { display: grid; gap: 1.5rem; }
+
+.edit-form, .join-form {
+    display: grid;
+    gap: 1.5rem;
+}
 
 .form-grid {
     display: grid;
@@ -320,6 +329,71 @@ dd {
 .form-actions {
     display: flex;
     justify-content: flex-end;
+}
+
+.travelers-card {
+    border-top: 4px solid var(--primary);
+}
+
+.member-count {
+    display: inline-flex;
+    align-items: center;
+    min-height: 34px;
+    padding: 0.35rem 0.8rem;
+    border-radius: 999px;
+    color: var(--primary-dark);
+    background: var(--primary-soft);
+    font-size: 0.85rem;
+    font-weight: 900;
+    white-space: nowrap;
+}
+
+.travelers-list {
+    display: grid;
+    gap: 0.9rem;
+}
+
+.traveler-item {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--background);
+}
+
+.traveler-avatar {
+    width: 46px;
+    height: 46px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    color: #ffffff;
+    background: var(--primary);
+    font-weight: 900;
+    text-transform: uppercase;
+}
+
+.traveler-info h3 {
+    margin: 0;
+    color: var(--primary-dark);
+    font-size: 1rem;
+}
+
+.traveler-info p {
+    margin: 0.15rem 0 0;
+    color: var(--muted);
+    font-size: 0.92rem;
+}
+
+.traveler-meta {
+    color: var(--muted);
+    font-size: 0.9rem;
+    font-weight: 700;
+    text-align: right;
 }
 
 .site-footer {
@@ -370,6 +444,7 @@ dd {
     }
 
     .section-heading { flex-direction: column; }
+
     .site-footer { grid-template-columns: 1fr; }
 }
 
@@ -383,8 +458,11 @@ dd {
     }
 
     .title-row { flex-direction: column; }
+
     .button { width: 100%; }
+
     .form-actions { justify-content: stretch; }
+
     .hero-section { padding: 2.5rem 0; }
 
     .summary-card, .details-card, .management-panel {
@@ -392,5 +470,15 @@ dd {
     }
 
     dl div { flex-direction: column; }
+
     dd { text-align: left; }
+
+    .traveler-item {
+        grid-template-columns: auto 1fr;
+    }
+
+    .traveler-meta {
+        grid-column: 1 / -1;
+        text-align: left;
+    }
 }
