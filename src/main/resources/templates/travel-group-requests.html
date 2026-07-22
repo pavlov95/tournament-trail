@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title th:text="${'Requests for ' + travelGroup.name + ' | TournamentTrail'}">
+        Travel Group Requests | TournamentTrail
+    </title>
+
+    <link rel="stylesheet" th:href="@{/css/travel-group-requests.css}">
+</head>
+<body>
+<header class="site-header">
+    <nav class="navbar">
+        <a class="brand" th:href="@{/}">TournamentTrail</a>
+        <div class="nav-links">
+            <a th:href="@{/}">Home</a>
+            <a th:href="@{/tournaments}">Tournaments</a>
+            <a th:href="@{/registrations}">My registrations</a>
+            <a class="active" th:href="@{/travel-groups}">Travel groups</a>
+            <a th:href="@{/about}">About</a>
+            <a th:href="@{/contact}">Contact</a>
+        </div>
+        <div class="nav-actions" sec:authorize="isAnonymous()">
+            <a class="button button-secondary secondary-button" th:href="@{/login}">Login</a>
+            <a class="button button-primary primary-button" th:href="@{/register}">Create account</a>
+        </div>
+        <div class="nav-actions" sec:authorize="isAuthenticated()">
+            <a class="button button-primary primary-button" th:href="@{/home}">Dashboard</a>
+            <form th:action="@{/logout}" method="post">
+                <button class="button button-secondary secondary-button logout-button"
+                        type="submit">Logout
+                </button>
+            </form>
+        </div>
+    </nav>
+</header>
+
+<main>
+    <div class="flash-message success"
+         th:if="${successMessage}"
+         th:text="${successMessage}">
+        Travel request updated successfully.
+    </div>
+
+    <div class="flash-message error"
+         th:if="${errorMessage}"
+         th:text="${errorMessage}">
+        Could not update travel request.
+    </div>
+
+    <section class="hero-section">
+        <div class="hero-content">
+            <a class="back-link" th:href="@{/travel-groups/{id}(id=${travelGroup.id})}">← Back to travel group</a>
+
+            <div class="title-row">
+                <h1>Travel requests</h1>
+
+                <span class="status"
+                      th:classappend="' status-' + ${#strings.toLowerCase(travelGroup.status.name())}"
+                      th:text="${travelGroup.status}">
+                    OPEN
+                </span>
+            </div>
+
+            <p class="description">
+                Review pending join requests for
+                <strong th:text="${travelGroup.name}">travel group</strong>.
+                Approving a request adds the applicant to the group. Rejecting a request closes it permanently.
+            </p>
+
+            <div class="hero-actions">
+                <a class="button button-secondary secondary-button"
+                   th:href="@{/travel-groups/{id}(id=${travelGroup.id})}">View group details
+                </a>
+
+                <a class="button button-secondary secondary-button" th:href="@{/travel-groups}">Browse groups</a>
+            </div>
+        </div>
+
+        <aside class="summary-card">
+            <h2>Request summary</h2>
+
+            <dl>
+                <div>
+                    <dt>Travel group</dt>
+                    <dd th:text="${travelGroup.name}">Sofia car group</dd>
+                </div>
+
+                <div>
+                    <dt>Available spots</dt>
+                    <dd th:text="${availableSpots}">2</dd>
+                </div>
+
+                <div>
+                    <dt>Pending requests</dt>
+                    <dd th:text="${#lists.size(travelRequests)}">3</dd>
+                </div>
+
+                <div>
+                    <dt>Maximum members</dt>
+                    <dd th:text="${travelGroup.maximumMembers}">4</dd>
+                </div>
+            </dl>
+        </aside>
+    </section>
+
+    <section class="management-panel">
+        <div class="section-heading">
+            <div>
+                <p class="eyebrow">Owner tools</p>
+                <h2>Pending join requests</h2>
+            </div>
+        </div>
+
+        <div class="empty-state"
+             th:if="${#lists.isEmpty(travelRequests)}">
+            <h3>No pending requests</h3>
+            <p>There are no pending join requests for this travel group right now.</p>
+        </div>
+
+        <div class="request-list" th:unless="${#lists.isEmpty(travelRequests)}">
+
+            <article class="request-card" th:each="request : ${travelRequests}">
+
+                <div class="request-main">
+                    <div class="request-header">
+                        <div>
+                            <p class="eyebrow">Applicant</p>
+                            <h3 th:text="${request.applicant.username}">username</h3>
+                        </div>
+
+                        <span class="status status-pending" th:text="${request.status}">PENDING</span>
+                    </div>
+
+                    <dl class="request-meta">
+                        <div>
+                            <dt>Email</dt>
+                            <dd th:text="${request.applicant.email}">player@example.com</dd>
+                        </div>
+
+                        <div>
+                            <dt>Requested on</dt>
+                            <dd th:text="${#temporals.format(request.requestedOn, 'dd MMM yyyy, HH:mm')}">
+                                21 Jul 2026, 18:00
+                            </dd>
+                        </div>
+                    </dl>
+
+                    <div class="message-box">
+                        <h4>Message</h4>
+
+                        <p th:if="${request.message != null and !#strings.isEmpty(request.message)}"
+                           th:text="${request.message}">
+                            I can meet at the station and share fuel costs.
+                        </p>
+
+                        <p class="muted"
+                           th:if="${request.message == null or #strings.isEmpty(request.message)}">
+                            The applicant did not add a message.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="request-actions">
+                    <form th:action="@{/travel-groups/{travelGroupId}/requests/{travelRequestId}/accept(
+                            travelGroupId=${travelGroup.id},
+                            travelRequestId=${request.id}
+                          )}"
+                          method="post">
+                        <input type="hidden" name="_method" value="patch">
+
+                        <button class="button button-primary primary-button"
+                                type="submit"
+                                th:disabled="${availableSpots <= 0}"
+                                th:title="${availableSpots <= 0 ? 'No available spots left' : 'Approve request'}">
+                            Approve
+                        </button>
+                    </form>
+
+                    <form th:action="@{/travel-groups/{travelGroupId}/requests/{travelRequestId}/reject(
+                            travelGroupId=${travelGroup.id},travelRequestId=${request.id})}" method="post">
+                        <input type="hidden" name="_method" value="patch">
+
+                        <button class="button button-danger"
+                                type="submit"
+                                onclick="return confirm('Are you sure you want to reject this request?')">
+                            Reject
+                        </button>
+                    </form>
+                </div>
+            </article>
+        </div>
+    </section>
+</main>
+
+<footer class="site-footer">
+    <div>
+        <a class="brand footer-brand" th:href="@{/}">TournamentTrail</a>
+
+        <p>Chess tournaments, registrations, and shared travel in one platform.</p>
+    </div>
+
+    <nav>
+        <a th:href="@{/tournaments}">Tournaments</a>
+        <a th:href="@{/registrations}">My registrations</a>
+        <a th:href="@{/travel-groups}" class="active">Travel groups</a>
+        <a th:href="@{/about}">About</a>
+        <a th:href="@{/contact}">Contact</a>
+    </nav>
+
+    <p>&copy; 2026 TournamentTrail</p>
+</footer>
+</body>
+</html>
