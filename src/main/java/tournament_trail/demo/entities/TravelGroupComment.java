@@ -37,4 +37,6 @@ public class TravelGroupComment {
 
     private LocalDateTime editedOn;
 
+    @Column(nullable = false)
+    private boolean hidden;
 }
