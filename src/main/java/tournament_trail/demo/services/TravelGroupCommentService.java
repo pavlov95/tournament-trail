@@ -9,6 +9,7 @@ import tournament_trail.demo.entities.enums.TravelGroupStatus;
 import tournament_trail.demo.exceptions.InvalidCommentContentException;
 import tournament_trail.demo.exceptions.InvalidCommentException;
 import tournament_trail.demo.repositories.TravelGroupCommentRepository;
+import tournament_trail.demo.web.dtos.TravelGroupCommentsPageData;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -40,7 +41,7 @@ public class TravelGroupCommentService {
         TravelGroup travelGroup = travelGroupService.findById(travelGroupId);
         checkForAccess(userId, travelGroup);
 
-        if (content == null || content.isBlank()) {
+        if (content == null || content.isBlank() || content.length() > 1000) {
             throw new InvalidCommentContentException();
         }
 
@@ -67,7 +68,7 @@ public class TravelGroupCommentService {
             throw new AccessDeniedException("You are only allowed to edit your own comments");
         }
 
-        if (content == null || content.isBlank()) {
+        if (content == null || content.isBlank() || content.length() > 1000) {
             throw new InvalidCommentContentException();
         }
 
@@ -76,10 +77,7 @@ public class TravelGroupCommentService {
         travelGroupCommentRepository.save(comment);
     }
 
-    private TravelGroupComment findByIdAndTravelGroupId(UUID commentId, UUID travelGroupId) {
-        return travelGroupCommentRepository.findByIdAndTravelGroupIdAndHiddenFalse(commentId, travelGroupId)
-                .orElseThrow(InvalidCommentException::new);
-    }
+
 
     @Transactional
     public void pinComment(UUID travelGroupId, UUID userId, UUID commentId) {
@@ -116,8 +114,8 @@ public class TravelGroupCommentService {
 
         TravelGroupComment comment = findByIdAndTravelGroupId(commentId, travelGroupId);
 
-        if(!travelGroup.getOwner().getId().equals(userId)){
-            throw new AccessDeniedException("Only the owner of the travel group can pin comments.");
+        if (!travelGroup.getOwner().getId().equals(userId)) {
+            throw new AccessDeniedException("Only the owner of the travel group can unpin comments.");
         }
 
         comment.setPinned(false);
@@ -127,7 +125,10 @@ public class TravelGroupCommentService {
     public int countVisibleComments(UUID travelGroupId) {
         return travelGroupCommentRepository.countByTravelGroupIdAndHiddenFalse(travelGroupId);
     }
-
+    private TravelGroupComment findByIdAndTravelGroupId(UUID commentId, UUID travelGroupId) {
+        return travelGroupCommentRepository.findByIdAndTravelGroupIdAndHiddenFalse(commentId, travelGroupId)
+                .orElseThrow(InvalidCommentException::new);
+    }
 
     private void checkForAccess(UUID currentUserId, TravelGroup travelGroup) {
         if (travelGroup.getStatus().equals(TravelGroupStatus.CANCELLED)) {
@@ -147,5 +148,18 @@ public class TravelGroupCommentService {
         }
 
         throw new AccessDeniedException("You are not part of this travel group");
+    }
+
+    public TravelGroupCommentsPageData getCommentsPageData(UUID travelGroupId, UUID userId) {
+        TravelGroup travelGroup = travelGroupService.findById(travelGroupId);
+
+        checkForAccess(userId, travelGroup);
+
+        List<TravelGroupComment> comments = travelGroupCommentRepository
+                .findAllByTravelGroupIdAndHiddenFalseOrderByPinnedDescCreatedOnDesc(travelGroupId);
+
+        int countVisibleComments = travelGroupCommentRepository.countByTravelGroupIdAndHiddenFalse(travelGroupId);
+
+        return new TravelGroupCommentsPageData(travelGroup, comments, countVisibleComments);
     }
 }

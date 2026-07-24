@@ -165,7 +165,9 @@ public class TravelGroupController {
             , TravelJoinRequest travelJoinRequest) {
 
         boolean isOwner = travelGroup.getOwner().getId().equals(userDetails.getId());
+        boolean isApprovedMember = travelRequestService.isApprovedMember(travelGroup.getId(), userDetails.getId());
 
+        boolean canViewPrivateGroupArea = isOwner || isApprovedMember;
 
         List<TravelRequest> approvedApplicants = travelRequestService.getApprovedApplicantsForTravelGroup(
                 travelGroup.getId());
@@ -188,6 +190,8 @@ public class TravelGroupController {
         modelAndView.addObject("availableSpots", Math.max(availableSpots, 0));
         modelAndView.addObject("canSendJoinRequest", canSendJoinRequest);
         modelAndView.addObject("approvedApplicants", approvedApplicants);
+        modelAndView.addObject("isApprovedMember", isApprovedMember);
+        modelAndView.addObject("canViewPrivateGroupArea", canViewPrivateGroupArea);
 
         addCommonData(modelAndView);
     }

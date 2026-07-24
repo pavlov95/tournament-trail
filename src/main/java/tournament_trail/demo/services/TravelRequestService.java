@@ -129,5 +129,8 @@ public class TravelRequestService {
         return travelRequestRepository.findAllByTravelGroupIdAndStatusOrderByRespondedOnDesc(
                 travelGroupId, TravelRequestStatus.APPROVED);
     }
-
+    public boolean isApprovedMember(UUID travelGroupId, UUID userId) {
+        return travelRequestRepository.existsByTravelGroupIdAndApplicantIdAndStatus(travelGroupId, userId
+                , TravelRequestStatus.APPROVED);
+    }
 }

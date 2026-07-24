@@ -11,6 +11,7 @@ import tournament_trail.demo.entities.TravelGroupComment;
 import tournament_trail.demo.security.AuthenticationUserDetails;
 import tournament_trail.demo.services.TravelGroupCommentService;
 import tournament_trail.demo.web.dtos.CommentRequest;
+import tournament_trail.demo.web.dtos.TravelGroupCommentsPageData;
 
 import java.util.List;
 import java.util.UUID;
@@ -104,11 +105,11 @@ public class CommentController {
     }
 
     private void addCommonData(ModelAndView modelAndView, UUID travelGroupId, UUID userId){
-        int countVisibleComments = travelGroupCommentService.countVisibleComments(travelGroupId);
-        List<TravelGroupComment> comments = travelGroupCommentService
-                .getCommentsForGroup(travelGroupId, userId);
+        TravelGroupCommentsPageData commentsPageData = travelGroupCommentService.getCommentsPageData(
+                travelGroupId, userId);
 
-        modelAndView.addObject("countVisibleComments", countVisibleComments);
-        modelAndView.addObject("comments", comments);
+        modelAndView.addObject("travelGroup", commentsPageData.travelGroup());
+        modelAndView.addObject("countVisibleComments", commentsPageData.countVisibleComments());
+        modelAndView.addObject("comments", commentsPageData.comments());
     }
 }

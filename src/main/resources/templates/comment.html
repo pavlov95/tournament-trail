@@ -12,8 +12,7 @@
         Private Discussion | TournamentTrail
     </title>
 
-    <link rel="stylesheet"
-          th:href="@{/css/comment.css}">
+    <link rel="stylesheet" th:href="@{/css/comment.css}">
 </head>
 
 <body>
@@ -21,10 +20,7 @@
 <header class="site-header">
     <nav class="navbar">
 
-        <a class="brand"
-           th:href="@{/}">
-            TournamentTrail
-        </a>
+        <a class="brand" th:href="@{/}">TournamentTrail</a>
 
         <div class="nav-links">
             <a th:href="@{/}">Home</a>
@@ -35,33 +31,17 @@
             <a th:href="@{/contact}">Contact</a>
         </div>
 
-        <div class="nav-actions"
-             sec:authorize="isAnonymous()">
-            <a class="button button-secondary"
-               th:href="@{/login}">
-                Login
-            </a>
-
-            <a class="button button-primary"
-               th:href="@{/register}">
-                Create account
-            </a>
+        <div class="nav-actions" sec:authorize="isAnonymous()">
+            <a class="button button-secondary" th:href="@{/login}">Login</a>
+            <a class="button button-primary" th:href="@{/register}">Create account</a>
         </div>
 
-        <div class="nav-actions"
-             sec:authorize="isAuthenticated()">
+        <div class="nav-actions" sec:authorize="isAuthenticated()">
 
-            <a class="button button-primary"
-               th:href="@{/home}">
-                Dashboard
-            </a>
+            <a class="button button-primary" th:href="@{/home}">Dashboard</a>
 
-            <form th:action="@{/logout}"
-                  method="post">
-                <button class="button button-secondary"
-                        type="submit">
-                    Logout
-                </button>
+            <form th:action="@{/logout}" method="post">
+                <button class="button button-secondary" type="submit">Logout</button>
             </form>
         </div>
     </nav>
@@ -72,16 +52,11 @@
     <section class="discussion-hero">
 
         <div class="hero-content">
-            <a class="back-link"
-               th:href="@{/travel-groups/{id}(id=${travelGroup.id})}">
-                ← Back to travel group
-            </a>
+            <a class="back-link" th:href="@{/travel-groups/{id}(id=${travelGroup.id})}">← Back to travel group</a>
 
             <p class="eyebrow">Private group area</p>
 
-            <h1 th:text="${travelGroup.name}">
-                Travel group name
-            </h1>
+            <h1 th:text="${travelGroup.name}">Travel group name</h1>
 
             <p class="hero-text">
                 This discussion is visible only to the group owner and accepted travelers.
@@ -89,8 +64,7 @@
             </p>
 
             <div class="hero-actions">
-                <a class="button button-secondary"
-                   th:href="@{/travel-groups/{id}(id=${travelGroup.id})}">
+                <a class="button button-secondary" th:href="@{/travel-groups/{id}(id=${travelGroup.id})}">
                     Group details
                 </a>
 
@@ -357,10 +331,7 @@
 <footer class="site-footer">
 
     <div>
-        <a class="brand footer-brand"
-           th:href="@{/}">
-            TournamentTrail
-        </a>
+        <a class="brand footer-brand" th:href="@{/}">TournamentTrail</a>
 
         <p>
             Chess tournaments, registrations, and shared travel in one platform.

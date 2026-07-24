@@ -82,6 +82,10 @@
             <div class="hero-actions">
 
                 <a class="button button-secondary" th:href="@{/travel-groups}">Browse groups</a>
+                <a class="button button-primary" th:if="${canViewPrivateGroupArea}"
+                   th:href="@{/travel-groups/{id}/comments(id=${travelGroup.id})}">
+                    Open discussion
+                </a>
 
                 <a class="button button-primary" th:if="${isOwner}"
                    th:href="@{/travel-groups/{id}/requests(id=${travelGroup.id})}">

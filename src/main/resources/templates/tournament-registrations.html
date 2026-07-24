@@ -30,23 +30,15 @@
             <a class="active" th:href="@{/registrations}"> My registrations</a>
             <a th:href="@{/travel-groups}">Travel groups</a>
             <a th:href="@{/about}">About</a>
-            <a th:href="@{/contacts}">Contacts</a>
+            <a th:href="@{/contact}">Contacts</a>
         </div>
 
-        <div class="nav-actions"
-             sec:authorize="isAuthenticated()">
+        <div class="nav-actions" sec:authorize="isAuthenticated()">
 
-            <a class="button button-primary"
-               th:href="@{/home}">
-                Dashboard
-            </a>
+            <a class="button button-primary" th:href="@{/home}">Dashboard</a>
 
-            <form th:action="@{/logout}"
-                  method="post">
-                <button class="button button-secondary"
-                        type="submit">
-                    Logout
-                </button>
+            <form th:action="@{/logout}" method="post">
+                <button class="button button-secondary" type="submit">Logout</button>
             </form>
         </div>
     </nav>
@@ -66,10 +58,7 @@
             </p>
         </div>
 
-        <a class="button button-primary"
-           th:href="@{/tournaments}">
-            Browse tournaments
-        </a>
+        <a class="button button-primary" th:href="@{/tournaments}">Browse tournaments</a>
     </section>
 
     <section class="panel">
@@ -78,32 +67,22 @@
             <div>
                 <h2>Registrations</h2>
 
-                <p>
-                    Hidden registrations are not shown here.
-                </p>
+                <p>Hidden registrations are not shown here.</p>
             </div>
         </div>
 
-        <div class="empty-state"
-             th:if="${#lists.isEmpty(registrations)}">
+        <div class="empty-state" th:if="${#lists.isEmpty(registrations)}">
 
             <h3>No registrations yet</h3>
 
-            <p>
-                You have not registered for a tournament yet.
-            </p>
+            <p>You have not registered for a tournament yet.</p>
 
-            <a class="button button-primary"
-               th:href="@{/tournaments}">
-                Find a tournament
-            </a>
+            <a class="button button-primary" th:href="@{/tournaments}">Find a tournament</a>
         </div>
 
-        <div class="registration-list"
-             th:if="${!#lists.isEmpty(registrations)}">
+        <div class="registration-list" th:if="${!#lists.isEmpty(registrations)}">
 
-            <article class="registration-card"
-                     th:each="registration : ${registrations}">
+            <article class="registration-card" th:each="registration : ${registrations}">
 
                 <div class="card-main">
 
@@ -214,12 +193,9 @@
                           th:action="@{/registrations/{id}/cancel(id=${registration.id})}"
                           method="post">
 
-                        <input type="hidden"
-                               name="_method"
-                               value="patch">
+                        <input type="hidden" name="_method" value="patch">
 
-                        <button class="button button-danger"
-                                type="submit"
+                        <button class="button button-danger" type="submit"
                                 onclick="return confirm('Cancel this registration?')">
                             Cancel
                         </button>

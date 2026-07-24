@@ -23,4 +23,7 @@ public interface TravelRequestRepository extends JpaRepository<TravelRequest, UU
 
     List<TravelRequest> findAllByTravelGroupIdAndStatusOrderByRespondedOnDesc(UUID travelGroupId
             , TravelRequestStatus status);
+
+    boolean existsByTravelGroupIdAndApplicantIdAndStatus(UUID travelGroupId, UUID applicantId
+            , TravelRequestStatus status);
 }
