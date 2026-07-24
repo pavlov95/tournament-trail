@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title th:text="${travelGroup.name + ' Discussion | TournamentTrail'}">
+        Private Discussion | TournamentTrail
+    </title>
+
+    <link rel="stylesheet"
+          th:href="@{/css/comment.css}">
+</head>
+
+<body>
+
+<header class="site-header">
+    <nav class="navbar">
+
+        <a class="brand"
+           th:href="@{/}">
+            TournamentTrail
+        </a>
+
+        <div class="nav-links">
+            <a th:href="@{/}">Home</a>
+            <a th:href="@{/tournaments}">Tournaments</a>
+            <a th:href="@{/registrations}">My registrations</a>
+            <a class="active" th:href="@{/travel-groups}">Travel groups</a>
+            <a th:href="@{/about}">About</a>
+            <a th:href="@{/contact}">Contact</a>
+        </div>
+
+        <div class="nav-actions"
+             sec:authorize="isAnonymous()">
+            <a class="button button-secondary"
+               th:href="@{/login}">
+                Login
+            </a>
+
+            <a class="button button-primary"
+               th:href="@{/register}">
+                Create account
+            </a>
+        </div>
+
+        <div class="nav-actions"
+             sec:authorize="isAuthenticated()">
+
+            <a class="button button-primary"
+               th:href="@{/home}">
+                Dashboard
+            </a>
+
+            <form th:action="@{/logout}"
+                  method="post">
+                <button class="button button-secondary"
+                        type="submit">
+                    Logout
+                </button>
+            </form>
+        </div>
+    </nav>
+</header>
+
+<main>
+
+    <section class="discussion-hero">
+
+        <div class="hero-content">
+            <a class="back-link"
+               th:href="@{/travel-groups/{id}(id=${travelGroup.id})}">
+                ← Back to travel group
+            </a>
+
+            <p class="eyebrow">Private group area</p>
+
+            <h1 th:text="${travelGroup.name}">
+                Travel group name
+            </h1>
+
+            <p class="hero-text">
+                This discussion is visible only to the group owner and accepted travelers.
+                Use it to coordinate meeting details, transport updates, and tournament travel plans.
+            </p>
+
+            <div class="hero-actions">
+                <a class="button button-secondary"
+                   th:href="@{/travel-groups/{id}(id=${travelGroup.id})}">
+                    Group details
+                </a>
+
+                <a class="button button-secondary"
+                   th:if="${#authentication.principal.id == travelGroup.owner.id}"
+                   th:href="@{/travel-groups/{id}/requests(id=${travelGroup.id})}">
+                    Manage requests
+                </a>
+            </div>
+        </div>
+
+        <aside class="discussion-summary">
+            <h2>Discussion summary</h2>
+
+            <dl>
+                <div>
+                    <dt>Comments</dt>
+                    <dd th:text="${countVisibleComments}">
+                        0
+                    </dd>
+                </div>
+
+                <div>
+                    <dt>Owner</dt>
+                    <dd th:text="${travelGroup.owner.username}">
+                        owner
+                    </dd>
+                </div>
+
+                <div>
+                    <dt>Group status</dt>
+                    <dd th:text="${travelGroup.status}">
+                        OPEN
+                    </dd>
+                </div>
+            </dl>
+        </aside>
+    </section>
+
+    <section class="discussion-layout">
+
+        <section class="comments-panel">
+
+            <div class="section-heading">
+                <div>
+                    <p class="eyebrow">Discussion</p>
+                    <h2>Group comments</h2>
+                </div>
+
+                <span class="comment-count"
+                      th:text="|${countVisibleComments} comments|">
+                    0 comments
+                </span>
+            </div>
+
+            <div class="empty-state"
+                 th:if="${#lists.isEmpty(comments)}">
+                <div class="empty-icon">♟</div>
+                <h3>No comments yet</h3>
+                <p>
+                    Start the private discussion by sharing meeting details,
+                    transport updates, or questions for the group.
+                </p>
+            </div>
+
+            <div class="comments-list"
+                 th:unless="${#lists.isEmpty(comments)}">
+
+                <article class="comment-card"
+                         th:each="comment : ${comments}"
+                         th:classappend="${comment.pinned} ? ' pinned-comment' : ''">
+
+                    <div class="comment-main">
+
+                        <div class="comment-avatar"
+                             th:text="${#strings.toUpperCase(#strings.substring(comment.author.username, 0, 1))}">
+                            D
+                        </div>
+
+                        <div class="comment-body">
+
+                            <div class="comment-header">
+
+                                <div>
+                                    <div class="author-line">
+                                        <strong th:text="${comment.author.username}">
+                                            username
+                                        </strong>
+
+                                        <span class="role-badge owner-badge"
+                                              th:if="${comment.author.id == travelGroup.owner.id}">
+                                            Owner
+                                        </span>
+
+                                        <span class="role-badge traveler-badge"
+                                              th:unless="${comment.author.id == travelGroup.owner.id}">
+                                            Traveler
+                                        </span>
+
+                                        <span class="pinned-badge"
+                                              th:if="${comment.pinned}">
+                                            Pinned
+                                        </span>
+                                    </div>
+
+                                    <div class="comment-meta">
+                                        <span th:text="${#temporals.format(comment.createdOn, 'dd MMM yyyy, HH:mm')}">
+                                            24 Jul 2026, 10:30
+                                        </span>
+
+                                        <span th:if="${comment.editedOn != null}">
+                                            · edited
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="comment-actions">
+
+                                    <form th:if="${#authentication.principal.id == travelGroup.owner.id and !comment.pinned}"
+                                          th:action="@{/travel-groups/{groupId}/comments/{commentId}/pin(
+                                                groupId=${travelGroup.id},
+                                                commentId=${comment.id}
+                                          )}"
+                                          method="post">
+                                        <input type="hidden"
+                                               name="_method"
+                                               value="patch">
+                                        <button class="link-button"
+                                                type="submit">
+                                            Pin
+                                        </button>
+                                    </form>
+
+                                    <form th:if="${#authentication.principal.id == travelGroup.owner.id and comment.pinned}"
+                                          th:action="@{/travel-groups/{groupId}/comments/{commentId}/unpin(
+                                                groupId=${travelGroup.id},
+                                                commentId=${comment.id}
+                                          )}"
+                                          method="post">
+                                        <input type="hidden"
+                                               name="_method"
+                                               value="patch">
+                                        <button class="link-button"
+                                                type="submit">
+                                            Unpin
+                                        </button>
+                                    </form>
+
+                                    <form th:if="${#authentication.principal.id == comment.author.id}"
+                                          th:action="@{/travel-groups/{groupId}/comments/{commentId}(
+                                                groupId=${travelGroup.id},
+                                                commentId=${comment.id}
+                                          )}"
+                                          method="post">
+                                        <input type="hidden"
+                                               name="_method"
+                                               value="delete">
+                                        <button class="link-button danger-link"
+                                                type="submit"
+                                                onclick="return confirm('Delete this comment?')">
+                                            Delete
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <p class="comment-content"
+                               th:text="${comment.content}">
+                                Comment content.
+                            </p>
+
+                            <details class="edit-details"
+                                     th:if="${#authentication.principal.id == comment.author.id}">
+                                <summary>Edit comment</summary>
+
+                                <form class="edit-comment-form"
+                                      th:action="@{/travel-groups/{groupId}/comments/{commentId}/edit(
+                                            groupId=${travelGroup.id},
+                                            commentId=${comment.id}
+                                      )}"
+                                      method="post">
+
+                                    <input type="hidden"
+                                           name="_method"
+                                           value="patch">
+
+                                    <textarea name="content"
+                                              rows="3"
+                                              maxlength="1000"
+                                              required
+                                              th:text="${comment.content}"></textarea>
+
+                                    <div class="inline-actions">
+                                        <button class="button button-primary"
+                                                type="submit">
+                                            Save edit
+                                        </button>
+                                    </div>
+                                </form>
+                            </details>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <aside class="new-comment-panel">
+
+            <div class="compose-card">
+                <p class="eyebrow">New comment</p>
+                <h2>Write an update</h2>
+
+                <p class="muted">
+                    Share short, practical information. Meeting point changes,
+                    delays, cost updates, and transport plans belong here.
+                </p>
+
+                <form class="comment-form"
+                      th:action="@{/travel-groups/{id}/comments(id=${travelGroup.id})}"
+                      method="post"
+                      th:object="${commentRequest}">
+
+                    <div class="form-group">
+                        <label for="content">
+                            Comment
+                            <span>max 1000 characters</span>
+                        </label>
+
+                        <textarea id="content"
+                                  rows="6"
+                                  maxlength="1000"
+                                  placeholder="Write a message for the travel group..."
+                                  th:field="*{content}"></textarea>
+
+                        <p class="field-error"
+                           th:if="${#fields.hasErrors('content')}"
+                           th:errors="*{content}">
+                            Comment error
+                        </p>
+                    </div>
+
+                    <button class="button button-primary button-full"
+                            type="submit">
+                        Post comment
+                    </button>
+                </form>
+            </div>
+
+            <div class="rules-card">
+                <h3>Discussion rules</h3>
+
+                <ul>
+                    <li>Visible only to accepted travelers and the owner.</li>
+                    <li>Owners can pin useful updates.</li>
+                    <li>You can edit or delete your own comments.</li>
+                    <li>Use comments for travel coordination, not public tournament reviews.</li>
+                </ul>
+            </div>
+        </aside>
+    </section>
+
+</main>
+
+<footer class="site-footer">
+
+    <div>
+        <a class="brand footer-brand"
+           th:href="@{/}">
+            TournamentTrail
+        </a>
+
+        <p>
+            Chess tournaments, registrations, and shared travel in one platform.
+        </p>
+    </div>
+
+    <nav>
+        <a th:href="@{/tournaments}">Tournaments</a>
+        <a th:href="@{/registrations}">My registrations</a>
+        <a th:href="@{/travel-groups}" class="active">Travel groups</a>
+        <a th:href="@{/about}">About</a>
+        <a th:href="@{/contact}">Contact</a>
+    </nav>
+
+    <p>&copy; 2026 TournamentTrail</p>
+</footer>
+
+</body>
+</html>
