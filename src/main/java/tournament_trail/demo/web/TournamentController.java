@@ -14,12 +14,10 @@ import tournament_trail.demo.entities.enums.CurrencyCode;
 import tournament_trail.demo.entities.enums.TimeControl;
 import tournament_trail.demo.entities.enums.TournamentStatus;
 import tournament_trail.demo.security.AuthenticationUserDetails;
+import tournament_trail.demo.services.ReviewService;
 import tournament_trail.demo.services.TournamentRegistrationService;
 import tournament_trail.demo.services.TournamentService;
-import tournament_trail.demo.web.dtos.OrganiserNoteRequest;
-import tournament_trail.demo.web.dtos.TournamentOptionResponse;
-import tournament_trail.demo.web.dtos.TournamentRequest;
-import tournament_trail.demo.web.dtos.TournamentSearchRequest;
+import tournament_trail.demo.web.dtos.*;
 
 import java.util.List;
 import java.util.UUID;
@@ -30,10 +28,12 @@ public class TournamentController {
 
     private final TournamentService tournamentService;
     private final TournamentRegistrationService tournamentRegistrationService;
+    private final ReviewService reviewService;
 
-    public TournamentController(TournamentService tournamentService, TournamentRegistrationService tournamentRegistrationService) {
+    public TournamentController(TournamentService tournamentService, TournamentRegistrationService tournamentRegistrationService, ReviewService reviewService) {
         this.tournamentService = tournamentService;
         this.tournamentRegistrationService = tournamentRegistrationService;
+        this.reviewService = reviewService;
     }
 
     @GetMapping
@@ -99,6 +99,7 @@ public class TournamentController {
 
             modelAndView.addObject("tournament", tournament);
             modelAndView.addObject("canEdit", true);
+            addReviewData(modelAndView, tournamentId);
             addCommonPageData(modelAndView);
 
             return modelAndView;
@@ -117,6 +118,7 @@ public class TournamentController {
         Tournament tournament = tournamentService.findById(tournamentId);
 
         ModelAndView modelAndView = new ModelAndView("tournament-details");
+        addReviewData(modelAndView, tournamentId);
         modelAndView.addObject("tournament", tournament);
         modelAndView.addObject("tournamentRequest",
                 tournamentService.mapToTournamentRequest(tournament));
@@ -214,6 +216,10 @@ public class TournamentController {
     private void addCommonPageData(ModelAndView modelAndView) {
         modelAndView.addObject("timeControls", TimeControl.values());
         modelAndView.addObject("currencies", CurrencyCode.values());
+    }
+    private void addReviewData(ModelAndView modelAndView, UUID tournamentId){
+        ReviewSummaryData reviewSummary = reviewService.getReviewSummary(tournamentId);
+        modelAndView.addObject("reviewSummary", reviewSummary);
     }
 
 

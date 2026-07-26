@@ -7,13 +7,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
-import tournament_trail.demo.entities.TravelGroupComment;
 import tournament_trail.demo.security.AuthenticationUserDetails;
 import tournament_trail.demo.services.TravelGroupCommentService;
 import tournament_trail.demo.web.dtos.CommentRequest;
 import tournament_trail.demo.web.dtos.TravelGroupCommentsPageData;
-
-import java.util.List;
 import java.util.UUID;
 
 @Controller

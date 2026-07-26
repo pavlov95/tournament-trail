@@ -139,7 +139,7 @@ public class TournamentService {
 
     @Transactional
     public void updateTournamentStatus(UUID tournamentId, TournamentStatus requestedStatus,
-            UUID userId, Role role){
+                                       UUID userId, Role role) {
         Tournament tournament = findById(tournamentId);
 
         boolean isOwner = tournament.getOrganiser().getId().equals(userId);
@@ -276,7 +276,7 @@ public class TournamentService {
 
     }
 
-    public void validateTournamentNotFull(int tournamentCapacity, int currentRegistrations){
+    public void validateTournamentNotFull(int tournamentCapacity, int currentRegistrations) {
         if (tournamentCapacity <= currentRegistrations) {
             throw new TournamentFullException();
         }
@@ -294,6 +294,7 @@ public class TournamentService {
         tournament.setStatus(TournamentStatus.CANCELLED);
         tournament.setUpdatedOn(LocalDateTime.now());
     }
+
     public List<TournamentOptionResponse> searchTournamentOptions(String query) {
         if (query == null || query.trim().length() < 2) {
             return List.of();
@@ -307,6 +308,7 @@ public class TournamentService {
         );
 
     }
+
     public String getTournamentOptionLabel(UUID tournamentId) {
         if (tournamentId == null) {
             return "";
@@ -316,4 +318,39 @@ public class TournamentService {
 
         return tournament.getName();
     }
+
+    @Transactional
+    public void updateTournamentStatuses() {
+        List<Tournament> tournaments = tournamentRepository.findAllByStatusIn(
+                List.of(TournamentStatus.PUBLISHED, TournamentStatus.STARTED, TournamentStatus.REGISTRATION_CLOSED));
+
+        LocalDateTime now = LocalDateTime.now();
+
+        for (Tournament tournament : tournaments) {
+            TournamentStatus status = tournament.getStatus();
+
+            if (status == TournamentStatus.STARTED) {
+                if (!tournament.getEndTime().isAfter(now)) {
+                    tournament.setStatus(TournamentStatus.COMPLETED);
+                    tournament.setUpdatedOn(now);
+                }
+                continue;
+            }
+            if (status == TournamentStatus.REGISTRATION_CLOSED) {
+                if (!tournament.getStartTime().isAfter(now)) {
+                    tournament.setStatus(TournamentStatus.STARTED);
+                    tournament.setUpdatedOn(now);
+                }
+                continue;
+            }
+            if (status == TournamentStatus.PUBLISHED) {
+                if (!tournament.getRegistrationDeadline().isAfter(now)) {
+                    tournament.setStatus(TournamentStatus.REGISTRATION_CLOSED);
+                    tournament.setUpdatedOn(now);
+                }
+            }
+        }
+    }
+
+
 }

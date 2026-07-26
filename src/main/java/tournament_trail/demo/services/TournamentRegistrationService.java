@@ -47,8 +47,7 @@ public class TournamentRegistrationService {
 
         Tournament tournament = tournamentService.findById(tournamentId);
 
-        Optional<TournamentRegistration> existingRegistration =
-                tournamentRegistrationRepository.findByTournamentIdAndPlayerId(tournamentId, userId);
+        Optional<TournamentRegistration> existingRegistration = findByTournamentIdAndPlayerId(tournamentId, userId);
 
         if (existingRegistration.isPresent()) {
             TournamentRegistration registration = existingRegistration.get();
@@ -289,4 +288,7 @@ public class TournamentRegistrationService {
                         List.of(RegistrationStatus.PENDING_PAYMENT, RegistrationStatus.CONFIRMED));
     }
 
+    public Optional<TournamentRegistration> findByTournamentIdAndPlayerId(UUID tournamentId, UUID playerId) {
+        return tournamentRegistrationRepository.findByTournamentIdAndPlayerId(tournamentId, playerId);
+    }
 }

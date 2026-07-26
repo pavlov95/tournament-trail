@@ -38,4 +38,6 @@ public interface TournamentRepository extends JpaRepository<Tournament, UUID> {
     List<Tournament> findAllByOrderByRegistrationDeadlineAsc();
 
     List<Tournament> findAll(Specification<Tournament> specification, Sort startTime);
+
+    List<Tournament> findAllByStatusIn(List<TournamentStatus> statuses);
 }

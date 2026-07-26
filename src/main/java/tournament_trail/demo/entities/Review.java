@@ -1,10 +1,8 @@
 package tournament_trail.demo.entities;
 
-
 import jakarta.persistence.*;
 import lombok.*;
 import tournament_trail.demo.entities.enums.Rating;
-
 import java.time.LocalDateTime;
 import java.util.UUID;
 

@@ -129,6 +129,27 @@
                    th:href="@{/tournaments/{tournamentId}/registrations(tournamentId=${tournament.id})}">
                     Manage registrations
                 </a>
+                <div class="review-action-group">
+
+                    <a class="button button-secondary"
+                       th:href="@{/tournaments/{id}/reviews(id=${tournament.id})}">
+                        Reviews
+                    </a>
+
+                    <span class="review-summary-badge"
+                          th:if="${(tournament.status.name() == 'STARTED' or tournament.status.name() == 'COMPLETED')
+                   and reviewSummary.reviewCount() > 0}"
+                          th:text="|${#numbers.formatDecimal(reviewSummary.averageRating(), 1, 1)} / 5 · ${reviewSummary.reviewCount()} reviews|">
+        4.3 / 5 · 12 reviews
+    </span>
+
+                    <span class="review-summary-badge muted-badge"
+                          th:if="${(tournament.status.name() == 'STARTED' or tournament.status.name() == 'COMPLETED')
+                   and reviewSummary.reviewCount() == 0}">
+        No reviews yet
+    </span>
+                </div>
+
             </div>
         </div>
 

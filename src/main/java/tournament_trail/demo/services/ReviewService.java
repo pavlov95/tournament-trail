@@ -108,5 +108,15 @@ public class ReviewService {
         return tournament;
     }
 
+    @Transactional(readOnly = true)
+    public ReviewSummaryData getReviewSummary(UUID tournamentId) {
+        List<Review> reviews = reviewRepository.findByTournamentIdOrderByCreatedOnDesc(tournamentId);
 
+        double averageRating = reviews.stream()
+                .mapToInt(review -> review.getRating().getGrade())
+                .average()
+                .orElse(0.0);
+
+        return new ReviewSummaryData(reviews.size(), averageRating);
+    }
 }
