@@ -5,7 +5,6 @@ import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 import tournament_trail.demo.entities.enums.CurrencyCode;
 import tournament_trail.demo.entities.enums.TimeControl;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -37,11 +36,8 @@ public class TournamentRequest {
 
     @NotNull(message = "Entry fee is required")
     @DecimalMin(value = "0.00", message = "Entry fee cannot be negative")
-    @Digits(
-            integer = 8,
-            fraction = 2,
-            message = "Entry fee must have up to 8 integer digits and 2 decimal places"
-    )
+    @Digits(integer = 8, fraction = 2
+            , message = "Entry fee must have up to 8 integer digits and 2 decimal places")
     private BigDecimal entryFee;
 
     @NotNull(message = "Currency is required")
@@ -62,7 +58,7 @@ public class TournamentRequest {
     @Min(value = 1, message = "Edition can not be negative or zero")
     private Integer edition;
 
-    @NotBlank
+    @NotBlank(message = "Description is required")
     private String description;
 
     private boolean rated;
@@ -71,11 +67,27 @@ public class TournamentRequest {
     @Min(value = 2, message = "A tournament must allow at least 2 participants")
     private Integer maximumParticipants;
 
-    @NotBlank
+    @NotBlank(message = "Participation requirements are required")
     @Size( max = 1000, message = "Participation requirements must be below 1000 characters")
     private String participationRequirements;
 
     @Size( max = 1000, message = "Payment instructions must be below 1000 characters")
     private String paymentInstructions;
 
+    @AssertTrue(message = "Tournament start time must be before tournament end time.")
+    public boolean isTournamentTimeValid() {
+        if (startTime == null || endTime == null) {
+            return true;
+        }
+
+        return startTime.isBefore(endTime);
+    }
+
+    @AssertTrue(message = "Registration must end before the start of the tournament.")
+    public boolean isRegistrationTimeValid(){
+        if(registrationDeadline == null || startTime == null){
+            return true;
+        }
+        return registrationDeadline.isBefore(startTime);
+    }
 }

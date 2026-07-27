@@ -128,7 +128,7 @@ public class TournamentRegistrationService {
             throw new AccessDeniedException("You are not allowed to delete this registration");
         }
         if (!canHide) {
-            throw new StatusNotTerminalException();
+            throw new IllegalStateException("Only cancelled, rejected, or expired registrations can be hidden.");
         }
 
         registration.setHidden(true);
@@ -152,7 +152,8 @@ public class TournamentRegistrationService {
         TournamentRegistration registration = findById(id);
         boolean isOwner = checkOwnership(registration, userId);
         if (!isOwner) {
-            throw new AccessDeniedException("You are not allowed to make a payment on behalf of another player");
+            throw new AccessDeniedException(
+                    "You are not allowed to make a payment on behalf of another player");
         }
         if (registration.getRegistrationStatus() != RegistrationStatus.PENDING_PAYMENT) {
             throw new IllegalStateException("Payment can only be submitted for pending payment registrations.");
@@ -161,8 +162,10 @@ public class TournamentRegistrationService {
                 registration.getPaymentStatus() != PaymentStatus.REJECTED) {
             throw new IllegalStateException("Payment reference cannot be submitted for this payment status.");
         }
-        if (registration.getReservedUntil() == null
-                || !registration.getReservedUntil().isAfter(LocalDateTime.now())) {
+        LocalDateTime reservedUntil = registration.getReservedUntil();
+
+        if (reservedUntil == null || !reservedUntil.isAfter(LocalDateTime.now())) {
+
             registration.setRegistrationStatus(RegistrationStatus.EXPIRED);
             registration.setPaymentStatus(PaymentStatus.EXPIRED);
             registration.setUpdatedOn(LocalDateTime.now());

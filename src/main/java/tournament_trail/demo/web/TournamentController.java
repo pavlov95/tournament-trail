@@ -64,6 +64,7 @@ public class TournamentController {
             BindingResult bindingResult,
             @AuthenticationPrincipal AuthenticationUserDetails userDetails,
             RedirectAttributes redirectAttributes) {
+
         if (bindingResult.hasErrors()) {
             ModelAndView modelAndView = new ModelAndView("tournament-create");
 
@@ -71,6 +72,7 @@ public class TournamentController {
                     tournamentService.searchTournaments(new TournamentSearchRequest()));
 
             modelAndView.addObject("searchRequest", new TournamentSearchRequest());
+            modelAndView.addObject("tournamentRequest", tournamentRequest);
             addCommonPageData(modelAndView);
 
             return modelAndView;
@@ -99,6 +101,7 @@ public class TournamentController {
 
             modelAndView.addObject("tournament", tournament);
             modelAndView.addObject("canEdit", true);
+            modelAndView.addObject("tournamentRequest", tournamentRequest);
             addReviewData(modelAndView, tournamentId);
             addCommonPageData(modelAndView);
 

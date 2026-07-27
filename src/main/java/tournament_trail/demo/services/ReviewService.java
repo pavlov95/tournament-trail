@@ -9,6 +9,7 @@ import tournament_trail.demo.entities.TournamentRegistration;
 import tournament_trail.demo.entities.enums.Role;
 import tournament_trail.demo.entities.enums.TournamentStatus;
 import tournament_trail.demo.exceptions.InvalidReviewException;
+import tournament_trail.demo.exceptions.ReviewAlreadyExistsException;
 import tournament_trail.demo.exceptions.TournamentNotStartedException;
 import tournament_trail.demo.repositories.ReviewRepository;
 import tournament_trail.demo.web.dtos.ReviewRequest;
@@ -42,7 +43,7 @@ public class ReviewService {
         Tournament tournament = validateUserCanReviewTournament(tournamentId, userId);
 
         if (reviewRepository.existsByTournamentIdAndAuthorId(tournamentId, userId)) {
-            throw new InvalidReviewException("You have already reviewed this tournament");
+            throw new ReviewAlreadyExistsException();
         }
 
         Review review = Review.builder()
@@ -87,8 +88,8 @@ public class ReviewService {
     }
 
     private Review findByIdAndTournamentId(UUID reviewId, UUID tournamentId) {
-        return reviewRepository.findByIdAndTournamentId(reviewId, tournamentId).orElseThrow(
-                () -> new InvalidReviewException("No such review exists"));
+        return reviewRepository.findByIdAndTournamentId(
+                reviewId, tournamentId).orElseThrow(InvalidReviewException::new);
     }
 
     private Tournament validateUserCanReviewTournament(UUID tournamentId, UUID userId) {
@@ -100,10 +101,11 @@ public class ReviewService {
         Optional<TournamentRegistration> optionalTournament = tournamentRegistrationService
                 .findByTournamentIdAndPlayerId(tournamentId, userId);
         if (optionalTournament.isEmpty()) {
-            throw new InvalidReviewException("You can not rate a tournament in which you do not have a registration");
+            throw new AccessDeniedException(
+                    "You can not rate a tournament in which you do not have a registration");
         }
         if (tournament.getOrganiser().getId().equals(userId)) {
-            throw new InvalidReviewException("An organiser can not rate his own tournament");
+            throw new AccessDeniedException("An organiser can not rate his own tournament");
         }
         return tournament;
     }

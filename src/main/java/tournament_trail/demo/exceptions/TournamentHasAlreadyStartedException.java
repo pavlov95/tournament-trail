@@ -1,7 +1,7 @@
 package tournament_trail.demo.exceptions;
 
-public class TournamentHasAlreadyStartedException extends RuntimeException {
+public class TournamentHasAlreadyStartedException extends IllegalStateException {
     public TournamentHasAlreadyStartedException() {
-        super("Tournament has already started");
+        super("This action is not available because the tournament has already started.");
     }
 }

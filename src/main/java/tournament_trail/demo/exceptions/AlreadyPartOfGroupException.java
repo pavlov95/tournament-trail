@@ -1,7 +1,7 @@
 package tournament_trail.demo.exceptions;
 
-public class AlreadyPartOfGroupException extends RuntimeException {
+public class AlreadyPartOfGroupException extends IllegalStateException {
     public AlreadyPartOfGroupException() {
-        super("You are already part of this group");
+        super("You cannot request to join your own travel group.");
     }
 }

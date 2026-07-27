@@ -6,11 +6,9 @@ import org.springframework.transaction.annotation.Transactional;
 import tournament_trail.demo.entities.TravelGroup;
 import tournament_trail.demo.entities.TravelGroupComment;
 import tournament_trail.demo.entities.enums.TravelGroupStatus;
-import tournament_trail.demo.exceptions.InvalidCommentContentException;
 import tournament_trail.demo.exceptions.InvalidCommentException;
 import tournament_trail.demo.repositories.TravelGroupCommentRepository;
 import tournament_trail.demo.web.dtos.TravelGroupCommentsPageData;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -41,10 +39,6 @@ public class TravelGroupCommentService {
         TravelGroup travelGroup = travelGroupService.findById(travelGroupId);
         checkForAccess(userId, travelGroup);
 
-        if (content == null || content.isBlank() || content.length() > 1000) {
-            throw new InvalidCommentContentException();
-        }
-
         TravelGroupComment comment = TravelGroupComment.builder()
                 .content(content.trim())
                 .pinned(false)
@@ -66,10 +60,6 @@ public class TravelGroupCommentService {
 
         if (!comment.getAuthor().getId().equals(userId)) {
             throw new AccessDeniedException("You are only allowed to edit your own comments");
-        }
-
-        if (content == null || content.isBlank() || content.length() > 1000) {
-            throw new InvalidCommentContentException();
         }
 
         comment.setContent(content.trim());

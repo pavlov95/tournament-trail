@@ -15,7 +15,6 @@ import tournament_trail.demo.web.dtos.TournamentOptionResponse;
 import tournament_trail.demo.web.dtos.TournamentRequest;
 import tournament_trail.demo.web.dtos.TournamentSearchRequest;
 import org.springframework.security.access.AccessDeniedException;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -36,7 +35,6 @@ public class TournamentService {
 
     @Transactional
     public Tournament createTournament(TournamentRequest tournamentRequest, UUID userID) {
-        verifyTournamentTime(tournamentRequest);
         User organiser = userService.findById(userID);
 
         Tournament tournament = Tournament.builder()
@@ -125,14 +123,6 @@ public class TournamentService {
         return tournamentRepository.findAll(specification, Sort.by(Sort.Direction.ASC, "startTime"));
     }
 
-    private void verifyTournamentTime(TournamentRequest tournamentRequest) {
-        LocalDateTime startTime = tournamentRequest.getStartTime();
-        LocalDateTime endTime = tournamentRequest.getEndTime();
-        if (startTime.isAfter(endTime) || startTime.isEqual(endTime)) {
-            throw new InvalidTournamentTimeCriteria();
-        }
-    }
-
     public Tournament findById(UUID id) {
         return tournamentRepository.findById(id).orElseThrow(TournamentDoesNotExist::new);
     }
@@ -164,7 +154,7 @@ public class TournamentService {
 
     public void editTournament(TournamentRequest tournamentRequest, UUID tournamentId,
                                UUID userId, Role role) {
-        verifyTournamentTime(tournamentRequest);
+
         Tournament tournament = findById(tournamentId);
 
         boolean isOwner = tournament.getOrganiser().getId().equals(userId);
@@ -239,9 +229,7 @@ public class TournamentService {
             throw new IllegalStateException("Cannot publish a tournament that has already started.");
         }
 
-        if (!tournament.getEndTime().isAfter(tournament.getStartTime())) {
-            throw new InvalidTournamentTimeCriteria();
-        }
+
 
         tournament.setStatus(TournamentStatus.PUBLISHED);
         tournament.setUpdatedOn(now);
@@ -259,7 +247,7 @@ public class TournamentService {
         LocalDateTime registrationDeadline = tournament.getRegistrationDeadline();
 
         if (status == TournamentStatus.CANCELLED) {
-            throw new TournamentCancelledException();
+            throw new IllegalStateException("This tournament has been cancelled");
         }
         if (status == TournamentStatus.REGISTRATION_CLOSED) {
             throw new AccessDeniedException("Registration is closed for this tournament.");

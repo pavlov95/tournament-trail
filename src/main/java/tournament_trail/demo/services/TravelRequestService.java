@@ -77,7 +77,6 @@ public class TravelRequestService {
 
     private boolean doesRequestExist(UUID travelGroupId, UUID userId) {
         return travelRequestRepository.existsByTravelGroupIdAndApplicantId(travelGroupId, userId);
-
     }
 
     public List<TravelRequest> getAllPendingRequests(UUID travelGroupId, TravelRequestStatus status) {
@@ -92,11 +91,11 @@ public class TravelRequestService {
             throw new AccessDeniedException("You are not allowed to manage this group");
         }
         if(travelRequest.getTravelGroup().getStatus() != TravelGroupStatus.OPEN){
-            throw new AccessDeniedException("Travel requests can only be accepted by travel groups that are open");
+            throw new IllegalStateException("Travel requests can only be accepted by travel groups that are open");
         }
 
         if (travelRequest.getStatus() != TravelRequestStatus.PENDING) {
-            throw new AccessDeniedException("Only Pending requests can be approved");
+            throw new IllegalStateException("Only Pending requests can be approved");
         }
         if(availableSpots<=0){
             throw new TravelGroupFullException();
