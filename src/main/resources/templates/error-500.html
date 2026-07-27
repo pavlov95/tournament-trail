@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Server Error | TournamentTrail</title>
+
+    <link rel="stylesheet" th:href="@{/css/error-500.css}">
+</head>
+
+<body>
+
+<header class="site-header">
+    <nav class="navbar">
+
+        <a class="brand" th:href="@{/}">TournamentTrail</a>
+
+        <div class="nav-links">
+            <a th:href="@{/}">Home</a>
+            <a th:href="@{/tournaments}">Tournaments</a>
+            <a th:href="@{/registrations}">My registrations</a>
+            <a th:href="@{/travel-groups}">Travel groups</a>
+            <a th:href="@{/about}">About</a>
+            <a th:href="@{/contact}">Contact</a>
+        </div>
+
+        <div class="nav-actions">
+            <a class="button button-primary" th:href="@{/home}">Dashboard</a>
+        </div>
+    </nav>
+</header>
+
+<main class="error-shell">
+
+    <section class="error-card">
+
+        <p class="eyebrow">Server error</p>
+
+        <div class="error-code">500</div>
+
+        <h1>Something went wrong on our side.</h1>
+
+        <p class="error-message"
+           th:text="${message != null ? message : 'An unexpected error occurred.'}">
+            An unexpected error occurred.
+        </p>
+
+        <div class="error-details" th:if="${path != null}">
+            <span>Requested path</span>
+            <strong th:text="${path}">/example/path</strong>
+        </div>
+
+        <p class="helper-text">
+            The request reached TournamentTrail, but the server could not complete it.
+            You can return to a safe page and try again.
+        </p>
+
+        <div class="error-actions">
+            <a class="button button-primary" th:href="@{/}">Go to home</a>
+            <a class="button button-secondary" th:href="@{/tournaments}">Browse tournaments</a>
+        </div>
+
+    </section>
+
+</main>
+
+<footer class="site-footer">
+
+    <div>
+        <a class="brand footer-brand" th:href="@{/}">TournamentTrail</a>
+        <p>
+            Chess tournaments, registrations, and shared travel in one platform.
+        </p>
+    </div>
+
+    <nav>
+        <a th:href="@{/tournaments}">Tournaments</a>
+        <a th:href="@{/registrations}">My registrations</a>
+        <a th:href="@{/travel-groups}">Travel groups</a>
+        <a th:href="@{/about}">About</a>
+        <a th:href="@{/contact}">Contact</a>
+    </nav>
+
+    <p>&copy; 2026 TournamentTrail</p>
+</footer>
+
+</body>
+</html>

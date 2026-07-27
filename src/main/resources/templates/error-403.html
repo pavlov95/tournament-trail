@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>403 | TournamentTrail</title>
+    <link rel="stylesheet" th:href="@{/css/error-403.css}">
+</head>
+<body>
+
+<header class="site-header">
+    <nav class="navbar">
+        <a class="brand" th:href="@{/}">TournamentTrail</a>
+
+        <div class="nav-links">
+            <a th:href="@{/}">Home</a>
+            <a th:href="@{/tournaments}">Tournaments</a>
+            <a th:href="@{/registrations}">My registrations</a>
+            <a th:href="@{/travel-groups}">Travel groups</a>
+            <a th:href="@{/about}">About</a>
+            <a th:href="@{/contact}">Contact</a>
+        </div>
+    </nav>
+</header>
+
+<main class="error-shell">
+
+    <section class="error-card">
+        <div class="error-badge">403</div>
+
+        <p class="eyebrow">Access denied</p>
+
+        <h1>You cannot access this page.</h1>
+
+        <p class="error-message"
+           th:text="${message != null ? message : 'You do not have permission to view this resource or perform this action.'}">
+            You do not have permission to view this resource or perform this action.
+        </p>
+
+        <p class="error-path" th:if="${path != null}">
+            Requested path:
+            <span th:text="${path}">/example</span>
+        </p>
+
+        <div class="error-actions">
+            <a class="button button-primary" sec:authorize="isAuthenticated()" th:href="@{/home}">
+                Go to dashboard
+            </a>
+
+            <a class="button button-primary" sec:authorize="isAnonymous()" th:href="@{/login}">
+                Login
+            </a>
+
+            <a class="button button-secondary" th:href="@{/tournaments}">
+                Browse tournaments
+            </a>
+
+            <a class="button button-secondary" th:href="@{/}">
+                Back to homepage
+            </a>
+        </div>
+    </section>
+
+</main>
+
+<footer class="site-footer">
+    <div>
+        <a class="brand footer-brand" th:href="@{/}">TournamentTrail</a>
+        <p>Chess tournaments, registrations, and shared travel in one platform.</p>
+    </div>
+
+    <nav>
+        <a th:href="@{/tournaments}">Tournaments</a>
+        <a th:href="@{/registrations}">My registrations</a>
+        <a th:href="@{/travel-groups}">Travel groups</a>
+        <a th:href="@{/about}">About</a>
+        <a th:href="@{/contact}">Contact</a>
+    </nav>
+
+    <p>&copy; 2026 TournamentTrail</p>
+</footer>
+
+</body>
+</html>
