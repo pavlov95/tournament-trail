@@ -4,6 +4,7 @@ package tournament_trail.demo.fixtures;
 import tournament_trail.demo.entities.Tournament;
 import tournament_trail.demo.entities.enums.TournamentStatus;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 public class TournamentFixture {
@@ -34,9 +35,33 @@ public class TournamentFixture {
                 .organiser(UserFixture.createUser(organiserID))
                 .build();
     }
-    public static Tournament create(){
+
+    public static Tournament create() {
         return Tournament.builder()
                 .id(UUID.randomUUID())
+                .build();
+    }
+
+    public static Tournament createTournamentWithStatus(UUID id, TournamentStatus status) {
+        return Tournament.builder()
+                .id(id)
+                .city("TestCity")
+                .country("TestCountry")
+                .venue("TestVenue")
+                .status(status)
+                .description("test")
+                .startTime(LocalDateTime.now())
+                .build();
+    }
+
+    public static Tournament createTournamentWithStartTime(UUID id, LocalDateTime localDateTime) {
+        return Tournament.builder()
+                .id(id)
+                .city("TestCity")
+                .country("TestCountry")
+                .venue("TestVenue")
+                .description("test")
+                .startTime(localDateTime)
                 .build();
     }
 

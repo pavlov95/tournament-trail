@@ -14,9 +14,11 @@ public class TravelGroupFixture {
                 .build();
     }
 
-    public static TravelGroup create(UUID id){
+    public static TravelGroup create(UUID id, UUID userId){
         return TravelGroup.builder()
                 .id(id)
+                .status(TravelGroupStatus.OPEN)
+                .owner(UserFixture.createUser(userId))
                 .build();
     }
 
