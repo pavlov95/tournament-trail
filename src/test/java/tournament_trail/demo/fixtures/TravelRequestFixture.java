@@ -1,23 +1,26 @@
 package tournament_trail.demo.fixtures;
 
+import tournament_trail.demo.entities.TravelGroup;
 import tournament_trail.demo.entities.TravelRequest;
-import tournament_trail.demo.entities.User;
+import tournament_trail.demo.entities.enums.TravelRequestStatus;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 public class TravelRequestFixture {
-    public static TravelRequest createWithApplicant(UUID applicantId){
+    public static TravelRequest create() {
         return TravelRequest.builder()
-                .applicant(UserFixture.createUser(applicantId))
+                .applicant(UserFixture.createUser())
+                .status(TravelRequestStatus.APPROVED)
+                .travelGroup(TravelGroupFixture.create())
                 .build();
     }
-    public static List<TravelRequest> createList(int listSize){
-        List<TravelRequest> list= new ArrayList<>();
-        for (int i = 0; i < listSize; i++) {
-            list.add(TravelRequestFixture.createWithApplicant(UUID.randomUUID()));
-        }
-        return list;
+
+    public static List<TravelRequest> createList() {
+        TravelRequest first = TravelRequestFixture.create();
+        TravelGroup travelGroup = first.getTravelGroup();
+        TravelRequest second = TravelRequestFixture.create();
+        second.setTravelGroup(travelGroup);
+        return  List.of(first, second);
+
     }
 }

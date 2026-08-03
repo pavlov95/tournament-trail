@@ -2,6 +2,8 @@ package tournament_trail.demo.services;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
@@ -11,8 +13,8 @@ import tournament_trail.demo.entities.Review;
 import tournament_trail.demo.entities.Tournament;
 import tournament_trail.demo.entities.TournamentRegistration;
 import tournament_trail.demo.entities.User;
-import tournament_trail.demo.entities.enums.Rating;
 import tournament_trail.demo.entities.enums.Role;
+import tournament_trail.demo.entities.enums.TournamentStatus;
 import tournament_trail.demo.exceptions.InvalidReviewException;
 import tournament_trail.demo.exceptions.ReviewAlreadyExistsException;
 import tournament_trail.demo.exceptions.TournamentNotStartedException;
@@ -21,9 +23,12 @@ import tournament_trail.demo.repositories.ReviewRepository;
 import org.mockito.junit.jupiter.MockitoExtension;
 import tournament_trail.demo.web.dtos.ReviewRequest;
 import tournament_trail.demo.web.dtos.ReviewSummaryData;
+
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -48,7 +53,7 @@ public class ReviewServiceTest {
     private ArgumentCaptor<Review> captor;
 
     @Test
-    public void findAllByTournamentId_shouldReturnEmptyList() {
+    public void findAllByTournamentId_shouldReturnEmptyList_whenThereAreNoReviews() {
         UUID tournamentId = UUID.randomUUID();
 
         when(reviewRepository.findByTournamentIdOrderByCreatedOnDesc(tournamentId))
@@ -62,11 +67,9 @@ public class ReviewServiceTest {
 
     @Test
     public void findAllByTournamentId_shouldReturnListWithReviews() {
-        UUID tournamentId = UUID.randomUUID();
-        List<Review> expected = List.of(Review.builder()
-                        .id(UUID.randomUUID())
-                        .build()
-                , Review.builder().id(UUID.randomUUID()).build());
+        List<Review> expected = ReviewFixture.createReviewsWithSameTournament();
+        UUID tournamentId = expected.get(0).getTournament().getId();
+
         when(reviewRepository.findByTournamentIdOrderByCreatedOnDesc(tournamentId)).thenReturn(expected);
 
         List<Review> result = reviewService.findAllByTournamentId(tournamentId);
@@ -77,203 +80,185 @@ public class ReviewServiceTest {
 
     @Test
     public void createReview_shouldCreateValidReview() {
-        UUID tournamentId = UUID.randomUUID();
-        UUID userId = UUID.randomUUID();
-        UUID organiserId = UUID.randomUUID();
-
-        User user = UserFixture.createUser(userId);
-        Tournament tournament = TournamentFixture.createWithStatusStarted(tournamentId, organiserId);
-
+        User user = UserFixture.createUser();
+        Tournament tournament = TournamentFixture.createWithStatusStarted();
         TournamentRegistration registration = TournamentRegistrationFixture.create();
-        ReviewRequest reviewRequest = ReviewRequestFixture.createWithRandomData();
+        ReviewRequest reviewRequest = ReviewRequestFixture.create();
 
-        when(tournamentService.findById(tournamentId)).thenReturn(tournament);
+        when(tournamentService.findById(tournament.getId())).thenReturn(tournament);
 
-        when(tournamentRegistrationService.findByTournamentIdAndPlayerId(tournamentId, userId))
+        when(tournamentRegistrationService.findByTournamentIdAndPlayerId(tournament.getId(), user.getId()))
                 .thenReturn(Optional.of(registration));
 
-        when(reviewRepository.existsByTournamentIdAndAuthorId(tournamentId, userId)).thenReturn(false);
+        when(reviewRepository.existsByTournamentIdAndAuthorId(tournament.getId(), user.getId())).thenReturn(false);
 
-        when(userService.findById(userId)).thenReturn(user);
+        when(userService.findById(user.getId())).thenReturn(user);
 
-        reviewService.createReview(tournamentId, userId, reviewRequest);
+        reviewService.createReview(tournament.getId(), user.getId(), reviewRequest);
 
         verify(reviewRepository).save(captor.capture());
+        Review result = captor.getValue();
 
-        Review savedReview = captor.getValue();
-
-        assertEquals("Great tournament", savedReview.getTitle());
-        assertEquals("Very well organised event.", savedReview.getContent());
-        assertEquals(Rating.GOOD, savedReview.getRating());
-        assertEquals(user, savedReview.getAuthor());
-        assertEquals(tournament, savedReview.getTournament());
-        assertNotNull(savedReview.getCreatedOn());
-        assertNotNull(savedReview.getUpdatedOn());
+        assertEquals(ReviewRequestFixture.TEST_TITLE, result.getTitle());
+        assertEquals(ReviewRequestFixture.TEST_CONTENT, result.getContent());
+        assertEquals(ReviewRequestFixture.TEST_RATING, result.getRating());
+        assertEquals(user, result.getAuthor());
+        assertEquals(tournament, result.getTournament());
+        assertNotNull(result.getCreatedOn());
+        assertNotNull(result.getUpdatedOn());
     }
 
-    @Test
-    public void createReview_shouldThrowTournamentNotStartedException() {
-        UUID tournamentId = UUID.randomUUID();
-        UUID userId = UUID.randomUUID();
+    @ParameterizedTest
+    @EnumSource(value = TournamentStatus.class, names =
+            {"DRAFT", "PUBLISHED", "REGISTRATION_CLOSED", "CANCELLED"})
+    public void createReview_shouldThrowTournamentNotStartedException_whenTournamentIsNotStartedOrComplete(
+            TournamentStatus status) {
+
         ReviewRequest reviewRequest = new ReviewRequest();
 
-        Tournament tournament = TournamentFixture.createWithStatusRegistrationClosed();
+        Tournament tournament = TournamentFixture.createWithStatus(status);
 
-        when(tournamentService.findById(tournamentId)).thenReturn(tournament);
+        when(tournamentService.findById(tournament.getId())).thenReturn(tournament);
 
         assertThrows(TournamentNotStartedException.class
-                , () -> reviewService.createReview(tournamentId, userId, reviewRequest));
+                , () -> reviewService.createReview(tournament.getId(), UUID.randomUUID(), reviewRequest));
 
         verify(reviewRepository, never()).save(any(Review.class));
     }
 
-    @Test
-    public void createReview_shouldThrowAccessDeniedExceptionWhenTournamentRegistrationIsNull() {
-        UUID tournamentId = UUID.randomUUID();
-        UUID userId = UUID.randomUUID();
+    @ParameterizedTest
+    @EnumSource(value = TournamentStatus.class, names = {"STARTED", "COMPLETED"})
+    public void createReview_shouldThrowAccessDeniedException_whenTournamentRegistrationIsNull(
+            TournamentStatus status) {
+
+        Tournament tournament = TournamentFixture.createWithStatus(status);
         ReviewRequest reviewRequest = new ReviewRequest();
+        UUID userId = UUID.randomUUID();
 
-        Tournament tournament = TournamentFixture.createWithStatusCompleted();
+        when(tournamentService.findById(tournament.getId())).thenReturn(tournament);
 
-        when(tournamentService.findById(tournamentId)).thenReturn(tournament);
-
-        when(tournamentRegistrationService.findByTournamentIdAndPlayerId(tournamentId, userId))
+        when(tournamentRegistrationService.findByTournamentIdAndPlayerId(tournament.getId(), userId))
                 .thenReturn(Optional.empty());
 
         assertThrows(AccessDeniedException.class
-                , () -> reviewService.createReview(tournamentId, userId, reviewRequest));
+                , () -> reviewService.createReview(tournament.getId(), userId, reviewRequest));
 
         verify(reviewRepository, never()).save(any(Review.class));
     }
 
-    @Test
-    public void createReview_shouldThrowAccessDeniedExceptionWhenUserAndOrganiserAreSame() {
-        UUID tournamentId = UUID.randomUUID();
-        UUID userId = UUID.randomUUID();
-        UUID organiserId = userId;
+    @ParameterizedTest
+    @EnumSource(value = TournamentStatus.class, names = {"STARTED", "COMPLETED"})
+    public void createReview_shouldThrowAccessDeniedException_whenUserAndOrganiserAreSame(
+            TournamentStatus status) {
 
-        Tournament tournament =
-                TournamentFixture.creteWithOrganiserIdAndStatusStarted(tournamentId, organiserId);
+        Tournament tournament = TournamentFixture.createWithStatus(status);
+        UUID organiserId = tournament.getOrganiser().getId();
 
         TournamentRegistration tournamentRegistration = TournamentRegistrationFixture.create();
 
-        when(tournamentService.findById(tournamentId)).thenReturn(tournament);
+        when(tournamentService.findById(tournament.getId())).thenReturn(tournament);
 
-        when(tournamentRegistrationService.findByTournamentIdAndPlayerId(tournamentId, userId))
+        when(tournamentRegistrationService.findByTournamentIdAndPlayerId(tournament.getId(), organiserId))
                 .thenReturn(Optional.of(tournamentRegistration));
 
         assertThrows(AccessDeniedException.class
-                , () -> reviewService.createReview(tournamentId, userId, new ReviewRequest()));
+                , () -> reviewService.createReview(tournament.getId(), organiserId, new ReviewRequest()));
 
         verify(reviewRepository, never()).save(any(Review.class));
     }
 
     @Test
     public void createReview_shouldThrowReviewAlreadyExistsException() {
-        UUID tournamentId = UUID.randomUUID();
-        UUID userId = UUID.randomUUID();
-        UUID organiserId = UUID.randomUUID();
-
-        Tournament tournament =
-                TournamentFixture.creteWithOrganiserIdAndStatusStarted(tournamentId, organiserId);
+        Tournament tournament = TournamentFixture.createWithStatusStarted();
         TournamentRegistration tournamentRegistration = TournamentRegistrationFixture.create();
+        UUID userId = UUID.randomUUID();
 
+        when(tournamentService.findById(tournament.getId())).thenReturn(tournament);
 
-        when(tournamentService.findById(tournamentId)).thenReturn(tournament);
-
-        when(tournamentRegistrationService.findByTournamentIdAndPlayerId(tournamentId, userId))
+        when(tournamentRegistrationService.findByTournamentIdAndPlayerId(tournament.getId(), userId))
                 .thenReturn(Optional.of(tournamentRegistration));
 
-        when(reviewRepository.existsByTournamentIdAndAuthorId(tournamentId, userId)).thenReturn(true);
+        when(reviewRepository.existsByTournamentIdAndAuthorId(tournament.getId(), userId)).thenReturn(true);
 
         assertThrows(ReviewAlreadyExistsException.class
-                , () -> reviewService.createReview(tournamentId, userId, new ReviewRequest()));
+                , () -> reviewService.createReview(tournament.getId(), userId, new ReviewRequest()));
         verify(reviewRepository, never()).save(any(Review.class));
     }
 
     @Test
-    public void editReview_shouldThrowInvalidReviewException() {
-        UUID tournamentId = UUID.randomUUID();
+    public void editReview_shouldThrowInvalidReviewException_whenThereIsNoReview() {
         UUID userId = UUID.randomUUID();
-        UUID organiserId = UUID.randomUUID();
         UUID reviewId = UUID.randomUUID();
-
         TournamentRegistration tournamentRegistration = TournamentRegistrationFixture.create();
-        Tournament tournament =
-                TournamentFixture.creteWithOrganiserIdAndStatusStarted(tournamentId, organiserId);
+        Tournament tournament = TournamentFixture.createWithStatusStarted();
 
-        when(tournamentService.findById(tournamentId)).thenReturn(tournament);
-        when(tournamentRegistrationService.findByTournamentIdAndPlayerId(tournamentId, userId))
+        when(tournamentService.findById(tournament.getId())).thenReturn(tournament);
+        when(tournamentRegistrationService.findByTournamentIdAndPlayerId(tournament.getId(), userId))
                 .thenReturn(Optional.of(tournamentRegistration));
 
-        when(reviewRepository.findByIdAndTournamentId(reviewId, tournamentId))
+        when(reviewRepository.findByIdAndTournamentId(reviewId, tournament.getId()))
                 .thenReturn(Optional.empty());
 
         assertThrows(InvalidReviewException.class
-                , () -> reviewService.editReview(tournamentId, userId, reviewId, new ReviewRequest()));
+                , () -> reviewService.editReview(tournament.getId(), userId, reviewId, new ReviewRequest()));
 
         verify(reviewRepository, never()).save(any(Review.class));
     }
 
     @Test
-    public void editReview_shouldThrowAccessDeniedException() {
-        UUID tournamentId = UUID.randomUUID();
+    public void editReview_shouldThrowAccessDeniedException_whenUserIsNotReviewAuthor() {
         UUID userId = UUID.randomUUID();
-        UUID organiserId = UUID.randomUUID();
-        UUID reviewId = UUID.randomUUID();
-
         TournamentRegistration tournamentRegistration = TournamentRegistrationFixture.create();
-        Tournament tournament =
-                TournamentFixture.creteWithOrganiserIdAndStatusStarted(tournamentId, organiserId);
+        Tournament tournament = TournamentFixture.createWithStatusStarted();
+        Review review = ReviewFixture.create();
 
-        Review review = ReviewFixture.createReviewWithUserId(reviewId, UUID.randomUUID());
-
-        when(tournamentService.findById(tournamentId)).thenReturn(tournament);
-        when(tournamentRegistrationService.findByTournamentIdAndPlayerId(tournamentId, userId))
+        when(tournamentService.findById(tournament.getId())).thenReturn(tournament);
+        when(tournamentRegistrationService.findByTournamentIdAndPlayerId(tournament.getId(), userId))
                 .thenReturn(Optional.of(tournamentRegistration));
 
-        when(reviewRepository.findByIdAndTournamentId(reviewId, tournamentId))
+        when(reviewRepository.findByIdAndTournamentId(review.getId(), tournament.getId()))
                 .thenReturn(Optional.of(review));
 
         assertThrows(AccessDeniedException.class
-                , () -> reviewService.editReview(tournamentId, userId, reviewId, new ReviewRequest()));
+                , () -> reviewService.editReview(
+                        tournament.getId(), userId, review.getId(), new ReviewRequest()));
 
         verify(reviewRepository, never()).save(any(Review.class));
     }
 
     @Test
     public void editReview_shouldEditReview() {
-        UUID tournamentId = UUID.randomUUID();
-        UUID userId = UUID.randomUUID();
-        UUID organiserId = UUID.randomUUID();
-        UUID reviewId = UUID.randomUUID();
         TournamentRegistration tournamentRegistration = TournamentRegistrationFixture.create();
+        Tournament tournament = TournamentFixture.createWithStatusStarted();
+        Review review = ReviewFixture.create();
 
-        Tournament tournament =
-                TournamentFixture.creteWithOrganiserIdAndStatusStarted(tournamentId, organiserId);
-        Review review = ReviewFixture.createReviewWithUserId(reviewId, userId);
+        ReviewRequest reviewRequest = ReviewRequestFixture.create();
+        LocalDateTime before = LocalDateTime.now();
 
-        ReviewRequest reviewRequest = ReviewRequestFixture.createWithRandomData();
+        when(tournamentService.findById(tournament.getId())).thenReturn(tournament);
 
-        when(tournamentService.findById(tournamentId)).thenReturn(tournament);
-        when(tournamentRegistrationService.findByTournamentIdAndPlayerId(tournamentId, userId))
+        when(tournamentRegistrationService.findByTournamentIdAndPlayerId(
+                tournament.getId(), review.getAuthor().getId()))
                 .thenReturn(Optional.of(tournamentRegistration));
 
-        when(reviewRepository.findByIdAndTournamentId(reviewId, tournamentId))
+        when(reviewRepository.findByIdAndTournamentId(review.getId(), tournament.getId()))
                 .thenReturn(Optional.of(review));
 
-        reviewService.editReview(tournamentId, userId, reviewId, reviewRequest);
+        reviewService.editReview(
+                tournament.getId(), review.getAuthor().getId(), review.getId(), reviewRequest);
 
         verify(reviewRepository).save(captor.capture());
-        Review savedReview = captor.getValue();
-        assertEquals(reviewRequest.getTitle(), savedReview.getTitle());
-        assertEquals(reviewRequest.getContent(), savedReview.getContent());
-        assertEquals(reviewRequest.getRating(), savedReview.getRating());
-        assertNotNull(savedReview.getUpdatedOn());
+        Review result = captor.getValue();
+
+        assertEquals(ReviewRequestFixture.TEST_TITLE, result.getTitle());
+        assertEquals(ReviewRequestFixture.TEST_CONTENT, result.getContent());
+        assertEquals(ReviewRequestFixture.TEST_RATING, result.getRating());
+        assertNotNull(result.getUpdatedOn());
+        assertTrue(before.isBefore(result.getUpdatedOn()));
     }
 
     @Test
-    public void getReviewSummary_shouldReturnReviewSummaryDataWithEmptyList() {
+    public void getReviewSummary_shouldReturnReviewSummaryData_whenThereAreNoReviews() {
         UUID tournamentId = UUID.randomUUID();
         double expectedAverageRating = 0.0;
         int expectedReviews = 0;
@@ -286,7 +271,7 @@ public class ReviewServiceTest {
     }
 
     @Test
-    public void getReviewSummary_shouldReturnReviewSummaryDataWithManyReviews() {
+    public void getReviewSummary_shouldReturnReviewSummaryData_whenThereAreReviews() {
         UUID tournamentId = UUID.randomUUID();
         List<Review> reviews = ReviewFixture.createListReviews(3);
         when(reviewRepository.findByTournamentIdOrderByCreatedOnDesc(tournamentId)).thenReturn(reviews);
@@ -296,51 +281,43 @@ public class ReviewServiceTest {
         assertEquals(3, result.reviewCount());
     }
 
-    @Test
-    public void delete_shouldThrowAccessDeniedExceptionWhenUserIsNotSameAndIsNotAdmin() {
+    @ParameterizedTest
+    @EnumSource(value = Role.class, names = {"PLAYER", "ORGANISER"})
+    public void delete_shouldThrowAccessDeniedException_whenUserIsNotSameAndIsNotAdmin(Role role) {
         UUID tournamentId = UUID.randomUUID();
-        UUID reviewId = UUID.randomUUID();
-        UUID userId = UUID.randomUUID();
+        Review review = ReviewFixture.create();
 
-        Review review = ReviewFixture.createReviewWithUserId(reviewId, UUID.randomUUID());
-
-        when(reviewRepository.findByIdAndTournamentId(reviewId, tournamentId))
+        when(reviewRepository.findByIdAndTournamentId(review.getId(), tournamentId))
                 .thenReturn(Optional.of(review));
         assertThrows(AccessDeniedException.class
-                , () -> reviewService.delete(tournamentId, reviewId, userId, Role.PLAYER));
+                , () -> reviewService.delete(tournamentId, review.getId(), UUID.randomUUID(), role));
 
         verify(reviewRepository, never()).delete(any(Review.class));
     }
 
-    @Test
-    public void delete_shouldDeleteReviewWhenUserIsAuthor() {
+    @ParameterizedTest
+    @EnumSource(value = Role.class, names = {"PLAYER", "ORGANISER"})
+    public void delete_shouldDeleteReview_whenUserIsAuthor(Role role) {
         UUID tournamentId = UUID.randomUUID();
-        UUID reviewId = UUID.randomUUID();
-        UUID userId = UUID.randomUUID();
+        Review review = ReviewFixture.create();
 
-        Review review = ReviewFixture.createReviewWithUserId(reviewId, userId);
-
-        when(reviewRepository.findByIdAndTournamentId(reviewId, tournamentId))
+        when(reviewRepository.findByIdAndTournamentId(review.getId(), tournamentId))
                 .thenReturn(Optional.of(review));
 
-        reviewService.delete(tournamentId, reviewId, userId, Role.PLAYER);
+        reviewService.delete(tournamentId, review.getId(), review.getAuthor().getId(), role);
 
         verify(reviewRepository).delete(review);
     }
 
     @Test
-    public void delete_shouldDeleteReviewWhenUserIsAdmin() {
+    public void delete_shouldDeleteReview_whenUserIsAdmin() {
         UUID tournamentId = UUID.randomUUID();
-        UUID reviewId = UUID.randomUUID();
-        UUID userId = UUID.randomUUID();
-        UUID authorId = UUID.randomUUID();
+        Review review = ReviewFixture.create();
 
-        Review review = ReviewFixture.createReviewWithUserId(reviewId, authorId);
-
-        when(reviewRepository.findByIdAndTournamentId(reviewId, tournamentId))
+        when(reviewRepository.findByIdAndTournamentId(review.getId(), tournamentId))
                 .thenReturn(Optional.of(review));
 
-        reviewService.delete(tournamentId, reviewId, userId, Role.ADMIN);
+        reviewService.delete(tournamentId, review.getId(), UUID.randomUUID(), Role.ADMIN);
 
         verify(reviewRepository).delete(review);
     }

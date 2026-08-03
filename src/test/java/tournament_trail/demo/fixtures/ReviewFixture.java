@@ -1,26 +1,21 @@
 package tournament_trail.demo.fixtures;
 
 import tournament_trail.demo.entities.Review;
+import tournament_trail.demo.entities.Tournament;
 import tournament_trail.demo.entities.enums.Rating;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 public class ReviewFixture {
-    public static Review createReview(UUID reviewId){
+    public static Review create(){
         return Review.builder()
-                .id(reviewId)
+                .id(UUID.randomUUID())
                 .tournament(TournamentFixture.create())
+                .author(UserFixture.createUser())
                 .build();
     }
 
-    public static Review createReviewWithUserId(UUID reviewId, UUID userId){
-        return Review.builder()
-                .id(reviewId)
-                .author(UserFixture.createUser(userId))
-                .build();
-    }
     public static Review createWithNeutralRating(){
         return Review.builder().rating(Rating.NEUTRAL).build();
     }
@@ -32,4 +27,15 @@ public class ReviewFixture {
         }
         return reviews;
     }
+
+    public static List<Review> createReviewsWithSameTournament(){
+        Review first = ReviewFixture.create();
+        Tournament tournament = first.getTournament();
+
+        Review second = ReviewFixture.create();
+        second.setTournament(tournament);
+
+        return List.of(first, second);
+    }
+
 }

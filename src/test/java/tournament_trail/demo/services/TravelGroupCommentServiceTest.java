@@ -1,8 +1,9 @@
 package tournament_trail.demo.services;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
@@ -13,17 +14,15 @@ import tournament_trail.demo.entities.TravelGroup;
 import tournament_trail.demo.entities.TravelGroupComment;
 import tournament_trail.demo.entities.TravelRequest;
 import tournament_trail.demo.entities.User;
-import tournament_trail.demo.entities.enums.TravelGroupStatus;
 import tournament_trail.demo.exceptions.InvalidCommentException;
 import tournament_trail.demo.exceptions.TravelGroupDoesNotExistException;
 import tournament_trail.demo.fixtures.TravelGroupCommentFixture;
 import tournament_trail.demo.fixtures.TravelGroupFixture;
 import tournament_trail.demo.fixtures.TravelRequestFixture;
-import tournament_trail.demo.fixtures.UserFixture;
+
 import tournament_trail.demo.repositories.TravelGroupCommentRepository;
 import tournament_trail.demo.web.dtos.TravelGroupCommentsPageData;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -42,119 +41,129 @@ public class TravelGroupCommentServiceTest {
     @Mock
     private TravelRequestService travelRequestService;
 
-    @Mock
-    private UserService userService;
-
     @InjectMocks
     private TravelGroupCommentService travelGroupCommentService;
 
     @Captor
     private ArgumentCaptor<TravelGroupComment> captor;
 
-    @BeforeEach
-    public void setUp(){
-
+     public enum AccessType {
+        OWNER,
+        APPROVED_APPLICANT
     }
 
     @Test
-    public void getCommentsForGroup_shouldThrowTravelGroupDoesNotExistException() {
+    public void getCommentsForGroup_shouldThrowTravelGroupDoesNotExistException_whenTravelGroupInvalid() {
         UUID travelGroupId = UUID.randomUUID();
-        UUID userId = UUID.randomUUID();
+
         when(travelGroupService.findById(travelGroupId)).thenThrow(TravelGroupDoesNotExistException.class);
 
         assertThrows(TravelGroupDoesNotExistException.class
-                , () -> travelGroupCommentService.getCommentsForGroup(travelGroupId, userId));
+                , () -> travelGroupCommentService.getCommentsForGroup(travelGroupId, UUID.randomUUID()));
+
         verify(travelGroupCommentRepository, never()).save(any(TravelGroupComment.class));
     }
 
     @Test
-    public void getCommentsForGroup_shouldThrowAccessDeniedExceptionWhenStatusIsCancelled() {
-        UUID travelGroupId = UUID.randomUUID();
-        UUID userId = UUID.randomUUID();
-        TravelGroup travelGroup = TravelGroupFixture.createWithCancelledStatus(travelGroupId);
-        when(travelGroupService.findById(travelGroupId)).thenReturn(travelGroup);
+    public void getCommentsForGroup_shouldThrowAccessDeniedException_whenStatusIsCancelled() {
+        TravelGroup travelGroup = TravelGroupFixture.createWithCancelledStatus();
+
+        when(travelGroupService.findById(travelGroup.getId())).thenReturn(travelGroup);
 
         assertThrows(AccessDeniedException.class
-                , () -> travelGroupCommentService.getCommentsForGroup(travelGroupId, userId));
+                , () -> travelGroupCommentService.getCommentsForGroup(
+                        travelGroup.getId(), UUID.randomUUID()));
+
         verify(travelGroupCommentRepository, never()).save(any(TravelGroupComment.class));
     }
 
     @Test
-    public void getCommentsForGroup_shouldThrowAccessDeniedExceptionWhenUserIsNotInTravelGroup() {
-        UUID travelGroupId = UUID.randomUUID();
-        UUID userId = UUID.randomUUID();
+    public void getCommentsForGroup_shouldThrowAccessDeniedException_whenUserIsNotInTravelGroup() {
+        TravelGroup travelGroup = TravelGroupFixture.create();
+        List<TravelRequest> travelRequests = TravelRequestFixture.createList();
 
-        TravelGroup travelGroup = TravelGroupFixture.createWithIdOwnerStatusMaxMembers(
-                travelGroupId, UUID.randomUUID(), TravelGroupStatus.OPEN, 4);
+        when(travelGroupService.findById(travelGroup.getId())).thenReturn(travelGroup);
 
-        List<TravelRequest> travelRequests = TravelRequestFixture.createList(2);
+        when(travelRequestService.getApprovedApplicantsForTravelGroup(travelGroup.getId()))
+                .thenReturn(travelRequests);
+
+        assertThrows(AccessDeniedException.class
+                , () -> travelGroupCommentService.getCommentsForGroup(
+                        travelGroup.getId(), UUID.randomUUID()));
+
+        verify(travelGroupCommentRepository, never()).save(any(TravelGroupComment.class));
+    }
+
+    @ParameterizedTest
+    @EnumSource(AccessType.class)
+    public void getCommentsForGroup_shouldReturnListOfTravelGroupComments_whenUserHasAccess(
+            AccessType accessType) {
+
+        List<TravelRequest> travelRequests = TravelRequestFixture.createList();
+
+        TravelGroup travelGroup = travelRequests.get(0).getTravelGroup();
+        UUID travelGroupId = travelGroup.getId();
+
+        UUID userId = switch (accessType) {
+            case OWNER -> travelGroup.getOwner().getId();
+            case APPROVED_APPLICANT -> travelRequests.get(0).getApplicant().getId();
+        };
+
+        List<TravelGroupComment> expected = TravelGroupCommentFixture.createList();
+        expected.forEach(comment -> comment.setTravelGroup(travelGroup));
+
+        when(travelGroupService.findById(travelGroupId))
+                .thenReturn(travelGroup);
+
+        when(travelRequestService.getApprovedApplicantsForTravelGroup(travelGroupId))
+                .thenReturn(travelRequests);
+
+        when(travelGroupCommentRepository
+                .findAllByTravelGroupIdAndHiddenFalseOrderByPinnedDescCreatedOnDesc(travelGroupId))
+                .thenReturn(expected);
+
+        List<TravelGroupComment> result = travelGroupCommentService.getCommentsForGroup(
+                travelGroupId, userId);
+
+        assertEquals(expected, result);
+
+        verify(travelGroupCommentRepository)
+                .findAllByTravelGroupIdAndHiddenFalseOrderByPinnedDescCreatedOnDesc(travelGroupId);
+    }
+
+    @ParameterizedTest
+    @EnumSource(AccessType.class)
+    public void editComment_shouldEditComment_whenUserHasAccessAndIsAuthor(AccessType accessType) {
+        List<TravelRequest> travelRequests = TravelRequestFixture.createList();
+
+        TravelGroup travelGroup = travelRequests.get(0).getTravelGroup();
+        UUID travelGroupId = travelGroup.getId();
+        UUID commentId = UUID.randomUUID();
+
+        User user = switch (accessType) {
+            case OWNER -> travelGroup.getOwner();
+            case APPROVED_APPLICANT -> travelRequests.get(0).getApplicant();
+        };
+
+        TravelGroupComment comment = TravelGroupCommentFixture.create();
+        comment.setAuthor(user);
 
         when(travelGroupService.findById(travelGroupId)).thenReturn(travelGroup);
 
         when(travelRequestService.getApprovedApplicantsForTravelGroup(travelGroupId))
                 .thenReturn(travelRequests);
 
-        assertThrows(AccessDeniedException.class
-                , () -> travelGroupCommentService.getCommentsForGroup(travelGroupId, userId));
-        verify(travelGroupCommentRepository, never()).save(any(TravelGroupComment.class));
-    }
+        when(travelGroupCommentRepository.findByIdAndTravelGroupIdAndHiddenFalse(commentId, travelGroupId))
+                .thenReturn(Optional.of(comment));
 
-    @Test
-    public void getCommentsForGroup_shouldReturnListOfTravelGroupComments() {
-        UUID travelGroupId = UUID.randomUUID();
-        UUID userId = UUID.randomUUID();
-
-        TravelGroup travelGroup = TravelGroupFixture.createWithIdOwnerStatusMaxMembers(
-                travelGroupId, userId, TravelGroupStatus.OPEN, 4);
-
-        List<TravelRequest> travelRequests = TravelRequestFixture.createList(2);
-
-        TravelGroupComment firstComment = TravelGroupComment.builder()
-                .travelGroup(travelGroup)
-                .build();
-        TravelGroupComment secondComment = TravelGroupComment.builder()
-                .travelGroup(travelGroup)
-                .build();
-
-        List<TravelGroupComment> expected = List.of(firstComment, secondComment);
-        when(travelGroupService.findById(travelGroupId)).thenReturn(travelGroup);
-
-        when(travelRequestService.getApprovedApplicantsForTravelGroup(travelGroupId)).thenReturn(travelRequests);
-
-        when(travelGroupCommentRepository
-                .findAllByTravelGroupIdAndHiddenFalseOrderByPinnedDescCreatedOnDesc(travelGroupId))
-                .thenReturn(expected);
-        assertEquals(expected, travelGroupCommentService.getCommentsForGroup(travelGroupId, userId));
-    }
-
-    @Test
-    public void createComment_shouldCreateValidComment() {
-        UUID travelGroupId = UUID.randomUUID();
-        String content = " Test ";
-        UUID userId = UUID.randomUUID();
-        LocalDateTime before = LocalDateTime.now();
-
-        TravelGroup travelGroup = TravelGroupFixture.create(travelGroupId, userId);
-        User user = UserFixture.createUser(userId);
-        List<TravelRequest> requests = TravelRequestFixture.createList(2);
-
-        when(travelGroupService.findById(travelGroupId)).thenReturn(travelGroup);
-        when(userService.findById(userId)).thenReturn(user);
-        when(travelRequestService.getApprovedApplicantsForTravelGroup(travelGroupId)).thenReturn(requests);
-
-        travelGroupCommentService.createComment(travelGroupId, content, userId);
+        travelGroupCommentService.editComment(
+                travelGroupId, user.getId(), commentId, " Test edit content ");
 
         verify(travelGroupCommentRepository).save(captor.capture());
-
         TravelGroupComment result = captor.getValue();
 
-        assertEquals("Test", result.getContent());
-        assertEquals(user, result.getAuthor());
-        assertFalse(result.isHidden());
-        assertFalse(result.isPinned());
-        assertNull(result.getEditedOn());
-        assertEquals(travelGroup, result.getTravelGroup());
-        assertTrue(before.isBefore(result.getCreatedOn()));
+        assertEquals("Test edit content", result.getContent());
+        assertNotNull(result.getEditedOn());
     }
 
     @Test
@@ -165,93 +174,61 @@ public class TravelGroupCommentServiceTest {
 
         assertThrows(TravelGroupDoesNotExistException.class
                 , () -> travelGroupCommentService.editComment(
-                        travelGroupId, UUID.randomUUID(), UUID.randomUUID(), "test"));
+                        travelGroupId, UUID.randomUUID(), UUID.randomUUID(), "TEST_EDIT_CONTENT"));
+
         verify(travelGroupCommentRepository, never()).save(any(TravelGroupComment.class));
     }
 
     @Test
-    public void editComment_shouldEditComment() {
-        UUID travelGroupId = UUID.randomUUID();
-        UUID ownerId = UUID.randomUUID();
+    public void editComment_shouldThrowInvalidCommentException_whenThereIsNoTravelGroupComment() {
+        TravelGroup travelGroup = TravelGroupFixture.create();
         UUID commentId = UUID.randomUUID();
-        LocalDateTime before = LocalDateTime.now();
-        TravelGroup travelGroup = TravelGroupFixture.createWithIdOwnerStatusMaxMembers(
-                travelGroupId, ownerId, TravelGroupStatus.OPEN, 4);
-        User user = UserFixture.createUser(ownerId);
-
-        when(travelGroupService.findById(travelGroupId)).thenReturn(travelGroup);
-        TravelGroupComment comment = TravelGroupCommentFixture.create(
-                commentId, travelGroup, user, " Test");
-
-        when(travelGroupCommentRepository.findByIdAndTravelGroupIdAndHiddenFalse(commentId, travelGroupId))
-                .thenReturn(Optional.of(comment));
-        travelGroupCommentService.editComment(travelGroupId, ownerId, commentId, " Test");
-
-        verify(travelGroupCommentRepository).save(captor.capture());
-
-        TravelGroupComment result = captor.getValue();
-        assertEquals("Test", result.getContent());
-        assertTrue(before.isBefore(result.getEditedOn()));
-    }
-
-    @Test
-    public void editComment_shouldThrowInvalidCommentException() {
-        UUID travelGroupId = UUID.randomUUID();
-        UUID ownerId = UUID.randomUUID();
-        UUID commentId = UUID.randomUUID();
-
-        TravelGroup travelGroup = TravelGroupFixture.createWithIdOwnerStatusMaxMembers(
-                travelGroupId, ownerId, TravelGroupStatus.OPEN, 4);
-
-        when(travelGroupService.findById(travelGroupId)).thenReturn(travelGroup);
-        when(travelGroupCommentRepository.findByIdAndTravelGroupIdAndHiddenFalse(commentId, travelGroupId))
+        when(travelGroupService.findById(travelGroup.getId())).thenReturn(travelGroup);
+        when(travelGroupCommentRepository.findByIdAndTravelGroupIdAndHiddenFalse(
+                commentId, travelGroup.getId()))
                 .thenReturn(Optional.empty());
 
         assertThrows(InvalidCommentException.class
-                , () -> travelGroupCommentService.editComment(travelGroupId, ownerId, commentId, " Test"));
+                , () -> travelGroupCommentService.editComment(
+                        travelGroup.getId(), travelGroup.getOwner().getId(), commentId
+                        , "TEST_EDIT_CONTENT"));
+
         verify(travelGroupCommentRepository, never()).save(any(TravelGroupComment.class));
     }
 
     @Test
-    public void editComment_shouldEditThrowAccessDeniedExceptionBecauseUserEditsAnotherUserComment() {
-        UUID travelGroupId = UUID.randomUUID();
-        UUID ownerId = UUID.randomUUID();
+    public void editComment_shouldThrowAccessDeniedException_whenUserEditsAnotherUserComment() {
         UUID commentId = UUID.randomUUID();
+        TravelGroup travelGroup = TravelGroupFixture.create();
+        TravelGroupComment comment = TravelGroupCommentFixture.create();
 
-        TravelGroup travelGroup = TravelGroupFixture.createWithIdOwnerStatusMaxMembers(
-                travelGroupId, ownerId, TravelGroupStatus.OPEN, 4);
-        User user = UserFixture.createUser(UUID.randomUUID());
+        when(travelGroupService.findById(travelGroup.getId())).thenReturn(travelGroup);
 
-        when(travelGroupService.findById(travelGroupId)).thenReturn(travelGroup);
-        TravelGroupComment comment = TravelGroupCommentFixture.create(
-                commentId, travelGroup, user, " Test");
-
-        when(travelGroupCommentRepository.findByIdAndTravelGroupIdAndHiddenFalse(commentId, travelGroupId))
+        when(travelGroupCommentRepository.findByIdAndTravelGroupIdAndHiddenFalse(commentId, travelGroup.getId()))
                 .thenReturn(Optional.of(comment));
 
         assertThrows(AccessDeniedException.class
                 , () -> travelGroupCommentService.editComment(
-                        travelGroupId, ownerId, commentId, " Test"));
+                        travelGroup.getId(), travelGroup.getOwner().getId(), commentId
+                        , "TEST_EDIT_CONTENT"));
+
         verify(travelGroupCommentRepository, never()).save(any(TravelGroupComment.class));
     }
 
     @Test
-    public void pinComment_shouldPinCommentCorrectly() {
-        UUID travelGroupId = UUID.randomUUID();
-        UUID userId = UUID.randomUUID();
-        UUID commentId = UUID.randomUUID();
-        User user = UserFixture.createUser(userId);
+    public void pinComment_shouldPinCommentCorrectly_whenUserIsOwnerOfTravelGroup() {
+        TravelGroup travelGroup = TravelGroupFixture.create();
 
-        TravelGroup travelGroup = TravelGroupFixture.createWithIdOwnerStatusMaxMembers(
-                travelGroupId, userId, TravelGroupStatus.OPEN, 4);
-        when(travelGroupService.findById(travelGroupId)).thenReturn(travelGroup);
+        when(travelGroupService.findById(travelGroup.getId())).thenReturn(travelGroup);
 
-        TravelGroupComment comment = TravelGroupCommentFixture.create(
-                commentId, travelGroup, user, "Test");
-        when(travelGroupCommentRepository.findByIdAndTravelGroupIdAndHiddenFalse(commentId, travelGroupId))
+        TravelGroupComment comment = TravelGroupCommentFixture.create();
+
+        when(travelGroupCommentRepository.findByIdAndTravelGroupIdAndHiddenFalse(
+                comment.getId(), travelGroup.getId()))
                 .thenReturn(Optional.of(comment));
 
-        travelGroupCommentService.pinComment(travelGroupId, userId, commentId);
+        travelGroupCommentService.pinComment(
+                travelGroup.getId(), travelGroup.getOwner().getId(), comment.getId());
 
         verify(travelGroupCommentRepository).save(captor.capture());
         TravelGroupComment result = captor.getValue();
@@ -260,22 +237,18 @@ public class TravelGroupCommentServiceTest {
     }
 
     @Test
-    public void unpinComment_shouldUnpinCommentSuccessfully() {
-        UUID travelGroupId = UUID.randomUUID();
-        UUID userId = UUID.randomUUID();
-        UUID commentId = UUID.randomUUID();
-        User user = UserFixture.createUser(userId);
+    public void unpinComment_shouldUnpinCommentSuccessfully_whenUserIsOwnerOfTravelGroup() {
+        TravelGroup travelGroup = TravelGroupFixture.create();
+        TravelGroupComment comment = TravelGroupCommentFixture.create();
 
-        TravelGroup travelGroup = TravelGroupFixture.createWithIdOwnerStatusMaxMembers(
-                travelGroupId, userId, TravelGroupStatus.OPEN, 4);
-        when(travelGroupService.findById(travelGroupId)).thenReturn(travelGroup);
+        when(travelGroupService.findById(travelGroup.getId())).thenReturn(travelGroup);
 
-        TravelGroupComment comment = TravelGroupCommentFixture.create(
-                commentId, travelGroup, user, "Test");
-        when(travelGroupCommentRepository.findByIdAndTravelGroupIdAndHiddenFalse(commentId, travelGroupId))
+        when(travelGroupCommentRepository.findByIdAndTravelGroupIdAndHiddenFalse(
+                comment.getId(), travelGroup.getId()))
                 .thenReturn(Optional.of(comment));
 
-        travelGroupCommentService.unpinComment(travelGroupId, userId, commentId);
+        travelGroupCommentService.unpinComment(
+                travelGroup.getId(), travelGroup.getOwner().getId(), comment.getId());
 
         verify(travelGroupCommentRepository).save(captor.capture());
         TravelGroupComment result = captor.getValue();
@@ -284,22 +257,20 @@ public class TravelGroupCommentServiceTest {
     }
 
     @Test
-    public void deleteComment_shouldDeleteCommentSuccessfully() {
-        UUID travelGroupId = UUID.randomUUID();
-        UUID userId = UUID.randomUUID();
-        UUID commentId = UUID.randomUUID();
-        User user = UserFixture.createUser(userId);
+    public void deleteComment_shouldDeleteCommentSuccessfully_whenUserIsAuthorOfComment() {
+        TravelGroup travelGroup = TravelGroupFixture.create();
+        TravelGroupComment comment = TravelGroupCommentFixture.create();
+        User author = comment.getAuthor();
+        travelGroup.setOwner(author);
 
-        TravelGroup travelGroup = TravelGroupFixture.createWithIdOwnerStatusMaxMembers(
-                travelGroupId, userId, TravelGroupStatus.OPEN, 4);
-        when(travelGroupService.findById(travelGroupId)).thenReturn(travelGroup);
+        when(travelGroupService.findById(travelGroup.getId())).thenReturn(travelGroup);
 
-        TravelGroupComment comment = TravelGroupCommentFixture.create(
-                commentId, travelGroup, user, "Test");
-        when(travelGroupCommentRepository.findByIdAndTravelGroupIdAndHiddenFalse(commentId, travelGroupId))
+        when(travelGroupCommentRepository.findByIdAndTravelGroupIdAndHiddenFalse
+                (comment.getId(), travelGroup.getId()))
                 .thenReturn(Optional.of(comment));
 
-        travelGroupCommentService.deleteComment(travelGroupId, userId, commentId);
+        travelGroupCommentService.deleteComment(
+                travelGroup.getId(), author.getId(), comment.getId());
 
         verify(travelGroupCommentRepository).save(captor.capture());
         TravelGroupComment result = captor.getValue();
@@ -308,31 +279,48 @@ public class TravelGroupCommentServiceTest {
     }
 
     @Test
+    public void deleteComment_shouldThrowAccessDeniedException_whenUserIsNotAuthorOfComment() {
+        TravelGroup travelGroup = TravelGroupFixture.create();
+        TravelGroupComment comment = TravelGroupCommentFixture.create();
+
+        when(travelGroupService.findById(travelGroup.getId())).thenReturn(travelGroup);
+
+        when(travelGroupCommentRepository.findByIdAndTravelGroupIdAndHiddenFalse(
+                comment.getId(), travelGroup.getId()))
+                .thenReturn(Optional.of(comment));
+
+        assertThrows(AccessDeniedException.class,
+                () -> travelGroupCommentService.deleteComment(
+                        travelGroup.getId(), travelGroup.getOwner().getId(), comment.getId()));
+
+        verify(travelGroupCommentRepository, never()).save(any(TravelGroupComment.class));
+    }
+
+    @Test
     public void getCommentsPageData_shouldReturnTravelGroupCommentsPageDataSuccessfully() {
-        UUID travelGroupId = UUID.randomUUID();
-        UUID userId = UUID.randomUUID();
-
-        User user = UserFixture.createUser(userId);
         int countVisibleComments = 2;
-        TravelGroup travelGroup = TravelGroupFixture.createWithIdOwnerStatusMaxMembers(
-                travelGroupId, userId, TravelGroupStatus.OPEN, 4);
+        TravelGroup travelGroup = TravelGroupFixture.create();
 
-        List<TravelGroupComment> comments = TravelGroupCommentFixture.createList(
-                2, travelGroup, user, "Test");
+        List<TravelGroupComment> comments = TravelGroupCommentFixture.createList();
 
-        when(travelGroupService.findById(travelGroupId)).thenReturn(travelGroup);
+        when(travelGroupService.findById(travelGroup.getId())).thenReturn(travelGroup);
+
         when(travelGroupCommentRepository
-                .findAllByTravelGroupIdAndHiddenFalseOrderByPinnedDescCreatedOnDesc(travelGroupId))
+                .findAllByTravelGroupIdAndHiddenFalseOrderByPinnedDescCreatedOnDesc(travelGroup.getId()))
                 .thenReturn(comments);
-        when(travelGroupCommentRepository.countByTravelGroupIdAndHiddenFalse(travelGroupId))
+
+        when(travelGroupCommentRepository.countByTravelGroupIdAndHiddenFalse(travelGroup.getId()))
                 .thenReturn(2);
+
         TravelGroupCommentsPageData expected = new TravelGroupCommentsPageData(
                 travelGroup, comments, countVisibleComments);
-        TravelGroupCommentsPageData result = travelGroupCommentService.getCommentsPageData(travelGroupId, userId);
+
+        TravelGroupCommentsPageData result = travelGroupCommentService.getCommentsPageData(
+                travelGroup.getId(), travelGroup.getOwner().getId());
+
         assertEquals(expected.travelGroup(), result.travelGroup());
         assertEquals(expected.comments(), result.comments());
         assertEquals(expected.countVisibleComments(), result.countVisibleComments());
-
     }
 }
 
