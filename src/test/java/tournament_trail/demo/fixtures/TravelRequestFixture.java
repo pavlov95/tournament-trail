@@ -15,11 +15,18 @@ public class TravelRequestFixture {
                 .build();
     }
 
+    public static TravelRequest createWithPendingStatus() {
+        return TravelRequest.builder()
+                .applicant(UserFixture.createUser())
+                .status(TravelRequestStatus.PENDING)
+                .travelGroup(TravelGroupFixture.create())
+                .build();
+    }
+
     public static List<TravelRequest> createList() {
         TravelRequest first = TravelRequestFixture.create();
-        TravelGroup travelGroup = first.getTravelGroup();
         TravelRequest second = TravelRequestFixture.create();
-        second.setTravelGroup(travelGroup);
+        second.setTravelGroup(first.getTravelGroup());
         return  List.of(first, second);
 
     }
