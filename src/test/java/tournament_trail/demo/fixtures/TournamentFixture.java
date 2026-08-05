@@ -102,5 +102,26 @@ public class TournamentFixture {
                 .build();
     }
 
+    public static Tournament createWithStatusCancelled(){
+        return Tournament.builder()
+                .id(UUID.randomUUID())
+                .status(TournamentStatus.CANCELLED)
+                .build();
+    }
 
+    public static Tournament createWithStatusPublished() {
+        return Tournament.builder()
+                .id(UUID.randomUUID())
+                .status(TournamentStatus.PUBLISHED)
+                .entryFee(BigDecimal.ZERO)
+                .build();
+    }
+
+    public static Tournament createPaidWithStatusPublished() {
+        return Tournament.builder()
+                .id(UUID.randomUUID())
+                .status(TournamentStatus.PUBLISHED)
+                .entryFee(BigDecimal.TEN)
+                .build();
+    }
 }
