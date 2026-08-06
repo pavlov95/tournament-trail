@@ -8,14 +8,17 @@ import tournament_trail.demo.entities.enums.TournamentStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 public class TournamentFixture {
     public static String TEST_CITY = "Test city";
+    public static String TEST_NAME = "Test name";
     public static String TEST_COUNTRY = "Test country";
     public static String TEST_VENUE = "Test venue";
     public static String TEST_DESCRIPTION = "Test description";
     public static String TEST_PAYMENT_INSTRUCTIONS = "Test payment instructions";
+    public static int TEST_MAXIMUM_PARTICIPANTS = 111;
     public static CurrencyCode TEST_CURRENCY = CurrencyCode.EUR;
     public static TimeControl TEST_TIME_CONTROL = TimeControl.BULLET;
     public static TournamentStatus TEST_TOURNAMENT_STATUS = TournamentStatus.PUBLISHED;
@@ -51,6 +54,7 @@ public class TournamentFixture {
 
     public static Tournament createWithStatusCompleted() {
         return Tournament.builder()
+                .organiser(UserFixture.createUser())
                 .status(TournamentStatus.COMPLETED)
                 .build();
     }
@@ -59,6 +63,7 @@ public class TournamentFixture {
         LocalDateTime now = LocalDateTime.now();
         return Tournament.builder()
                 .id(UUID.randomUUID())
+                .name(TEST_NAME)
                 .country(TEST_COUNTRY)
                 .city(TEST_CITY)
                 .venue(TEST_VENUE)
@@ -85,6 +90,7 @@ public class TournamentFixture {
                 .country(TEST_COUNTRY)
                 .venue(TEST_VENUE)
                 .status(status)
+                .maximumParticipants(TEST_MAXIMUM_PARTICIPANTS)
                 .description(TEST_DESCRIPTION)
                 .startTime(LocalDateTime.now())
                 .build();
@@ -102,9 +108,10 @@ public class TournamentFixture {
                 .build();
     }
 
-    public static Tournament createWithStatusCancelled(){
+    public static Tournament createWithStatusCancelled() {
         return Tournament.builder()
                 .id(UUID.randomUUID())
+                .organiser(UserFixture.createUser())
                 .status(TournamentStatus.CANCELLED)
                 .build();
     }
@@ -123,5 +130,29 @@ public class TournamentFixture {
                 .status(TournamentStatus.PUBLISHED)
                 .entryFee(BigDecimal.TEN)
                 .build();
+    }
+
+    public static Tournament createPaidWithStatusDraft() {
+        return Tournament.builder()
+                .id(UUID.randomUUID())
+                .organiser(UserFixture.createUser())
+                .status(TournamentStatus.DRAFT)
+                .entryFee(BigDecimal.TEN)
+                .build();
+    }
+
+    public static List<Tournament> createList() {
+        Tournament first = TournamentFixture.create();
+        Tournament second = TournamentFixture.create();
+
+        return List.of(first, second);
+    }
+
+    public static List<Tournament> createListWithPublishedStartedAndRegistrationClosedStatuses() {
+        Tournament first = TournamentFixture.create();
+        Tournament second = TournamentFixture.createWithStatusStarted();
+        Tournament third = TournamentFixture.createWithStatusRegistrationClosed();
+
+        return List.of(first, second, third);
     }
 }
