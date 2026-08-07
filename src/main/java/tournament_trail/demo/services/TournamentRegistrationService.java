@@ -1,5 +1,6 @@
 package tournament_trail.demo.services;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +18,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@Slf4j
 @Service
 public class TournamentRegistrationService {
     private final TournamentRegistrationRepository tournamentRegistrationRepository;
@@ -82,7 +84,11 @@ public class TournamentRegistrationService {
             builder.registrationStatus(RegistrationStatus.PENDING_PAYMENT);
         }
 
-        return tournamentRegistrationRepository.save(builder.build());
+        TournamentRegistration registration = builder.build();
+        tournamentRegistrationRepository.save(registration);
+        log.info("Registration {} created for tournament {} by user {}",
+                registration.getId(), tournamentId, userId);
+        return registration;
     }
 
     public TournamentRegistration findById(UUID id) {
@@ -100,6 +106,7 @@ public class TournamentRegistrationService {
         boolean isOrganiser = checkIfOrganiser(registration, userId);
 
         if (!isOwner && !isAdmin && !isOrganiser) {
+            log.warn("Registration {} cancellation attempt by user {}", registrationId, userId);
             throw new AccessDeniedException("You are not allowed to cancel this registration");
         }
         if (isTerminalStatus(registration.getRegistrationStatus())) {
@@ -115,6 +122,7 @@ public class TournamentRegistrationService {
         }
         registration.setCancelledOn(LocalDateTime.now());
         registration.setUpdatedOn(LocalDateTime.now());
+        log.info("Registration {} cancelled by user {}", registrationId, userId);
     }
 
     @Transactional
@@ -133,6 +141,7 @@ public class TournamentRegistrationService {
 
         registration.setHidden(true);
         registration.setUpdatedOn(LocalDateTime.now());
+        log.info("Registration {} hidden by user {}", registration.getId(), userId);
     }
 
     public TournamentRegistration getRegistrationIfOwnerOrAdmin(UUID userId, UUID registrationId, Role role) {
@@ -152,6 +161,8 @@ public class TournamentRegistrationService {
         TournamentRegistration registration = findById(id);
         boolean isOwner = checkOwnership(registration, userId);
         if (!isOwner) {
+            log.warn("User {} attempted to make payment on behalf of user {}"
+                    , userId, registration.getPlayer().getId());
             throw new AccessDeniedException(
                     "You are not allowed to make a payment on behalf of another player");
         }
@@ -180,6 +191,8 @@ public class TournamentRegistrationService {
         registration.setUpdatedOn(LocalDateTime.now());
 
         tournamentRegistrationRepository.save(registration);
+
+        log.info("Payment submitted for registration {} by user {}", id, userId);
     }
 
     @Transactional
@@ -194,6 +207,7 @@ public class TournamentRegistrationService {
             registration.setPaymentStatus(PaymentStatus.EXPIRED);
             registration.setUpdatedOn(now);
         }
+        log.info("Expired {} pending tournament registrations", expiredRegistrations.size());
     }
 
     public List<TournamentRegistration> getRegistrationsForTournamentManagement(UUID tournamentId, UUID userId, Role role) {
@@ -214,6 +228,7 @@ public class TournamentRegistrationService {
         registration.setPaymentStatus(PaymentStatus.CONFIRMED);
         registration.setUpdatedOn(LocalDateTime.now());
         registration.setOrganiserNote(APPROVED_PAYMENT_MESSAGE + registration.getTournament().getName() + ".");
+        log.info("Registration {} payment approved by {}", registrationId, userId);
     }
 
     @Transactional
@@ -228,6 +243,7 @@ public class TournamentRegistrationService {
         } else {
             registration.setOrganiserNote(organiserNote.trim());
         }
+        log.info("Registration {} payment rejected by user {}", registrationId, userId);
     }
 
     private TournamentRegistration verifyRoleForPayment(UUID registrationId, UUID userId, Role role) {
@@ -282,6 +298,8 @@ public class TournamentRegistrationService {
             registration.setReservedUntil(now.plusHours(1));
         }
 
+        log.info("Registration {} from user {} reactivated"
+                , registration.getId(), registration.getPlayer().getId());
         return registration;
     }
 

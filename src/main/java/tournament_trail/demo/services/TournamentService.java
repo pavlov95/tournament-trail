@@ -1,5 +1,6 @@
 package tournament_trail.demo.services;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
@@ -19,6 +20,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Service
 public class TournamentService {
     private final TournamentRepository tournamentRepository;
@@ -59,7 +61,9 @@ public class TournamentService {
                 .updatedOn(LocalDateTime.now())
                 .organiser(organiser)
                 .build();
-        return tournamentRepository.save(tournament);
+        tournamentRepository.save(tournament);
+        log.info("Tournament {} created by user {}", tournament.getId(), userID);
+        return tournament;
     }
 
     public List<Tournament> searchTournaments(TournamentSearchRequest request) {
@@ -136,16 +140,19 @@ public class TournamentService {
         boolean isAdmin = role == Role.ADMIN;
 
         if (!isOwner && !isAdmin) {
+            log.warn("User {} attempted to update tournament {} status", userId, tournamentId);
             throw new AccessDeniedException("You are not allowed to change this tournament.");
         }
 
         if (requestedStatus == TournamentStatus.PUBLISHED) {
             publishTournament(tournament);
+            log.info("Tournament {} published by user {}", tournament.getId(), userId);
             return;
         }
 
         if (requestedStatus == TournamentStatus.CANCELLED) {
             cancelTournament(tournament);
+            log.info("Tournament {} was cancelled by user {}", tournament.getId(), userId);
             return;
         }
 
@@ -161,6 +168,7 @@ public class TournamentService {
         boolean isAdmin = role == Role.ADMIN;
 
         if (!isOwner && !isAdmin) {
+            log.warn("User {} attempted to edit tournament {}", userId, tournamentId);
             throw new AccessDeniedException("You are not allowed to alter this tournament");
         }
         if (tournament.getStatus() == TournamentStatus.CANCELLED
@@ -187,7 +195,7 @@ public class TournamentService {
         tournament.setUpdatedOn(LocalDateTime.now());
 
         tournamentRepository.save(tournament);
-
+        log.info("Tournament {} edited by user {}", tournamentId, userId);
     }
 
     public TournamentRequest mapToTournamentRequest(Tournament tournament) {
@@ -229,8 +237,6 @@ public class TournamentService {
             throw new IllegalStateException("Cannot publish a tournament that has already started.");
         }
 
-
-
         tournament.setStatus(TournamentStatus.PUBLISHED);
         tournament.setUpdatedOn(now);
     }
@@ -261,7 +267,6 @@ public class TournamentService {
         if (!registrationDeadline.isAfter(now)) {
             throw new AccessDeniedException("Registration has ended");
         }
-
     }
 
     public void validateTournamentNotFull(int tournamentCapacity, int currentRegistrations) {
@@ -294,7 +299,6 @@ public class TournamentService {
                 LocalDateTime.now(),
                 PageRequest.of(0, 15)
         );
-
     }
 
     public String getTournamentOptionLabel(UUID tournamentId) {
@@ -313,6 +317,7 @@ public class TournamentService {
                 List.of(TournamentStatus.PUBLISHED, TournamentStatus.STARTED, TournamentStatus.REGISTRATION_CLOSED));
 
         LocalDateTime now = LocalDateTime.now();
+        int updatedStatuses = 0;
 
         for (Tournament tournament : tournaments) {
             TournamentStatus status = tournament.getStatus();
@@ -321,6 +326,7 @@ public class TournamentService {
                 if (!tournament.getEndTime().isAfter(now)) {
                     tournament.setStatus(TournamentStatus.COMPLETED);
                     tournament.setUpdatedOn(now);
+                    updatedStatuses++;
                 }
                 continue;
             }
@@ -328,6 +334,7 @@ public class TournamentService {
                 if (!tournament.getStartTime().isAfter(now)) {
                     tournament.setStatus(TournamentStatus.STARTED);
                     tournament.setUpdatedOn(now);
+                    updatedStatuses++;
                 }
                 continue;
             }
@@ -335,10 +342,13 @@ public class TournamentService {
                 if (!tournament.getRegistrationDeadline().isAfter(now)) {
                     tournament.setStatus(TournamentStatus.REGISTRATION_CLOSED);
                     tournament.setUpdatedOn(now);
+                    updatedStatuses++;
                 }
             }
         }
+        if (updatedStatuses > 0) {
+            log.info("Automatically updated status of {} tournaments", updatedStatuses);
+        }
     }
-
 
 }

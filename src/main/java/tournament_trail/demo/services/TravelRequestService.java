@@ -1,5 +1,6 @@
 package tournament_trail.demo.services;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +17,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Service
 public class TravelRequestService {
     private final TravelRequestRepository travelRequestRepository;
@@ -27,7 +29,8 @@ public class TravelRequestService {
     }
 
     public List<TravelRequest> findAcceptedRequests(UUID userId) {
-        return travelRequestRepository.findAllByApplicantIdAndStatus(userId, TravelRequestStatus.APPROVED);
+        return travelRequestRepository.findAllByApplicantIdAndStatus(
+                userId, TravelRequestStatus.APPROVED);
     }
 
     @Transactional
@@ -37,6 +40,7 @@ public class TravelRequestService {
             throw new AlreadyPartOfGroupException();
         }
         if (travelGroup.getStatus() != TravelGroupStatus.OPEN) {
+            log.warn("User {} attempted to join unavailable travel group {}", userId, travelGroup.getId());
             throw new AccessDeniedException("You can not enter this travel group");
         }
         if (countAvailableSpots(travelGroup) <= 0) {
@@ -57,8 +61,11 @@ public class TravelRequestService {
             builder.message(travelRequestMessage.trim());
         }
 
-        travelRequestRepository.save(builder.build());
+        TravelRequest travelRequest = builder.build();
+        travelRequestRepository.save(travelRequest);
 
+        log.info("Travel request {} created by user {} for travel group {}",
+                travelRequest.getId(), userId, travelGroup.getId());
     }
 
     public int countAvailableSpots(TravelGroup travelGroup) {
@@ -88,6 +95,8 @@ public class TravelRequestService {
 
         TravelRequest travelRequest = findByIdAndGroupId(travelRequestId, travelGroupId);
         if (!travelRequest.getTravelGroup().getOwner().getId().equals(userId)) {
+            log.warn("User {} attempted to accept travel request {} for travel group {}",
+                    userId, travelRequestId, travelGroupId);
             throw new AccessDeniedException("You are not allowed to manage this group");
         }
         if(travelRequest.getTravelGroup().getStatus() != TravelGroupStatus.OPEN){
@@ -103,12 +112,17 @@ public class TravelRequestService {
         travelRequest.setStatus(TravelRequestStatus.APPROVED);
         travelRequest.setRespondedOn(LocalDateTime.now());
         travelRequestRepository.save(travelRequest);
+
+        log.info("Travel request {} accepted for travel group {} by user {}",
+            travelRequestId, travelGroupId, userId);
     }
 
     @Transactional
     public void rejectTravelRequest(UUID travelGroupId, UUID travelRequestId, UUID userId) {
         TravelRequest travelRequest = findByIdAndGroupId(travelRequestId, travelGroupId);
         if (!travelRequest.getTravelGroup().getOwner().getId().equals(userId)) {
+            log.warn("User {} attempted to reject travel request {} for travel group {}",
+                    userId, travelRequestId, travelGroupId);
             throw new AccessDeniedException("You are not allowed to view this information");
         }
 
@@ -119,6 +133,9 @@ public class TravelRequestService {
         travelRequest.setStatus(TravelRequestStatus.REJECTED);
         travelRequest.setRespondedOn(LocalDateTime.now());
         travelRequestRepository.save(travelRequest);
+
+        log.info("Travel request {} rejected for travel group {} by user {}",
+                travelRequestId, travelGroupId, userId);
     }
     private TravelRequest findByIdAndGroupId(UUID requestId, UUID travelGroupId){
         return travelRequestRepository.findByIdAndTravelGroupId(requestId, travelGroupId).orElseThrow();

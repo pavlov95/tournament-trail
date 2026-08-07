@@ -1,5 +1,6 @@
 package tournament_trail.demo.services;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +20,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@Slf4j
 @Service
 public class ReviewService {
     private final ReviewRepository reviewRepository;
@@ -57,6 +59,7 @@ public class ReviewService {
                 .build();
 
         reviewRepository.save(review);
+        log.info("Review {} created for tournament {} by user {}", review.getId(), tournamentId, userId);
     }
 
     @Transactional
@@ -66,6 +69,8 @@ public class ReviewService {
         Review review = findByIdAndTournamentId(reviewId, tournamentId);
 
         if (!review.getAuthor().getId().equals(userId)) {
+            log.warn("User {} attempted to edit review {} by user {}"
+                    , userId, reviewId, review.getAuthor().getId());
             throw new AccessDeniedException("You can only alter your own reviews");
         }
         review.setTitle(reviewRequest.getTitle());
@@ -73,6 +78,8 @@ public class ReviewService {
         review.setContent(reviewRequest.getContent());
         review.setUpdatedOn(LocalDateTime.now());
         reviewRepository.save(review);
+
+        log.info("Review {} edited for tournament {}", review.getId(), tournamentId);
     }
 
     @Transactional
@@ -82,9 +89,13 @@ public class ReviewService {
         boolean isAdmin = role == Role.ADMIN;
 
         if (!isAdmin && !isAuthor) {
+            log.warn("User {} attempted to delete review {} from tournament {} without permission",
+                    userId, reviewId, tournamentId);
             throw new AccessDeniedException("You can only delete your own Review");
         }
         reviewRepository.delete(review);
+
+        log.info("Review {} deleted from tournament {} by user {}", reviewId, tournamentId, userId);
     }
 
     private Review findByIdAndTournamentId(UUID reviewId, UUID tournamentId) {

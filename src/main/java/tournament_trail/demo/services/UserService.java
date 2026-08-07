@@ -1,5 +1,6 @@
 package tournament_trail.demo.services;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -17,6 +18,7 @@ import tournament_trail.demo.web.dtos.RegisterRequest;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+@Slf4j
 @Service
 public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
@@ -46,6 +48,8 @@ public class UserService implements UserDetailsService {
         userRepository.save(user);
         VerificationToken verificationToken = verificationTokenService.generateToken(user);
         emailService.sendVerificationEmail(user.getEmail(), verificationToken.getToken());
+
+        log.info("User {} registered", user.getId());
     }
 
     @Transactional
@@ -53,6 +57,7 @@ public class UserService implements UserDetailsService {
         User user = verificationToken.getUser();
         user.setEnabled(true);
         userRepository.save(user);
+        log.info("User {} account enabled", user.getId());
     }
 
     @Override

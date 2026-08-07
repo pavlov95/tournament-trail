@@ -1,5 +1,6 @@
 package tournament_trail.demo.services;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.AccessDeniedException;
@@ -19,6 +20,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Service
 public class TravelGroupService {
 
@@ -105,7 +107,11 @@ public class TravelGroupService {
                 .createdOn(LocalDateTime.now())
                 .updatedOn(LocalDateTime.now())
                 .build();
-        return travelGroupRepository.save(travelGroup);
+
+        travelGroupRepository.save(travelGroup);
+        log.info("Travel group {} created by user {}", travelGroup.getId(), ownerId);
+
+        return travelGroup;
     }
 
     private void validateTournamentForTravelGroupCreation(Tournament tournament) {
@@ -136,6 +142,7 @@ public class TravelGroupService {
         boolean isOwner = ownerId.equals(userId);
         boolean isAdmin = role.equals(Role.ADMIN);
         if (!isOwner && !isAdmin) {
+            log.warn("User {} attempted to cancel travel group {}", userId, travelGroupId);
             throw new AccessDeniedException("You are not allowed to alter this travel group");
         }
         if (travelGroup.getStatus() == TravelGroupStatus.CANCELLED) {
@@ -144,6 +151,7 @@ public class TravelGroupService {
         travelGroup.setStatus(TravelGroupStatus.CANCELLED);
         travelGroup.setUpdatedOn(LocalDateTime.now());
         travelGroupRepository.save(travelGroup);
+        log.info("Travel group {} cancelled by user {}", travelGroupId, userId);
     }
 
     public TravelGroupRequest mapToTravelGroupRequest(TravelGroup travelGroup) {
@@ -173,6 +181,7 @@ public class TravelGroupService {
         boolean isAdmin = role == Role.ADMIN;
 
         if(!isOwner && !isAdmin){
+            log.warn("User {} attempted to update travel group {}", userId, travelGroup.getId());
             throw new AccessDeniedException("You are not authorised to alter this travel group");
         }
 
@@ -190,5 +199,6 @@ public class TravelGroupService {
         travelGroup.setUpdatedOn(LocalDateTime.now());
 
         travelGroupRepository.save(travelGroup);
+        log.info("User {} updated travel group {}", userId, travelGroup.getId());
     }
 }

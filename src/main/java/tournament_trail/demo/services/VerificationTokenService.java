@@ -1,7 +1,7 @@
 package tournament_trail.demo.services;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import tournament_trail.demo.entities.User;
 import tournament_trail.demo.entities.VerificationToken;
 import tournament_trail.demo.exceptions.ExpiredVerificationTokenException;
@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
+@Slf4j
 @Service
 public class VerificationTokenService {
     private final VerificationTokenRepository verificationTokenRepository;
