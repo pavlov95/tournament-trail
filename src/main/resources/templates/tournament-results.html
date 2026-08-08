@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Tournament Results | TournamentTrail</title>
+    <link rel="stylesheet" th:href="@{/css/tournament-results.css}">
+</head>
+
+<body>
+
+<header class="site-header">
+    <nav class="navbar">
+        <a class="brand" th:href="@{/}">TournamentTrail</a>
+
+        <div class="nav-links">
+            <a th:href="@{/}">Home</a>
+            <a class="active" th:href="@{/tournaments}">Tournaments</a>
+            <a th:href="@{/registrations}">My registrations</a>
+            <a th:href="@{/travel-groups}">Travel groups</a>
+            <a th:href="@{/about}">About</a>
+            <a th:href="@{/contact}">Contact</a>
+        </div>
+
+        <div class="nav-actions" sec:authorize="isAnonymous()">
+            <a class="button button-secondary" th:href="@{/login}">Login</a>
+            <a class="button button-primary" th:href="@{/register}">Create account</a>
+        </div>
+
+        <div class="nav-actions" sec:authorize="isAuthenticated()">
+            <a class="button button-primary" th:href="@{/home}">Dashboard</a>
+
+            <form th:action="@{/logout}" method="post">
+                <input th:if="${_csrf != null}"
+                       type="hidden"
+                       th:name="${_csrf.parameterName}"
+                       th:value="${_csrf.token}">
+
+                <button class="button button-secondary logout-button" type="submit">
+                    Logout
+                </button>
+            </form>
+        </div>
+    </nav>
+</header>
+
+<main class="page-shell">
+
+    <section class="results-hero">
+        <div>
+            <p class="eyebrow">Tournament board</p>
+            <h1>Tournament Results</h1>
+            <p>
+                View recorded games, current standings, and tournament score progress.
+            </p>
+        </div>
+
+        <div class="hero-actions">
+            <a class="button button-secondary"
+               th:href="@{/tournaments/{id}(id=${tournamentId})}">
+                Back to tournament
+            </a>
+        </div>
+    </section>
+
+    <div th:if="${resultsError}" class="flash-message error" th:text="${resultsError}">
+        Results service error.
+    </div>
+
+    <section class="results-layout"
+             th:classappend="${canUserEditGames} ? '' : ' results-layout-readonly'">
+
+        <aside class="result-form-card" th:if="${canUserEditGames}">
+            <p class="eyebrow">Organiser tools</p>
+            <h2>Add game result</h2>
+            <p class="muted">
+                Select confirmed tournament players and enter the result.
+            </p>
+
+            <div th:if="${#lists.isEmpty(players)}" class="empty-state">
+                <h3>No confirmed players</h3>
+                <p>No confirmed players are available for this tournament yet.</p>
+            </div>
+
+            <form th:if="${!#lists.isEmpty(players)}"
+                  class="result-form"
+                  th:action="@{/tournaments/{id}/games(id=${tournamentId})}"
+                  th:object="${gameRequest}"
+                  method="post">
+
+                <input th:if="${_csrf != null}"
+                       type="hidden"
+                       th:name="${_csrf.parameterName}"
+                       th:value="${_csrf.token}">
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="roundNumber">Round number</label>
+                        <input id="roundNumber"
+                               type="number"
+                               min="1"
+                               th:field="*{roundNumber}"
+                               required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="boardNumber">Board number</label>
+                        <input id="boardNumber"
+                               type="number"
+                               min="1"
+                               th:field="*{boardNumber}"
+                               required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="whitePlayerId">White player</label>
+                        <select id="whitePlayerId" th:field="*{whitePlayerId}" required>
+                            <option value="">Select white player</option>
+                            <option th:each="player : ${players}"
+                                    th:value="${player.id}"
+                                    th:text="${player.username}">
+                                player
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="blackPlayerId">Black player</label>
+                        <select id="blackPlayerId" th:field="*{blackPlayerId}" required>
+                            <option value="">Select black player</option>
+                            <option th:each="player : ${players}"
+                                    th:value="${player.id}"
+                                    th:text="${player.username}">
+                                player
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="result">Result</label>
+                        <select id="result" th:field="*{result}" required>
+                            <option value="">Select result</option>
+                            <option value="PENDING">Pending</option>
+                            <option value="WHITE_WIN">White win</option>
+                            <option value="BLACK_WIN">Black win</option>
+                            <option value="DRAW">Draw</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="winCondition">Win condition</label>
+                        <select id="winCondition" th:field="*{winCondition}">
+                            <option value="">Not specified</option>
+                            <option value="CHECKMATE">Checkmate</option>
+                            <option value="RESIGNATION">Resignation</option>
+                            <option value="TIME">Time</option>
+                            <option value="FORFEIT">Forfeit</option>
+                            <option value="AGREEMENT">Agreement</option>
+                            <option value="ARBITER_DECISION">Arbiter decision</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="totalMoves">Total moves</label>
+                        <input id="totalMoves"
+                               type="number"
+                               min="0"
+                               th:field="*{totalMoves}">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="playedOn">Played on</label>
+                        <input id="playedOn"
+                               type="datetime-local"
+                               th:field="*{playedOn}">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="organiserNotes">Organiser notes</label>
+                    <textarea id="organiserNotes"
+                              rows="4"
+                              maxlength="1000"
+                              th:field="*{organiserNotes}"
+                              placeholder="Optional notes for the organiser or arbiter"></textarea>
+                </div>
+
+                <button class="button button-primary full-button" type="submit">
+                    Add game
+                </button>
+            </form>
+        </aside>
+
+        <section class="results-content-card">
+
+            <div class="section-heading">
+                <div>
+                    <p class="eyebrow">Live table</p>
+                    <h2>Standings</h2>
+                </div>
+
+                <span class="result-count"
+                      th:text="|${#lists.size(standings)} players|">
+                    0 players
+                </span>
+            </div>
+
+            <div th:if="${#lists.isEmpty(standings)}" class="empty-state">
+                <h3>No standings yet</h3>
+                <p>Standings will appear after games are added.</p>
+            </div>
+
+            <div th:unless="${#lists.isEmpty(standings)}" class="table-wrapper">
+                <table class="data-table">
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Player</th>
+                        <th>Points</th>
+                        <th>Games</th>
+                        <th>Wins</th>
+                        <th>Draws</th>
+                        <th>Losses</th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    <tr th:each="standing, iterStat : ${standings}">
+                        <td th:text="${iterStat.count}">1</td>
+                        <td th:text="${standing.username}">player</td>
+                        <td th:text="${standing.points}">0</td>
+                        <td th:text="${standing.gamesPlayed}">0</td>
+                        <td th:text="${standing.wins}">0</td>
+                        <td th:text="${standing.draws}">0</td>
+                        <td th:text="${standing.losses}">0</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="section-heading games-heading">
+                <div>
+                    <p class="eyebrow">Game archive</p>
+                    <h2>Games</h2>
+                </div>
+
+                <span class="result-count"
+                      th:text="|${#lists.size(games)} games|">
+                    0 games
+                </span>
+            </div>
+
+            <div th:if="${#lists.isEmpty(games)}" class="empty-state">
+                <h3>No games yet</h3>
+                <p>Saved game results will appear here.</p>
+            </div>
+
+            <div th:unless="${#lists.isEmpty(games)}" class="game-list">
+
+                <article class="game-item" th:each="game : ${games}">
+                    <div class="game-topline">
+                        <div>
+                            <h3>
+                                Round <span th:text="${game.roundNumber}">1</span>,
+                                Board <span th:text="${game.boardNumber}">1</span>
+                            </h3>
+
+                            <p>
+                                <strong th:text="${game.whitePlayerUsername}">white</strong>
+                                vs
+                                <strong th:text="${game.blackPlayerUsername}">black</strong>
+                            </p>
+                        </div>
+
+                        <div class="result-badge" th:text="${game.result}">
+                            WHITE_WIN
+                        </div>
+                    </div>
+
+                    <div class="game-meta"
+                         th:if="${game.totalMoves != null || game.winCondition != null}">
+                        <span th:if="${game.totalMoves != null}">
+                            Moves:
+                            <strong th:text="${game.totalMoves}">40</strong>
+                        </span>
+
+                        <span th:if="${game.winCondition != null}">
+                            Condition:
+                            <strong th:text="${game.winCondition}">CHECKMATE</strong>
+                        </span>
+                    </div>
+
+                    <p class="game-notes"
+                       th:if="${game.organiserNotes != null and !#strings.isEmpty(game.organiserNotes)}"
+                       th:text="${game.organiserNotes}">
+                        Notes
+                    </p>
+
+                    <div class="game-actions" th:if="${canUserEditGames}">
+
+                        <details class="edit-result">
+                            <summary>Edit game</summary>
+
+                            <form class="inline-result-form"
+                                  th:action="@{/tournaments/{tournamentId}/games/{gameId}/edit(tournamentId=${tournamentId}, gameId=${game.id})}"
+                                  method="post">
+
+                                <input th:if="${_csrf != null}"
+                                       type="hidden"
+                                       th:name="${_csrf.parameterName}"
+                                       th:value="${_csrf.token}">
+
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label th:for="|edit-round-${game.id}|">Round number</label>
+                                        <input th:id="|edit-round-${game.id}|"
+                                               type="number"
+                                               name="roundNumber"
+                                               min="1"
+                                               th:value="${game.roundNumber}"
+                                               required>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label th:for="|edit-board-${game.id}|">Board number</label>
+                                        <input th:id="|edit-board-${game.id}|"
+                                               type="number"
+                                               name="boardNumber"
+                                               min="1"
+                                               th:value="${game.boardNumber}"
+                                               required>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label th:for="|edit-white-${game.id}|">White player</label>
+                                        <select th:id="|edit-white-${game.id}|"
+                                                name="whitePlayerId"
+                                                required>
+                                            <option value="">Select white player</option>
+                                            <option th:each="player : ${players}"
+                                                    th:value="${player.id}"
+                                                    th:text="${player.username}"
+                                                    th:selected="${player.id.equals(game.whitePlayerId)}">
+                                                player
+                                            </option>
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label th:for="|edit-black-${game.id}|">Black player</label>
+                                        <select th:id="|edit-black-${game.id}|"
+                                                name="blackPlayerId"
+                                                required>
+                                            <option value="">Select black player</option>
+                                            <option th:each="player : ${players}"
+                                                    th:value="${player.id}"
+                                                    th:text="${player.username}"
+                                                    th:selected="${player.id.equals(game.blackPlayerId)}">
+                                                player
+                                            </option>
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label th:for="|edit-result-${game.id}|">Result</label>
+                                        <select th:id="|edit-result-${game.id}|"
+                                                name="result"
+                                                required>
+                                            <option value="PENDING"
+                                                    th:selected="${game.result.name() == 'PENDING'}">
+                                                Pending
+                                            </option>
+                                            <option value="WHITE_WIN"
+                                                    th:selected="${game.result.name() == 'WHITE_WIN'}">
+                                                White win
+                                            </option>
+                                            <option value="BLACK_WIN"
+                                                    th:selected="${game.result.name() == 'BLACK_WIN'}">
+                                                Black win
+                                            </option>
+                                            <option value="DRAW"
+                                                    th:selected="${game.result.name() == 'DRAW'}">
+                                                Draw
+                                            </option>
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label th:for="|edit-condition-${game.id}|">Win condition</label>
+                                        <select th:id="|edit-condition-${game.id}|"
+                                                name="winCondition">
+                                            <option value="">Not specified</option>
+                                            <option value="CHECKMATE"
+                                                    th:selected="${game.winCondition != null and game.winCondition.name() == 'CHECKMATE'}">
+                                                Checkmate
+                                            </option>
+                                            <option value="RESIGNATION"
+                                                    th:selected="${game.winCondition != null and game.winCondition.name() == 'RESIGNATION'}">
+                                                Resignation
+                                            </option>
+                                            <option value="TIME"
+                                                    th:selected="${game.winCondition != null and game.winCondition.name() == 'TIME'}">
+                                                Time
+                                            </option>
+                                            <option value="FORFEIT"
+                                                    th:selected="${game.winCondition != null and game.winCondition.name() == 'FORFEIT'}">
+                                                Forfeit
+                                            </option>
+                                            <option value="AGREEMENT"
+                                                    th:selected="${game.winCondition != null and game.winCondition.name() == 'AGREEMENT'}">
+                                                Agreement
+                                            </option>
+                                            <option value="ARBITER_DECISION"
+                                                    th:selected="${game.winCondition != null and game.winCondition.name() == 'ARBITER_DECISION'}">
+                                                Arbiter decision
+                                            </option>
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label th:for="|edit-moves-${game.id}|">Total moves</label>
+                                        <input th:id="|edit-moves-${game.id}|"
+                                               type="number"
+                                               name="totalMoves"
+                                               min="0"
+                                               th:value="${game.totalMoves}">
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label th:for="|edit-notes-${game.id}|">Organiser notes</label>
+                                    <textarea th:id="|edit-notes-${game.id}|"
+                                              name="organiserNotes"
+                                              rows="4"
+                                              maxlength="1000"
+                                              th:text="${game.organiserNotes}"></textarea>
+                                </div>
+
+                                <button class="button button-primary" type="submit">
+                                    Save changes
+                                </button>
+                            </form>
+                        </details>
+
+                        <form th:action="@{/tournaments/{tournamentId}/games/{gameId}/delete(tournamentId=${tournamentId}, gameId=${game.id})}"
+                              method="post"
+                              onsubmit="return confirm('Are you sure you want to delete this game result?')">
+
+                            <input th:if="${_csrf != null}"
+                                   type="hidden"
+                                   th:name="${_csrf.parameterName}"
+                                   th:value="${_csrf.token}">
+
+                            <button class="text-danger-button" type="submit">
+                                Delete game
+                            </button>
+                        </form>
+                    </div>
+                </article>
+            </div>
+        </section>
+    </section>
+
+</main>
+
+<footer class="site-footer">
+    <div>
+        <a class="brand footer-brand" th:href="@{/}">TournamentTrail</a>
+        <p>Chess tournaments, registrations, and shared travel in one platform.</p>
+    </div>
+
+    <nav>
+        <a class="active" th:href="@{/tournaments}">Tournaments</a>
+        <a th:href="@{/registrations}">My registrations</a>
+        <a th:href="@{/travel-groups}">Travel groups</a>
+        <a th:href="@{/about}">About</a>
+        <a th:href="@{/contact}">Contact</a>
+    </nav>
+
+    <p>&copy; 2026 TournamentTrail</p>
+</footer>
+
+</body>
+</html>
