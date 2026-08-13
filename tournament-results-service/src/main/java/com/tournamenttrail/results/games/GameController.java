@@ -25,8 +25,7 @@ public class GameController {
 
     @PostMapping("/games")
     @ResponseStatus(HttpStatus.CREATED)
-    public GameResponse createGame(@PathVariable UUID tournamentId
-            , @Valid @RequestBody GameRequest gameRequest) {
+    public GameResponse createGame(@PathVariable UUID tournamentId, @Valid @RequestBody GameRequest gameRequest) {
 
         return gameService.createGame(tournamentId, gameRequest);
     }

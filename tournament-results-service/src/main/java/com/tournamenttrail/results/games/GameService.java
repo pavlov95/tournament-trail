@@ -31,27 +31,35 @@ public class GameService {
 
     @Transactional
     public GameResponse createGame(UUID tournamentId, GameRequest gameRequest) {
-        Game game = new Game();
 
-        game.setTournamentId(tournamentId);
-
-        applyRequestData(game, gameRequest);
+        Game game = Game.builder()
+                .roundNumber(gameRequest.getRoundNumber())
+                .boardNumber(gameRequest.getBoardNumber())
+                .tournamentId(tournamentId)
+                .whitePlayerId(gameRequest.getWhitePlayerId())
+                .blackPlayerId(gameRequest.getBlackPlayerId())
+                .whitePlayerUsername(gameRequest.getWhitePlayerUsername())
+                .blackPlayerUsername(gameRequest.getBlackPlayerUsername())
+                .result(gameRequest.getResult())
+                .totalMoves(gameRequest.getTotalMoves())
+                .winCondition(gameRequest.getWinCondition())
+                .organiserNotes(gameRequest.getOrganiserNotes())
+                .playedOn(gameRequest.getPlayedOn())
+                .createdOn(LocalDateTime.now())
+                .updatedOn(LocalDateTime.now())
+                .build();
         applyPoints(game);
 
-        LocalDateTime now = LocalDateTime.now();
-        game.setCreatedOn(now);
-        game.setUpdatedOn(now);
+        gameRepository.save(game);
 
-        Game savedGame = gameRepository.save(game);
+        log.info("Created game result {} for tournament {}", game.getId(), tournamentId);
 
-        log.info("Created game result {} for tournament {}", savedGame.getId(), tournamentId);
-
-        return mapToGameResponse(savedGame);
+        return mapToGameResponse(game);
     }
 
     @Transactional
     public GameResponse updateGame(UUID tournamentId, UUID gameId, GameRequest gameRequest) {
-        Game game = getGameOrThrow(tournamentId, gameId);
+        Game game = findById(tournamentId, gameId);
         game.setUpdatedOn(LocalDateTime.now());
         applyRequestData(game, gameRequest);
         applyPoints(game);
@@ -65,7 +73,7 @@ public class GameService {
 
     @Transactional
     public void deleteGame(UUID tournamentId, UUID gameId) {
-        Game game = getGameOrThrow(tournamentId, gameId);
+        Game game = findById(tournamentId, gameId);
 
         gameRepository.delete(game);
 
@@ -93,28 +101,24 @@ public class GameService {
 
             StandingStats whiteStats = standings.computeIfAbsent(
                     game.getWhitePlayerId(),
-                    playerId -> new StandingStats(game.getWhitePlayerId(), game.getWhitePlayerUsername())
-            );
+                    playerId -> new StandingStats(game.getWhitePlayerId(), game.getWhitePlayerUsername()));
 
             StandingStats blackStats = standings.computeIfAbsent(
                     game.getBlackPlayerId(),
-                    playerId -> new StandingStats(game.getBlackPlayerId(), game.getBlackPlayerUsername())
-            );
+                    playerId -> new StandingStats(game.getBlackPlayerId(), game.getBlackPlayerUsername()));
 
             applyGameToStandings(game, whiteStats, blackStats);
         }
 
         return standings.values()
                 .stream()
-                .sorted(
-                        Comparator.comparing(StandingStats::getPoints).reversed()
-                                .thenComparing(StandingStats::getUsername)
-                )
+                .sorted(Comparator.comparing(StandingStats::getPoints).reversed()
+                                .thenComparing(StandingStats::getUsername))
                 .map(this::mapToStandingResponse)
                 .toList();
     }
 
-    private Game getGameOrThrow(UUID tournamentId, UUID gameId) {
+    private Game findById(UUID tournamentId, UUID gameId) {
         return gameRepository.findByIdAndTournamentId(gameId, tournamentId)
                 .orElseThrow(() -> new GameNotFoundException(gameId));
     }
@@ -143,16 +147,12 @@ public class GameService {
                 game.setBlackPoints(LOSS_POINTS);
             }
             case BLACK_WIN -> {
-                game.setWhitePoints(LOSS_POINTS);
                 game.setBlackPoints(WIN_POINTS);
+                game.setWhitePoints(LOSS_POINTS);
             }
             case DRAW -> {
                 game.setWhitePoints(DRAW_POINTS);
                 game.setBlackPoints(DRAW_POINTS);
-            }
-            case PENDING -> {
-                game.setWhitePoints(LOSS_POINTS);
-                game.setBlackPoints(LOSS_POINTS);
             }
         }
     }
