@@ -14,7 +14,6 @@ import tournament_trail.demo.entities.User;
 import tournament_trail.demo.entities.VerificationToken;
 import tournament_trail.demo.entities.enums.Role;
 import tournament_trail.demo.repositories.UserRepository;
-import tournament_trail.demo.web.dtos.RegisterRequest;
 
 import java.util.Optional;
 
