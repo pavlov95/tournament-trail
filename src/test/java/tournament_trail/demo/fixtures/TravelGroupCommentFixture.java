@@ -1,6 +1,10 @@
 package tournament_trail.demo.fixtures;
 
+import tournament_trail.demo.entities.TravelGroup;
 import tournament_trail.demo.entities.TravelGroupComment;
+import tournament_trail.demo.entities.User;
+
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -22,5 +26,16 @@ public class TravelGroupCommentFixture {
         TravelGroupComment second = TravelGroupCommentFixture.create();
 
         return List.of(first, second);
+    }
+
+    public static TravelGroupComment createWithAuthorAndTravelGroup(User author, TravelGroup travelGroup){
+        return TravelGroupComment.builder()
+                .travelGroup(travelGroup)
+                .hidden(false)
+                .author(author)
+                .content(TEST_CONTENT)
+                .createdOn(LocalDateTime.now())
+                .editedOn(null)
+                .build();
     }
 }

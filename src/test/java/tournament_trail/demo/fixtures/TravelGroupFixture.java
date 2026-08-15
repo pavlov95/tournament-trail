@@ -77,4 +77,22 @@ public class TravelGroupFixture {
         TravelGroup second = TravelGroupFixture.create();
         return List.of(first, second);
     }
+
+    public static TravelGroup createWithoutIdAndUserAndTournament(){
+        return TravelGroup.builder()
+                .status(TravelGroupStatus.OPEN)
+                .createdOn(TEST_NOW)
+                .updatedOn(TEST_NOW)
+                .name(TEST_NAME)
+                .departureCity(TEST_CITY)
+                .departureCountry(TEST_COUNTRY)
+                .meetingPoint(TEST_MEETING_POINT)
+                .description(TEST_DESCRIPTION)
+                .currency(TEST_CURRENCY)
+                .maximumMembers(TEST_MAXIMUM_MEMBERS)
+                .departureTime(TEST_DEPARTURE_DATE)
+                .estimatedCost(TEST_ESTIMATED_COST)
+                .transportationType(TEST_TRANSPORTATION_TYPE)
+                .build();
+    }
 }

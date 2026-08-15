@@ -1,5 +1,6 @@
 package tournament_trail.demo.fixtures;
 
+import tournament_trail.demo.entities.User;
 import tournament_trail.demo.entities.enums.Role;
 import tournament_trail.demo.security.AuthenticationUserDetails;
 
@@ -18,6 +19,7 @@ public class AuthenticationUserDetailsFixture {
                 .enabled(true)
                 .build();
     }
+
     public static AuthenticationUserDetails createDisabled() {
         return AuthenticationUserDetails.builder()
                 .id(UUID.randomUUID())
@@ -25,6 +27,16 @@ public class AuthenticationUserDetailsFixture {
                 .password(TEST_PASSWORD)
                 .role(Role.PLAYER)
                 .enabled(false)
+                .build();
+    }
+
+    public static AuthenticationUserDetails createFromUser(User user){
+        return AuthenticationUserDetails.builder()
+                .id(user.getId())
+                .username(user.getUsername())
+                .password(user.getPassword())
+                .role(user.getRole())
+                .enabled(user.isEnabled())
                 .build();
     }
 }

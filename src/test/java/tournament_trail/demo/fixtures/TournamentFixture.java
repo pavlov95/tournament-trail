@@ -155,4 +155,27 @@ public class TournamentFixture {
 
         return List.of(first, second, third);
     }
+
+    public static Tournament createWithoutIdAndOrganiser(){
+        LocalDateTime now = LocalDateTime.now();
+        return Tournament.builder()
+                .name(TEST_NAME)
+                .country(TEST_COUNTRY)
+                .city(TEST_CITY)
+                .venue(TEST_VENUE)
+                .registrationDeadline(now)
+                .startTime(now.plusDays(2))
+                .endTime(now.plusDays(3))
+                .currency(TEST_CURRENCY)
+                .description(TEST_DESCRIPTION)
+                .rated(true)
+                .createdOn(now)
+                .updatedOn(now)
+                .entryFee(BigDecimal.TEN)
+                .timeControl(TEST_TIME_CONTROL)
+                .paymentInstructions(TEST_PAYMENT_INSTRUCTIONS)
+                .participationRequirements("NONE")
+                .status(TEST_TOURNAMENT_STATUS)
+                .build();
+    }
 }
