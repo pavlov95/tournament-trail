@@ -65,8 +65,7 @@ public class CommentControllerTest {
 
         userDetails = AuthenticationUserDetailsFixture.createFromUser(user);
 
-        tournament = TournamentFixture.createWithoutIdAndOrganiser();
-        tournament.setOrganiser(user);
+        tournament = TournamentFixture.createWithoutIdAndOrganiser(user);
         tournamentRepository.save(tournament);
 
         travelGroup = TravelGroupFixture.createWithoutIdAndUserAndTournament();

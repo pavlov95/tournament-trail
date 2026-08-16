@@ -2,6 +2,7 @@ package tournament_trail.demo.fixtures;
 
 
 import tournament_trail.demo.entities.Tournament;
+import tournament_trail.demo.entities.User;
 import tournament_trail.demo.entities.enums.CurrencyCode;
 import tournament_trail.demo.entities.enums.TimeControl;
 import tournament_trail.demo.entities.enums.TournamentStatus;
@@ -21,7 +22,7 @@ public class TournamentFixture {
     public static int TEST_MAXIMUM_PARTICIPANTS = 111;
     public static CurrencyCode TEST_CURRENCY = CurrencyCode.EUR;
     public static TimeControl TEST_TIME_CONTROL = TimeControl.BULLET;
-    public static TournamentStatus TEST_TOURNAMENT_STATUS = TournamentStatus.PUBLISHED;
+    public static TournamentStatus TEST_PUBLISHED_TOURNAMENT_STATUS = TournamentStatus.PUBLISHED;
 
     public static Tournament createWithStatusStarted() {
         LocalDateTime now = LocalDateTime.now();
@@ -78,7 +79,7 @@ public class TournamentFixture {
                 .entryFee(BigDecimal.TEN)
                 .timeControl(TEST_TIME_CONTROL)
                 .paymentInstructions(TEST_PAYMENT_INSTRUCTIONS)
-                .status(TEST_TOURNAMENT_STATUS)
+                .status(TEST_PUBLISHED_TOURNAMENT_STATUS)
                 .build();
     }
 
@@ -103,7 +104,7 @@ public class TournamentFixture {
                 .country(TEST_COUNTRY)
                 .venue(TEST_VENUE)
                 .description(TEST_DESCRIPTION)
-                .status(TEST_TOURNAMENT_STATUS)
+                .status(TEST_PUBLISHED_TOURNAMENT_STATUS)
                 .startTime(localDateTime)
                 .build();
     }
@@ -156,10 +157,11 @@ public class TournamentFixture {
         return List.of(first, second, third);
     }
 
-    public static Tournament createWithoutIdAndOrganiser(){
+    public static Tournament createWithoutIdAndOrganiser(User organiser){
         LocalDateTime now = LocalDateTime.now();
         return Tournament.builder()
                 .name(TEST_NAME)
+                .organiser(organiser)
                 .country(TEST_COUNTRY)
                 .city(TEST_CITY)
                 .venue(TEST_VENUE)
@@ -175,7 +177,7 @@ public class TournamentFixture {
                 .timeControl(TEST_TIME_CONTROL)
                 .paymentInstructions(TEST_PAYMENT_INSTRUCTIONS)
                 .participationRequirements("NONE")
-                .status(TEST_TOURNAMENT_STATUS)
+                .status(TournamentStatus.COMPLETED)
                 .build();
     }
 }

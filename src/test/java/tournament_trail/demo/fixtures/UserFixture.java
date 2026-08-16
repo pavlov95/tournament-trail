@@ -9,8 +9,6 @@ import java.util.UUID;
 public class UserFixture {
     public static final String TEST_USERNAME="TestUsername1";
 
-
-
     public static User createUser() {
         return User.builder()
                 .id(UUID.randomUUID())
@@ -27,5 +25,14 @@ public class UserFixture {
                 .createdOn(LocalDateTime.now())
                 .updatedOn(LocalDateTime.now())
                 .build();
+    }
+
+    public static User createWithAllFieldsWithDifferentUsernameAndEmail() {
+        User user = createWithAllFields();
+        String unique = UUID.randomUUID().toString().substring(0,5);
+        user.setEmail("example"+unique+"gmail.com");
+        user.setUsername(TEST_USERNAME+unique);
+
+        return user;
     }
 }

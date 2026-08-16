@@ -2,7 +2,10 @@ package tournament_trail.demo.fixtures;
 
 import tournament_trail.demo.entities.Review;
 import tournament_trail.demo.entities.Tournament;
+import tournament_trail.demo.entities.User;
 import tournament_trail.demo.entities.enums.Rating;
+
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -36,6 +39,17 @@ public class ReviewFixture {
         second.setTournament(tournament);
 
         return List.of(first, second);
+    }
+
+    public static Review createWithoutUserAndTournament(User author, Tournament tournament){
+        return Review.builder()
+                .author(author)
+                .tournament(tournament)
+                .rating(Rating.GOOD)
+                .content("TEST")
+                .createdOn(LocalDateTime.now())
+                .updatedOn(LocalDateTime.now())
+                .build();
     }
 
 }
