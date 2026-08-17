@@ -36,6 +36,10 @@ public class TravelGroupRequestFixture {
         return travelGroupRequest;
     }
 
+    public static TravelGroupRequest createInvalid(){
+        return new TravelGroupRequest();
+    }
+
     public static TravelGroupRequest createWithTournament(UUID tournamentId) {
         TravelGroupRequest travelGroupRequest = new TravelGroupRequest();
         travelGroupRequest.setTournamentId(tournamentId);

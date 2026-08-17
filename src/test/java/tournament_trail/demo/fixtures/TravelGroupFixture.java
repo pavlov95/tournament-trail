@@ -1,5 +1,6 @@
 package tournament_trail.demo.fixtures;
 
+import tournament_trail.demo.entities.Tournament;
 import tournament_trail.demo.entities.TravelGroup;
 import tournament_trail.demo.entities.enums.CurrencyCode;
 import tournament_trail.demo.entities.enums.TransportationType;
