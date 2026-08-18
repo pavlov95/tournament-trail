@@ -2,8 +2,10 @@ package tournament_trail.demo.fixtures;
 
 import tournament_trail.demo.entities.TravelGroup;
 import tournament_trail.demo.entities.TravelRequest;
+import tournament_trail.demo.entities.User;
 import tournament_trail.demo.entities.enums.TravelRequestStatus;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class TravelRequestFixture {
@@ -20,6 +22,26 @@ public class TravelRequestFixture {
                 .applicant(UserFixture.createUser())
                 .status(TravelRequestStatus.PENDING)
                 .travelGroup(TravelGroupFixture.create())
+                .build();
+    }
+
+    public static TravelRequest createWithPendingStatus(User applicant, TravelGroup travelGroup) {
+        return TravelRequest.builder()
+                .applicant(applicant)
+                .status(TravelRequestStatus.PENDING)
+                .travelGroup(travelGroup)
+                .message("Test")
+                .requestedOn(LocalDateTime.now())
+                .build();
+    }
+
+    public static TravelRequest createWithApprovedStatus(User applicant, TravelGroup travelGroup) {
+        return TravelRequest.builder()
+                .applicant(applicant)
+                .status(TravelRequestStatus.APPROVED)
+                .travelGroup(travelGroup)
+                .message("Test")
+                .requestedOn(LocalDateTime.now())
                 .build();
     }
 
