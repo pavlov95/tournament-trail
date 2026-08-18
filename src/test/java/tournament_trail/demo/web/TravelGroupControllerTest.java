@@ -14,6 +14,7 @@ import tournament_trail.demo.entities.User;
 import tournament_trail.demo.entities.enums.TravelGroupStatus;
 import tournament_trail.demo.entities.enums.TravelRequestStatus;
 import tournament_trail.demo.fixtures.*;
+import tournament_trail.demo.fixtures.dtos.TravelGroupRequestFixture;
 import tournament_trail.demo.repositories.TournamentRepository;
 import tournament_trail.demo.repositories.TravelGroupRepository;
 import tournament_trail.demo.repositories.TravelRequestRepository;

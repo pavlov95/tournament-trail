@@ -20,7 +20,7 @@ import tournament_trail.demo.exceptions.TravelGroupDoesNotExistException;
 import tournament_trail.demo.exceptions.UserDoesNotExist;
 import tournament_trail.demo.fixtures.TournamentFixture;
 import tournament_trail.demo.fixtures.TravelGroupFixture;
-import tournament_trail.demo.fixtures.TravelGroupRequestFixture;
+import tournament_trail.demo.fixtures.dtos.TravelGroupRequestFixture;
 import tournament_trail.demo.fixtures.UserFixture;
 import tournament_trail.demo.repositories.TravelGroupRepository;
 import tournament_trail.demo.web.dtos.TravelGroupRequest;

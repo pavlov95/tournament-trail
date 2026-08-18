@@ -26,7 +26,7 @@ import tournament_trail.demo.exceptions.TournamentFullException;
 import tournament_trail.demo.exceptions.TournamentHasAlreadyStartedException;
 import tournament_trail.demo.exceptions.UserDoesNotExist;
 import tournament_trail.demo.fixtures.TournamentFixture;
-import tournament_trail.demo.fixtures.TournamentRequestFixture;
+import tournament_trail.demo.fixtures.dtos.TournamentRequestFixture;
 import tournament_trail.demo.fixtures.UserFixture;
 import tournament_trail.demo.repositories.TournamentRepository;
 import tournament_trail.demo.web.dtos.TournamentOptionResponse;

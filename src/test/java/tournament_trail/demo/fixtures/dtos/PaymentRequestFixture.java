@@ -1,4 +1,4 @@
-package tournament_trail.demo.fixtures;
+package tournament_trail.demo.fixtures.dtos;
 
 import tournament_trail.demo.web.dtos.PaymentRequest;
 

@@ -27,6 +27,18 @@ public class UserFixture {
                 .build();
     }
 
+    public static User createWithAllFieldsAndRoleOrganiser() {
+        return User.builder()
+                .role(Role.ORGANISER)
+                .username(TEST_USERNAME)
+                .password("$2b$10$N9qo8uLOickgx2ZMRZoMyeZOZTZ27Cz8McCi1n5muM5bJd8qK51vK")
+                .email("example@abv.bg")
+                .enabled(false)
+                .createdOn(LocalDateTime.now())
+                .updatedOn(LocalDateTime.now())
+                .build();
+    }
+
     public static User createWithAllFieldsWithDifferentUsernameAndEmail() {
         User user = createWithAllFields();
         String unique = UUID.randomUUID().toString().substring(0,5);

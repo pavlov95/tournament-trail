@@ -1,9 +1,12 @@
 package tournament_trail.demo.fixtures;
 
+import tournament_trail.demo.entities.Tournament;
 import tournament_trail.demo.entities.TournamentRegistration;
+import tournament_trail.demo.entities.User;
 import tournament_trail.demo.entities.enums.PaymentStatus;
 import tournament_trail.demo.entities.enums.RegistrationStatus;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -47,7 +50,7 @@ public class TournamentRegistrationFixture {
                 .build();
     }
 
-    public static TournamentRegistration createWithRegistrationStatusPendingAndPaymentStatusPending() {
+    public static TournamentRegistration createWithRegistrationStatusPendingAndPaymentStatusSubmitted() {
         return TournamentRegistration.builder()
                 .id(UUID.randomUUID())
                 .player(UserFixture.createUser())
@@ -57,9 +60,27 @@ public class TournamentRegistrationFixture {
                 .build();
     }
 
+    public static TournamentRegistration createWithRegistrationStatusPendingAndPaymentStatusSubmitted(
+            User applicant, Tournament tournament) {
+
+        return TournamentRegistration.builder()
+                .player(applicant)
+                .tournament(tournament)
+                .registrationStatus(RegistrationStatus.PENDING_PAYMENT)
+                .paymentStatus(PaymentStatus.SUBMITTED)
+                .paymentReference("Test")
+                .organiserNote("Test")
+                .hidden(false)
+                .updatedOn(LocalDateTime.now())
+                .registeredOn(LocalDateTime.now())
+                .reservedUntil(LocalDateTime.now().plusHours(1))
+                .paymentSubmittedOn(LocalDateTime.now())
+                .build();
+    }
+
     public static List<TournamentRegistration> createList() {
-        TournamentRegistration first = createWithRegistrationStatusPendingAndPaymentStatusPending();
-        TournamentRegistration second = createWithRegistrationStatusPendingAndPaymentStatusPending();
+        TournamentRegistration first = createWithRegistrationStatusPendingAndPaymentStatusSubmitted();
+        TournamentRegistration second = createWithRegistrationStatusPendingAndPaymentStatusSubmitted();
 
         return List.of(first, second);
     }

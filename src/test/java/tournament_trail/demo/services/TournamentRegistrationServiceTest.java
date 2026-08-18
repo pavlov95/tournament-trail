@@ -22,7 +22,7 @@ import tournament_trail.demo.entities.enums.RegistrationStatus;
 import tournament_trail.demo.entities.enums.Role;
 import tournament_trail.demo.entities.enums.TournamentStatus;
 import tournament_trail.demo.exceptions.*;
-import tournament_trail.demo.fixtures.PaymentRequestFixture;
+import tournament_trail.demo.fixtures.dtos.PaymentRequestFixture;
 import tournament_trail.demo.fixtures.TournamentFixture;
 import tournament_trail.demo.fixtures.TournamentRegistrationFixture;
 import tournament_trail.demo.fixtures.UserFixture;
@@ -608,7 +608,7 @@ public class TournamentRegistrationServiceTest {
     public void addPayment_shouldThrowRegistrationReservationExpiredException_whenReservationHasExpiredOrNull(
             LocalDateTime reservedUntil) {
         TournamentRegistration registration =
-                TournamentRegistrationFixture.createWithRegistrationStatusPendingAndPaymentStatusPending();
+                TournamentRegistrationFixture.createWithRegistrationStatusPendingAndPaymentStatusSubmitted();
         registration.setReservedUntil(reservedUntil);
 
         when(tournamentRegistrationRepository.findById(registration.getId()))
@@ -630,7 +630,7 @@ public class TournamentRegistrationServiceTest {
         PaymentRequest paymentRequest = PaymentRequestFixture.create();
 
         TournamentRegistration registration =
-                TournamentRegistrationFixture.createWithRegistrationStatusPendingAndPaymentStatusPending();
+                TournamentRegistrationFixture.createWithRegistrationStatusPendingAndPaymentStatusSubmitted();
         registration.setReservedUntil(LocalDateTime.now().plusMinutes(1));
 
         when(tournamentRegistrationRepository.findById(registration.getId()))
