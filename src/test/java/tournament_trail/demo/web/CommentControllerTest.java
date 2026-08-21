@@ -69,8 +69,8 @@ public class CommentControllerTest {
         tournamentRepository.save(tournament);
 
         travelGroup = TravelGroupFixture.createWithoutIdAndUserAndTournament();
-        travelGroup.setOwner(user);
         travelGroup.setTournament(tournament);
+        travelGroup.setOwner(user);
         travelGroupRepository.save(travelGroup);
 
         comment = TravelGroupCommentFixture.createWithAuthorAndTravelGroup(user, travelGroup);

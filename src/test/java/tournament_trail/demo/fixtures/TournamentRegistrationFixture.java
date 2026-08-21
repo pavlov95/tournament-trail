@@ -78,6 +78,79 @@ public class TournamentRegistrationFixture {
                 .build();
     }
 
+    public static TournamentRegistration createWithRegistrationStatusCancelledAndPaymentStatusRejected(
+            User applicant, Tournament tournament) {
+
+        return TournamentRegistration.builder()
+                .player(applicant)
+                .tournament(tournament)
+                .registrationStatus(RegistrationStatus.CANCELLED)
+                .paymentStatus(PaymentStatus.REJECTED)
+                .paymentReference("Test")
+                .organiserNote("Test")
+                .hidden(false)
+                .updatedOn(LocalDateTime.now())
+                .registeredOn(LocalDateTime.now())
+                .reservedUntil(LocalDateTime.now().plusHours(1))
+                .paymentSubmittedOn(LocalDateTime.now())
+                .build();
+    }
+
+    public static TournamentRegistration createWithRegistrationStatusPendingAndPaymentStatusPending(
+            User applicant, Tournament tournament) {
+
+        return TournamentRegistration.builder()
+                .player(applicant)
+                .tournament(tournament)
+                .registrationStatus(RegistrationStatus.PENDING_PAYMENT)
+                .paymentStatus(PaymentStatus.PENDING)
+                .paymentReference("Test")
+                .organiserNote("Test")
+                .hidden(false)
+                .updatedOn(LocalDateTime.now())
+                .registeredOn(LocalDateTime.now())
+                .reservedUntil(LocalDateTime.now().plusHours(1))
+                .paymentSubmittedOn(LocalDateTime.now())
+                .build();
+    }
+
+    public static TournamentRegistration createWithRegistrationStatusPendingAndPaymentStatusConfirmed(
+            User applicant, Tournament tournament) {
+
+        return TournamentRegistration.builder()
+                .player(applicant)
+                .tournament(tournament)
+                .registrationStatus(RegistrationStatus.PENDING_PAYMENT)
+                .paymentStatus(PaymentStatus.CONFIRMED)
+                .paymentReference("Test")
+                .organiserNote("Test")
+                .hidden(false)
+                .updatedOn(LocalDateTime.now())
+                .registeredOn(LocalDateTime.now())
+                .reservedUntil(LocalDateTime.now().plusHours(1))
+                .paymentSubmittedOn(LocalDateTime.now())
+                .build();
+    }
+
+    public static TournamentRegistration createWithRegistrationStatusRejectedAndPaymentStatusConfirmed(
+            User applicant, Tournament tournament) {
+
+        return TournamentRegistration.builder()
+                .player(applicant)
+                .tournament(tournament)
+                .registrationStatus(RegistrationStatus.REJECTED)
+                .paymentStatus(PaymentStatus.CONFIRMED)
+                .paymentReference("Test")
+                .organiserNote("Test")
+                .hidden(false)
+                .updatedOn(LocalDateTime.now())
+                .registeredOn(LocalDateTime.now())
+                .reservedUntil(LocalDateTime.now().plusHours(1))
+                .paymentSubmittedOn(LocalDateTime.now())
+                .build();
+    }
+
+
     public static List<TournamentRegistration> createList() {
         TournamentRegistration first = createWithRegistrationStatusPendingAndPaymentStatusSubmitted();
         TournamentRegistration second = createWithRegistrationStatusPendingAndPaymentStatusSubmitted();
