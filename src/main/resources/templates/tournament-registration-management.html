@@ -1,13 +1,17 @@
 <!DOCTYPE html>
 <html lang="en"
+      th:lang="${#locale.language}"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0">
 
-    <title>Registration management | TournamentTrail</title>
+    <title th:text="#{registration.management.page.title}">
+        Registration management | TournamentTrail
+    </title>
 
     <link rel="stylesheet"
           th:href="@{/css/tournament-registration-management.css}">
@@ -18,35 +22,39 @@
         <a class="brand" th:href="@{/}">TournamentTrail</a>
 
         <div class="nav-links">
-            <a th:href="@{/}">Home</a>
-            <a class="active" th:href="@{/tournaments}">Tournaments</a>
-            <a th:href="@{/registrations}">My registrations</a>
-            <a th:href="@{/travel-groups}">Travel groups</a>
-            <a th:href="@{/about}">About</a>
-            <a th:href="@{/contact}">Contact</a>
+            <a th:href="@{/}" th:text="#{nav.home}">Home</a>
+            <a class="active" th:href="@{/tournaments}" th:text="#{nav.tournaments}">Tournaments</a>
+            <a th:href="@{/registrations}" th:text="#{nav.registrations}">My registrations</a>
+            <a th:href="@{/travel-groups}" th:text="#{nav.travel-groups}">Travel groups</a>
+            <a th:href="@{/about}" th:text="#{nav.about}">About</a>
+            <a th:href="@{/contact}" th:text="#{nav.contact}">Contact</a>
         </div>
 
         <div class="nav-actions" sec:authorize="isAnonymous()">
             <a class="button button-secondary secondary-button"
-               th:href="@{/login}">
+               th:href="@{/login}"
+               th:text="#{nav.login}">
                 Login
             </a>
 
             <a class="button button-primary primary-button"
-               th:href="@{/register}">
+               th:href="@{/register}"
+               th:text="#{nav.create-account}">
                 Create account
             </a>
         </div>
 
         <div class="nav-actions" sec:authorize="isAuthenticated()">
             <a class="button button-primary primary-button"
-               th:href="@{/home}">
+               th:href="@{/home}"
+               th:text="#{nav.dashboard}">
                 Dashboard
             </a>
 
             <form th:action="@{/logout}" method="post">
                 <button class="button button-secondary secondary-button logout-button"
-                        type="submit">
+                        type="submit"
+                        th:text="#{nav.logout}">
                     Logout
                 </button>
             </form>
@@ -57,11 +65,12 @@
 <main>
     <section class="hero-section">
         <div class="hero-content">
-            <p class="eyebrow">Organiser tools</p>
+            <p class="eyebrow" th:text="#{registration.management.hero.eyebrow}">Organiser tools</p>
 
-            <h1>Manage tournament registrations.</h1>
+            <h1 th:text="#{registration.management.hero.title}">Manage tournament registrations.</h1>
 
-            <p class="hero-description">
+            <p class="hero-description"
+               th:text="#{registration.management.hero.description}">
                 Review submitted payment references, confirm accepted players,
                 and reject registrations that cannot be approved.
             </p>
@@ -70,17 +79,17 @@
         <div class="hero-summary">
             <div>
                 <strong th:text="${#lists.size(registrations)}">0</strong>
-                <span>Total registrations</span>
+                <span th:text="#{registration.management.summary.total}">Total registrations</span>
             </div>
 
             <div>
                 <strong th:text="${#lists.size(registrations.?[paymentStatus.name() == 'SUBMITTED'])}">0</strong>
-                <span>Waiting for review</span>
+                <span th:text="#{registration.management.summary.waiting-review}">Waiting for review</span>
             </div>
 
             <div>
                 <strong th:text="${#lists.size(registrations.?[registrationStatus.name() == 'CONFIRMED'])}">0</strong>
-                <span>Confirmed players</span>
+                <span th:text="#{registration.management.summary.confirmed}">Confirmed players</span>
             </div>
         </div>
     </section>
@@ -88,13 +97,14 @@
     <section class="content-section">
         <div class="section-heading">
             <div>
-                <p class="eyebrow">Payment review</p>
+                <p class="eyebrow" th:text="#{registration.management.section.eyebrow}">Payment review</p>
 
-                <h2>Registrations</h2>
+                <h2 th:text="#{registration.management.section.title}">Registrations</h2>
             </div>
 
             <a class="button button-secondary"
-               th:href="@{/tournaments}">
+               th:href="@{/tournaments}"
+               th:text="#{registration.management.action.back-to-tournaments}">
                 Back to tournaments
             </a>
         </div>
@@ -107,9 +117,9 @@
 
         <div class="empty-state"
              th:if="${#lists.isEmpty(registrations)}">
-            <h3>No registrations yet.</h3>
+            <h3 th:text="#{registration.management.empty.title}">No registrations yet.</h3>
 
-            <p>
+            <p th:text="#{registration.management.empty.text}">
                 Registrations for this tournament will appear here once players sign up.
             </p>
         </div>
@@ -121,7 +131,7 @@
                 <div class="registration-main">
                     <div class="registration-title-row">
                         <div>
-                            <p class="eyebrow">Player</p>
+                            <p class="eyebrow" th:text="#{registration.management.card.player}">Player</p>
 
                             <h3 th:text="${registration.player.username}">
                                 player_username
@@ -154,53 +164,56 @@
 
                     <dl class="details-grid">
                         <div>
-                            <dt>Tournament</dt>
+                            <dt th:text="#{registration.management.details.tournament}">Tournament</dt>
                             <dd th:text="${registration.tournament.name}">Tournament name</dd>
                         </div>
 
                         <div>
-                            <dt>Registered on</dt>
+                            <dt th:text="#{registration.management.details.registered-on}">Registered on</dt>
                             <dd th:text="${#temporals.format(registration.registeredOn, 'dd MMM yyyy, HH:mm')}">
                                 18 Jul 2026, 12:00
                             </dd>
                         </div>
 
                         <div>
-                            <dt>Reserved until</dt>
+                            <dt th:text="#{registration.management.details.reserved-until}">Reserved until</dt>
                             <dd th:if="${registration.reservedUntil != null}"
                                 th:text="${#temporals.format(registration.reservedUntil, 'dd MMM yyyy, HH:mm')}">
                                 18 Jul 2026, 13:00
                             </dd>
-                            <dd th:if="${registration.reservedUntil == null}">
+                            <dd th:if="${registration.reservedUntil == null}"
+                                th:text="#{registration.management.value.not-required}">
                                 Not required
                             </dd>
                         </div>
 
                         <div>
-                            <dt>Payment submitted</dt>
+                            <dt th:text="#{registration.management.details.payment-submitted}">Payment submitted</dt>
                             <dd th:if="${registration.paymentSubmittedOn != null}"
                                 th:text="${#temporals.format(registration.paymentSubmittedOn, 'dd MMM yyyy, HH:mm')}">
                                 18 Jul 2026, 12:20
                             </dd>
-                            <dd th:if="${registration.paymentSubmittedOn == null}">
+                            <dd th:if="${registration.paymentSubmittedOn == null}"
+                                th:text="#{registration.management.value.not-submitted}">
                                 Not submitted
                             </dd>
                         </div>
 
                         <div class="full-width">
-                            <dt>Payment reference</dt>
+                            <dt th:text="#{registration.management.details.payment-reference}">Payment reference</dt>
                             <dd th:if="${registration.paymentReference != null and !#strings.isEmpty(registration.paymentReference)}"
                                 th:text="${registration.paymentReference}">
                                 REVOLUT-123456
                             </dd>
-                            <dd th:if="${registration.paymentReference == null or #strings.isEmpty(registration.paymentReference)}">
+                            <dd th:if="${registration.paymentReference == null or #strings.isEmpty(registration.paymentReference)}"
+                                th:text="#{registration.management.value.no-payment-reference}">
                                 No payment reference submitted.
                             </dd>
                         </div>
 
                         <div class="full-width"
                              th:if="${registration.organiserNote != null and !#strings.isEmpty(registration.organiserNote)}">
-                            <dt>Organiser note</dt>
+                            <dt th:text="#{registration.management.details.organiser-note}">Organiser note</dt>
                             <dd th:text="${registration.organiserNote}">
                                 Organiser note.
                             </dd>
@@ -210,9 +223,9 @@
 
                 <div class="review-panel"
                      th:if="${registration.paymentStatus.name() == 'SUBMITTED'}">
-                    <h4>Review submitted payment</h4>
+                    <h4 th:text="#{registration.management.review.title}">Review submitted payment</h4>
 
-                    <p>
+                    <p th:text="#{registration.management.review.text}">
                         Approving confirms the player for this tournament.
                         Rejecting declines the registration and stores an organiser note.
                     </p>
@@ -228,7 +241,8 @@
                                    value="patch">
 
                             <button class="button button-primary"
-                                    type="submit">
+                                    type="submit"
+                                    th:text="#{registration.management.action.approve-payment}">
                                 Approve payment
                             </button>
                         </form>
@@ -244,16 +258,18 @@
                                    name="_method"
                                    value="patch">
 
-                            <label th:for="'organiserNote-' + ${registration.id}">
+                            <label th:for="'organiserNote-' + ${registration.id}"
+                                   th:text="#{registration.management.form.rejection-note}">
                                 Rejection note
                             </label>
 
                             <textarea th:id="'organiserNote-' + ${registration.id}"
                                       th:field="*{organiserNote}"
                                       rows="3"
-                                      placeholder="Optional. Example: Payment could not be verified."></textarea>
+                                      th:placeholder="#{registration.management.form.rejection-note.placeholder}"></textarea>
 
-                            <p class="field-hint">
+                            <p class="field-hint"
+                               th:text="#{registration.management.form.rejection-note.hint}">
                                 Leave empty to use the default rejection message.
                             </p>
 
@@ -264,7 +280,8 @@
                             </p>
 
                             <button class="button button-danger"
-                                    type="submit">
+                                    type="submit"
+                                    th:text="#{registration.management.action.reject-registration}">
                                 Reject registration
                             </button>
                         </form>
@@ -273,9 +290,9 @@
 
                 <div class="review-panel muted-panel"
                      th:if="${registration.paymentStatus.name() != 'SUBMITTED'}">
-                    <h4>No action required</h4>
+                    <h4 th:text="#{registration.management.no-action.title}">No action required</h4>
 
-                    <p>
+                    <p th:text="#{registration.management.no-action.text}">
                         This registration is not waiting for payment review.
                     </p>
                 </div>
@@ -291,21 +308,21 @@
             TournamentTrail
         </a>
 
-        <p>
+        <p th:text="#{footer.description}">
             Chess tournaments, registrations, and shared travel in one platform.
         </p>
     </div>
 
     <nav>
-        <a th:href="@{/}">Home</a>
-        <a class="active" th:href="@{/tournaments}">Tournaments</a>
-        <a th:href="@{/registrations}">My registrations</a>
-        <a th:href="@{/travel-groups}">Travel groups</a>
-        <a th:href="@{/about}">About</a>
-        <a th:href="@{/contact}">Contact</a>
+        <a th:href="@{/}" th:text="#{nav.home}">Home</a>
+        <a class="active" th:href="@{/tournaments}" th:text="#{nav.tournaments}">Tournaments</a>
+        <a th:href="@{/registrations}" th:text="#{nav.registrations}">My registrations</a>
+        <a th:href="@{/travel-groups}" th:text="#{nav.travel-groups}">Travel groups</a>
+        <a th:href="@{/about}" th:text="#{nav.about}">About</a>
+        <a th:href="@{/contact}" th:text="#{nav.contact}">Contact</a>
     </nav>
 
-    <p>&copy; 2026 TournamentTrail</p>
+    <p th:text="#{footer.copyright}">&copy; 2026 TournamentTrail</p>
 </footer>
 </body>
 </html>

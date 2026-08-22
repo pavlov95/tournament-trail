@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en"
+      th:lang="${#locale.language}"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
@@ -8,14 +9,13 @@
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0">
 
-    <title>Travel Groups | TournamentTrail</title>
+    <title th:text="#{travel-groups.page.title}">Travel Groups | TournamentTrail</title>
 
     <link rel="stylesheet"
           th:href="@{/css/travel-groups.css}">
 </head>
 
 <body>
-
 
 <header class="site-header">
     <nav class="navbar">
@@ -26,30 +26,49 @@
         </a>
 
         <div class="nav-links">
-            <a th:href="@{/}">Home</a>
-            <a th:href="@{/tournaments}">Tournaments</a>
-            <a th:href="@{/registrations}" sec:authorize="isAuthenticated()">My registrations</a>
-            <a class="active" th:href="@{/travel-groups}">Travel groups</a>
-            <a th:href="@{/about}">About</a>
-            <a th:href="@{/contact}">Contact</a>
+            <a th:href="@{/}" th:text="#{nav.home}">Home</a>
+            <a th:href="@{/tournaments}" th:text="#{nav.tournaments}">Tournaments</a>
+            <a th:href="@{/registrations}"
+               sec:authorize="isAuthenticated()"
+               th:text="#{nav.registrations}">My registrations</a>
+            <a class="active" th:href="@{/travel-groups}" th:text="#{nav.travel-groups}">Travel groups</a>
+            <a th:href="@{/about}" th:text="#{nav.about}">About</a>
+            <a th:href="@{/contact}" th:text="#{nav.contact}">Contact</a>
         </div>
 
         <div class="nav-actions" sec:authorize="isAnonymous()">
-            <a class="button button-secondary secondary-button" th:href="@{/login}">Login</a>
-            <a class="button button-primary primary-button" th:href="@{/register}">Create account</a>
+            <a class="button button-secondary secondary-button"
+               th:href="@{/login}"
+               th:text="#{nav.login}">Login</a>
+
+            <a class="button button-primary primary-button"
+               th:href="@{/register}"
+               th:text="#{nav.create-account}">Create account</a>
         </div>
 
         <div class="nav-actions" sec:authorize="isAuthenticated()">
-            <a class="button button-primary primary-button" th:href="@{/home}">Dashboard</a>
+            <a class="button button-primary primary-button"
+               th:href="@{/home}"
+               th:text="#{nav.dashboard}">Dashboard</a>
+
             <form th:action="@{/logout}" method="post">
                 <button class="button button-secondary secondary-button logout-button"
-                        type="submit">Logout
+                        type="submit"
+                        th:text="#{nav.logout}">
+                    Logout
                 </button>
             </form>
         </div>
+
+        <div class="language-switcher">
+            <a th:href="@{/travel-groups(lang='en')}"
+               th:text="#{language.english}">English</a>
+            <span>|</span>
+            <a th:href="@{/travel-groups(lang='bg')}"
+               th:text="#{language.bulgarian}">Bulgarian</a>
+        </div>
     </nav>
 </header>
-
 
 <main class="container">
 
@@ -61,11 +80,11 @@
 
     <section class="page-heading">
         <div>
-            <p class="eyebrow">Shared travel</p>
+            <p class="eyebrow" th:text="#{travel-groups.hero.eyebrow}">Shared travel</p>
 
-            <h1>Travel groups</h1>
+            <h1 th:text="#{travel-groups.hero.title}">Travel groups</h1>
 
-            <p>
+            <p th:text="#{travel-groups.hero.description}">
                 Find open travel groups connected to chess tournaments,
                 or create one for players travelling from your area.
             </p>
@@ -73,7 +92,8 @@
 
         <a class="button button-primary"
            th:href="@{/travel-groups/create}"
-           sec:authorize="hasAuthority('TRAVEL_GROUP_CREATE')">
+           sec:authorize="hasAuthority('TRAVEL_GROUP_CREATE')"
+           th:text="#{travel-groups.action.create}">
             Create travel group
         </a>
     </section>
@@ -81,9 +101,9 @@
     <section class="panel search-panel">
         <div class="section-heading">
             <div>
-                <p class="eyebrow">Search</p>
-                <h2>Find a travel group</h2>
-                <p>Filter by group name or departure location.</p>
+                <p class="eyebrow" th:text="#{travel-groups.search.eyebrow}">Search</p>
+                <h2 th:text="#{travel-groups.search.title}">Find a travel group</h2>
+                <p th:text="#{travel-groups.search.help}">Filter by group name or departure location.</p>
             </div>
         </div>
 
@@ -93,40 +113,45 @@
               th:object="${searchRequest}">
 
             <div class="form-group search-name">
-                <label for="search-name">Group name</label>
+                <label for="search-name" th:text="#{travel-groups.search.name}">Group name</label>
 
                 <input id="search-name"
                        type="text"
                        th:field="*{name}"
+                       th:placeholder="#{travel-groups.search.name.placeholder}"
                        placeholder="For example: Varna players">
             </div>
 
             <div class="form-group">
-                <label for="search-country">Departure country</label>
+                <label for="search-country" th:text="#{travel-groups.search.departure-country}">Departure country</label>
 
                 <input id="search-country"
                        type="text"
                        th:field="*{departureCountry}"
+                       th:placeholder="#{travel-groups.search.departure-country.placeholder}"
                        placeholder="Bulgaria">
             </div>
 
             <div class="form-group">
-                <label for="search-city">Departure city</label>
+                <label for="search-city" th:text="#{travel-groups.search.departure-city}">Departure city</label>
 
                 <input id="search-city"
                        type="text"
                        th:field="*{departureCity}"
+                       th:placeholder="#{travel-groups.search.departure-city.placeholder}"
                        placeholder="Varna">
             </div>
 
             <div class="search-actions">
                 <button class="button button-primary"
-                        type="submit">
+                        type="submit"
+                        th:text="#{travel-groups.action.search}">
                     Search
                 </button>
 
                 <a class="button button-secondary"
-                   th:href="@{/travel-groups}">
+                   th:href="@{/travel-groups}"
+                   th:text="#{travel-groups.action.clear-filters}">
                     Clear filters
                 </a>
             </div>
@@ -136,11 +161,12 @@
     <section class="travel-results">
         <div class="section-heading results-heading">
             <div>
-                <p class="eyebrow">Available groups</p>
-                <h2>Open travel groups</h2>
+                <p class="eyebrow" th:text="#{travel-groups.results.eyebrow}">Available groups</p>
+                <h2 th:text="#{travel-groups.results.title}">Open travel groups</h2>
 
-                <p th:if="${travelGroups != null}">
-                    <span th:text="${#lists.size(travelGroups)}">0</span>group(s) found
+                <p th:if="${travelGroups != null}"
+                   th:text="#{travel-groups.results.count(${#lists.size(travelGroups)})}">
+                    0 group(s) found
                 </p>
             </div>
         </div>
@@ -148,16 +174,17 @@
         <div class="empty-state"
              th:if="${travelGroups == null || #lists.isEmpty(travelGroups)}">
 
-            <h3>No travel groups found</h3>
+            <h3 th:text="#{travel-groups.empty.title}">No travel groups found</h3>
 
-            <p>
+            <p th:text="#{travel-groups.empty.text}">
                 Try clearing the filters, or create a new travel group
                 for a published tournament.
             </p>
 
             <a class="button button-primary"
                th:href="@{/travel-groups/create}"
-               sec:authorize="hasAuthority('TRAVEL_GROUP_CREATE')">
+               sec:authorize="hasAuthority('TRAVEL_GROUP_CREATE')"
+               th:text="#{travel-groups.action.create}">
                 Create travel group
             </a>
         </div>
@@ -193,7 +220,7 @@
                 <div class="card-details">
 
                     <div class="detail-row">
-                        <span class="detail-label">Tournament</span>
+                        <span class="detail-label" th:text="#{travel-groups.card.tournament}">Tournament</span>
 
                         <span th:text="${group.tournament.name}">
                             Tournament name
@@ -201,7 +228,7 @@
                     </div>
 
                     <div class="detail-row">
-                        <span class="detail-label">Departure</span>
+                        <span class="detail-label" th:text="#{travel-groups.card.departure}">Departure</span>
 
                         <span>
                             <span th:text="${group.departureCity}">City</span>,
@@ -210,7 +237,7 @@
                     </div>
 
                     <div class="detail-row">
-                        <span class="detail-label">Meeting point</span>
+                        <span class="detail-label" th:text="#{travel-groups.card.meeting-point}">Meeting point</span>
 
                         <span th:text="${group.meetingPoint}">
                             Main station
@@ -218,7 +245,7 @@
                     </div>
 
                     <div class="detail-row">
-                        <span class="detail-label">Departure time</span>
+                        <span class="detail-label" th:text="#{travel-groups.card.departure-time}">Departure time</span>
 
                         <span th:text="${#temporals.format(group.departureTime, 'dd MMM yyyy, HH:mm')}">
                             15 Jul 2026, 08:00
@@ -226,22 +253,23 @@
                     </div>
 
                     <div class="detail-row">
-                        <span class="detail-label">Members</span>
+                        <span class="detail-label" th:text="#{travel-groups.card.members}">Members</span>
 
-                        <span th:text="|Maximum ${group.maximumMembers}|">
+                        <span th:text="#{travel-groups.card.maximum(${group.maximumMembers})}">
                             Maximum 4
                         </span>
                     </div>
 
                     <div class="detail-row">
-                        <span class="detail-label">Estimated cost</span>
+                        <span class="detail-label" th:text="#{travel-groups.card.estimated-cost}">Estimated cost</span>
 
                         <span th:if="${group.estimatedCost != null}">
                             <span th:text="${group.estimatedCost}">50.00</span>
                             <span th:text="${group.currency}">EUR</span>
                         </span>
 
-                        <span th:if="${group.estimatedCost == null}">
+                        <span th:if="${group.estimatedCost == null}"
+                              th:text="#{travel-groups.card.not-specified}">
                             Not specified
                         </span>
                     </div>
@@ -249,12 +277,14 @@
 
                 <div class="card-footer">
                     <a class="card-link"
-                       th:href="@{/travel-groups/{id}(id=${group.id})}">
+                       th:href="@{/travel-groups/{id}(id=${group.id})}"
+                       th:text="#{travel-groups.action.view-group}">
                         View group
                     </a>
 
                     <a class="card-link muted-link"
-                       th:href="@{/tournaments/{id}(id=${group.tournament.id})}">
+                       th:href="@{/tournaments/{id}(id=${group.tournament.id})}"
+                       th:text="#{travel-groups.action.view-tournament}">
                         View tournament
                     </a>
                 </div>
@@ -263,7 +293,6 @@
     </section>
 </main>
 
-
 <footer class="site-footer">
     <div>
         <a class="brand footer-brand"
@@ -271,22 +300,23 @@
             TournamentTrail
         </a>
 
-        <p>
+        <p th:text="#{footer.description}">
             Chess tournaments, registrations, and shared travel in one platform.
         </p>
     </div>
 
     <nav>
-        <a th:href="@{/tournaments}">Tournaments</a>
-        <a th:href="@{/registrations}" sec:authorize="isAuthenticated()">My registrations</a>
-        <a th:href="@{/travel-groups}">Travel groups</a>
-        <a th:href="@{/about}">About</a>
-        <a th:href="@{/contact}">Contact</a>
+        <a th:href="@{/tournaments}" th:text="#{nav.tournaments}">Tournaments</a>
+        <a th:href="@{/registrations}"
+           sec:authorize="isAuthenticated()"
+           th:text="#{nav.registrations}">My registrations</a>
+        <a th:href="@{/travel-groups}" th:text="#{nav.travel-groups}">Travel groups</a>
+        <a th:href="@{/about}" th:text="#{nav.about}">About</a>
+        <a th:href="@{/contact}" th:text="#{nav.contact}">Contact</a>
     </nav>
 
-    <p>&copy; 2026 TournamentTrail</p>
+    <p th:text="#{footer.copyright}">&copy; 2026 TournamentTrail</p>
 </footer>
-
 
 </body>
 </html>

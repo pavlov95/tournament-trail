@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en"
+      th:lang="${#locale.language}"
       xmlns:th="http://www.thymeleaf.org">
 
 <head>
@@ -7,7 +8,7 @@
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0">
 
-    <title>Server Error | TournamentTrail</title>
+    <title th:text="#{error500.page.title}">Server Error | TournamentTrail</title>
 
     <link rel="stylesheet" th:href="@{/css/error-500.css}">
 </head>
@@ -20,16 +21,26 @@
         <a class="brand" th:href="@{/}">TournamentTrail</a>
 
         <div class="nav-links">
-            <a th:href="@{/}">Home</a>
-            <a th:href="@{/tournaments}">Tournaments</a>
-            <a th:href="@{/registrations}">My registrations</a>
-            <a th:href="@{/travel-groups}">Travel groups</a>
-            <a th:href="@{/about}">About</a>
-            <a th:href="@{/contact}">Contact</a>
+            <a th:text="#{nav.home}" th:href="@{/}">Home</a>
+            <a th:text="#{nav.tournaments}" th:href="@{/tournaments}">Tournaments</a>
+            <a th:text="#{nav.registrations}" th:href="@{/registrations}">My registrations</a>
+            <a th:text="#{nav.travel-groups}" th:href="@{/travel-groups}">Travel groups</a>
+            <a th:text="#{nav.about}" th:href="@{/about}">About</a>
+            <a th:text="#{nav.contact}" th:href="@{/contact}">Contact</a>
         </div>
 
         <div class="nav-actions">
-            <a class="button button-primary" th:href="@{/home}">Dashboard</a>
+            <a class="button button-primary"
+               th:text="#{nav.dashboard}"
+               th:href="@{/home}">Dashboard</a>
+        </div>
+
+        <div class="language-switcher">
+            <a th:href="@{/error(lang='en')}"
+               th:text="#{language.english}">English</a>
+            <span>|</span>
+            <a th:href="@{/error(lang='bg')}"
+               th:text="#{language.bulgarian}">Bulgarian</a>
         </div>
     </nav>
 </header>
@@ -38,30 +49,35 @@
 
     <section class="error-card">
 
-        <p class="eyebrow">Server error</p>
+        <p class="eyebrow" th:text="#{error500.eyebrow}">Server error</p>
 
         <div class="error-code">500</div>
 
-        <h1>Something went wrong on our side.</h1>
+        <h1 th:text="#{error500.title}">Something went wrong on our side.</h1>
 
         <p class="error-message"
-           th:text="${message != null ? message : 'An unexpected error occurred.'}">
+           th:text="${message != null ? message : #messages.msg('error500.default-message')}">
             An unexpected error occurred.
         </p>
 
         <div class="error-details" th:if="${path != null}">
-            <span>Requested path</span>
+            <span th:text="#{error.requested-path}">Requested path</span>
             <strong th:text="${path}">/example/path</strong>
         </div>
 
-        <p class="helper-text">
+        <p class="helper-text" th:text="#{error500.helper-text}">
             The request reached TournamentTrail, but the server could not complete it.
             You can return to a safe page and try again.
         </p>
 
         <div class="error-actions">
-            <a class="button button-primary" th:href="@{/}">Go to home</a>
-            <a class="button button-secondary" th:href="@{/tournaments}">Browse tournaments</a>
+            <a class="button button-primary"
+               th:text="#{error.action.home}"
+               th:href="@{/}">Go to home</a>
+
+            <a class="button button-secondary"
+               th:text="#{error.action.browse-tournaments}"
+               th:href="@{/tournaments}">Browse tournaments</a>
         </div>
 
     </section>
@@ -72,20 +88,20 @@
 
     <div>
         <a class="brand footer-brand" th:href="@{/}">TournamentTrail</a>
-        <p>
+        <p th:text="#{footer.description}">
             Chess tournaments, registrations, and shared travel in one platform.
         </p>
     </div>
 
     <nav>
-        <a th:href="@{/tournaments}">Tournaments</a>
-        <a th:href="@{/registrations}">My registrations</a>
-        <a th:href="@{/travel-groups}">Travel groups</a>
-        <a th:href="@{/about}">About</a>
-        <a th:href="@{/contact}">Contact</a>
+        <a th:text="#{nav.tournaments}" th:href="@{/tournaments}">Tournaments</a>
+        <a th:text="#{nav.registrations}" th:href="@{/registrations}">My registrations</a>
+        <a th:text="#{nav.travel-groups}" th:href="@{/travel-groups}">Travel groups</a>
+        <a th:text="#{nav.about}" th:href="@{/about}">About</a>
+        <a th:text="#{nav.contact}" th:href="@{/contact}">Contact</a>
     </nav>
 
-    <p>&copy; 2026 TournamentTrail</p>
+    <p th:text="#{footer.copyright}">&copy; 2026 TournamentTrail</p>
 </footer>
 
 </body>

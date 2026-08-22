@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en"
+<html th:lang="${#locale.language}"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
@@ -7,7 +7,7 @@
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0">
 
-    <title>Contact and FAQ | TournamentTrail</title>
+    <title th:text="#{contact.page.title}">Contact and FAQ | TournamentTrail</title>
 
     <link rel="stylesheet"
           th:href="@{/css/contact.css}">
@@ -16,50 +16,71 @@
 <header class="site-header">
     <nav class="navbar">
         <a class="brand" th:href="@{/}">TournamentTrail</a>
+
         <div class="nav-links">
-            <a th:href="@{/}">Home</a>
-            <a th:href="@{/tournaments}">Tournaments</a>
-            <a th:href="@{/registrations}">My registrations</a>
-            <a th:href="@{/travel-groups}">Travel groups</a>
-            <a th:href="@{/about}">About</a>
-            <a class="active" th:href="@{/contact}">Contact</a>
+            <a th:text="#{nav.home}" th:href="@{/}">Home</a>
+            <a th:text="#{nav.tournaments}" th:href="@{/tournaments}">Tournaments</a>
+            <a th:text="#{nav.registrations}" th:href="@{/registrations}">My registrations</a>
+            <a th:text="#{nav.travel-groups}" th:href="@{/travel-groups}">Travel groups</a>
+            <a th:text="#{nav.about}" th:href="@{/about}">About</a>
+            <a class="active" th:text="#{nav.contact}" th:href="@{/contact}">Contact</a>
         </div>
+
         <div class="nav-actions" sec:authorize="isAnonymous()">
-            <a class="button button-secondary secondary-button" th:href="@{/login}">Login</a>
-            <a class="button button-primary primary-button" th:href="@{/register}">Create account</a>
+            <a class="button button-secondary secondary-button"
+               th:text="#{nav.login}"
+               th:href="@{/login}">Login</a>
+
+            <a class="button button-primary primary-button"
+               th:text="#{nav.create-account}"
+               th:href="@{/register}">Create account</a>
         </div>
+
         <div class="nav-actions" sec:authorize="isAuthenticated()">
-            <a class="button button-primary primary-button" th:href="@{/home}">Dashboard</a>
+            <a class="button button-primary primary-button"
+               th:text="#{nav.dashboard}"
+               th:href="@{/home}">Dashboard</a>
+
             <form th:action="@{/logout}" method="post">
                 <button class="button button-secondary secondary-button logout-button"
+                        th:text="#{nav.logout}"
                         type="submit">Logout
                 </button>
             </form>
         </div>
+
+        <div class="language-switcher">
+            <a th:href="@{/contact(lang='en')}"
+               th:text="#{language.english}">English</a>
+            <span>|</span>
+            <a th:href="@{/contact(lang='bg')}"
+               th:text="#{language.bulgarian}">Bulgarian</a>
+        </div>
     </nav>
 </header>
-
 
 <main>
     <section class="hero-section">
         <div>
-            <p class="eyebrow">Help and contact</p>
-            <h1>Frequently asked questions</h1>
-            <p class="hero-description">
+            <p class="eyebrow" th:text="#{contact.hero.eyebrow}">Help and contact</p>
+            <h1 th:text="#{contact.hero.title}">Frequently asked questions</h1>
+            <p class="hero-description" th:text="#{contact.hero.description}">
                 Find answers about tournament registration, travel groups,
                 organiser permissions, payments, and rated chess events.
             </p>
         </div>
 
         <aside class="contact-card">
-            <p class="eyebrow">Further questions</p>
-            <h2>Contact TournamentTrail</h2>
-            <p>If your question is not answered below, send an email to:</p>
+            <p class="eyebrow" th:text="#{contact.card.eyebrow}">Further questions</p>
+            <h2 th:text="#{contact.card.title}">Contact TournamentTrail</h2>
+            <p th:text="#{contact.card.text}">If your question is not answered below, send an email to:</p>
+
             <a class="email-link"
                href="mailto:support@tournamenttrail.com">
                 support@tournamenttrail.com
             </a>
-            <p class="contact-note">
+
+            <p class="contact-note" th:text="#{contact.card.note}">
                 TournamentTrail can help with platform-related issues. Tournament rules,
                 refunds, disputes, and title requirements may also require contacting the
                 tournament organiser or the relevant chess federation.
@@ -69,14 +90,14 @@
 
     <section class="faq-section">
         <div class="section-heading">
-            <p class="eyebrow">FAQ</p>
-            <h2>Using TournamentTrail</h2>
+            <p class="eyebrow" th:text="#{contact.faq.eyebrow}">FAQ</p>
+            <h2 th:text="#{contact.faq.title}">Using TournamentTrail</h2>
         </div>
 
         <div class="faq-list">
             <details>
-                <summary>Do I need an account to browse tournaments?</summary>
-                <p>
+                <summary th:text="#{contact.faq.browse.question}">Do I need an account to browse tournaments?</summary>
+                <p th:text="#{contact.faq.browse.answer}">
                     No. Public tournaments can be viewed without an account. You need to
                     create an account and log in before registering for a tournament,
                     joining a travel group, or using private features.
@@ -84,27 +105,26 @@
             </details>
 
             <details>
-                <summary>How do I register for a tournament?</summary>
-                <p>
-                    Open the tournament details page and select <strong>Register for tournament</strong>.
+                <summary th:text="#{contact.faq.register.question}">How do I register for a tournament?</summary>
+                <p th:text="#{contact.faq.register.answer}">
+                    Open the tournament details page and select Register for tournament.
                     You must be logged in and meet any requirements listed by the organiser.
-                    Your registration and payment status will then appear under
-                    <strong>My registrations</strong>.
+                    Your registration and payment status will then appear under My registrations.
                 </p>
             </details>
 
             <details>
-                <summary>Where can I see my tournament registrations?</summary>
-                <p>
-                    Log in and open <strong>My registrations</strong> from the navigation menu.
+                <summary th:text="#{contact.faq.my-registrations.question}">Where can I see my tournament registrations?</summary>
+                <p th:text="#{contact.faq.my-registrations.answer}">
+                    Log in and open My registrations from the navigation menu.
                     There you can view registration status, payment status, reservation deadlines,
                     cancellations, and hidden registrations.
                 </p>
             </details>
 
             <details>
-                <summary>How do I join a travel group?</summary>
-                <p>
+                <summary th:text="#{contact.faq.travel-group.question}">How do I join a travel group?</summary>
+                <p th:text="#{contact.faq.travel-group.answer}">
                     Open a tournament and view its available travel groups. Select a group,
                     review its public details, and submit a join request. The group owner
                     decides whether to approve or reject the request.
@@ -112,8 +132,8 @@
             </details>
 
             <details>
-                <summary>Who can create tournaments?</summary>
-                <p>
+                <summary th:text="#{contact.faq.organiser.question}">Who can create tournaments?</summary>
+                <p th:text="#{contact.faq.organiser.answer}">
                     Only approved organisers and administrators can create tournaments.
                     A regular player must first submit an organiser application and receive
                     administrator approval.
@@ -121,8 +141,8 @@
             </details>
 
             <details>
-                <summary>Can I cancel a tournament registration?</summary>
-                <p>
+                <summary th:text="#{contact.faq.cancel.question}">Can I cancel a tournament registration?</summary>
+                <p th:text="#{contact.faq.cancel.answer}">
                     Cancellation depends on the tournament's rules and current status. If
                     cancellation is enabled, use the option on the tournament or registration
                     page. Refunds are controlled by the organiser's policy and are not
@@ -131,8 +151,8 @@
             </details>
 
             <details>
-                <summary>How is my payment status confirmed?</summary>
-                <p>
+                <summary th:text="#{contact.faq.payment.question}">How is my payment status confirmed?</summary>
+                <p th:text="#{contact.faq.payment.answer}">
                     Payment is made according to the organiser's instructions. The organiser
                     reviews the payment information and updates your status. TournamentTrail
                     displays that status but does not process the payment unless a payment
@@ -144,21 +164,22 @@
 
     <section class="support-section">
         <div>
-            <p class="eyebrow">Still need help?</p>
-            <h2>Send us your question</h2>
-            <p>
+            <p class="eyebrow" th:text="#{contact.support.eyebrow}">Still need help?</p>
+            <h2 th:text="#{contact.support.title}">Send us your question</h2>
+            <p th:text="#{contact.support.text}">
                 Include your username, the tournament or travel-group name, and a clear
                 description of the issue. Do not send passwords, card details, or other
                 sensitive payment information.
             </p>
         </div>
+
         <a class="button button-primary"
+           th:text="#{contact.support.email-button}"
            href="mailto:support@tournamenttrail.com?subject=TournamentTrail%20support%20question">
             Email support
         </a>
     </section>
 </main>
-
 
 <footer class="site-footer">
     <div>
@@ -167,22 +188,21 @@
             TournamentTrail
         </a>
 
-        <p>
+        <p th:text="#{footer.description}">
             Chess tournaments, registrations, and shared travel in one platform.
         </p>
     </div>
 
     <nav>
-        <a th:href="@{/tournaments}">Tournaments</a>
-        <a th:href="@{/registrations}">My registrations</a>
-        <a th:href="@{/travel-groups}">Travel groups</a>
-        <a th:href="@{/about}">About</a>
-        <a th:href="@{/contact}" class="active" >Contact</a>
+        <a th:text="#{nav.tournaments}" th:href="@{/tournaments}">Tournaments</a>
+        <a th:text="#{nav.registrations}" th:href="@{/registrations}">My registrations</a>
+        <a th:text="#{nav.travel-groups}" th:href="@{/travel-groups}">Travel groups</a>
+        <a th:text="#{nav.about}" th:href="@{/about}">About</a>
+        <a th:text="#{nav.contact}" th:href="@{/contact}" class="active">Contact</a>
     </nav>
 
-    <p>&copy; 2026 TournamentTrail</p>
+    <p th:text="#{footer.copyright}">&copy; 2026 TournamentTrail</p>
 </footer>
-
 
 </body>
 </html>

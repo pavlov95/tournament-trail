@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en"
+      th:lang="${#locale.language}"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
@@ -8,7 +9,7 @@
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0">
 
-    <title>Login | TournamentTrail</title>
+    <title th:text="#{login.page.title}">Login | TournamentTrail</title>
 
     <link rel="stylesheet"
           th:href="@{/css/login.css}">
@@ -25,23 +26,25 @@
         </a>
 
         <div class="nav-links">
-            <a th:href="@{/}">Home</a>
-            <a th:href="@{/tournaments}">Tournaments</a>
-            <a th:href="@{/registrations}">My registrations</a>
-            <a th:href="@{/travel-groups}">Travel groups</a>
-            <a th:href="@{/about}">About</a>
-            <a th:href="@{/contact}">Contact</a>
+            <a th:text="#{nav.home}" th:href="@{/}">Home</a>
+            <a th:text="#{nav.tournaments}" th:href="@{/tournaments}">Tournaments</a>
+            <a th:text="#{nav.registrations}" th:href="@{/registrations}">My registrations</a>
+            <a th:text="#{nav.travel-groups}" th:href="@{/travel-groups}">Travel groups</a>
+            <a th:text="#{nav.about}" th:href="@{/about}">About</a>
+            <a th:text="#{nav.contact}" th:href="@{/contact}">Contact</a>
         </div>
 
         <div class="nav-actions"
              sec:authorize="isAnonymous()">
 
             <a class="button button-secondary secondary-button"
+               th:text="#{nav.login}"
                th:href="@{/login}">
                 Login
             </a>
 
             <a class="button button-primary primary-button"
+               th:text="#{nav.create-account}"
                th:href="@{/register}">
                 Create account
             </a>
@@ -51,6 +54,7 @@
              sec:authorize="isAuthenticated()">
 
             <a class="button button-primary primary-button"
+               th:text="#{nav.dashboard}"
                th:href="@{/home}">
                 Dashboard
             </a>
@@ -58,10 +62,19 @@
             <form th:action="@{/logout}"
                   method="post">
                 <button class="button button-secondary secondary-button logout-button"
+                        th:text="#{nav.logout}"
                         type="submit">
                     Logout
                 </button>
             </form>
+        </div>
+
+        <div class="language-switcher">
+            <a th:href="@{/login(lang='en')}"
+               th:text="#{language.english}">English</a>
+            <span>|</span>
+            <a th:href="@{/login(lang='bg')}"
+               th:text="#{language.bulgarian}">Bulgarian</a>
         </div>
     </nav>
 </header>
@@ -70,54 +83,63 @@
 
     <section class="auth-introduction">
 
-        <p class="eyebrow">
+        <p class="eyebrow" th:text="#{login.intro.eyebrow}">
             Welcome back
         </p>
 
-        <h1>
+        <h1 th:text="#{login.intro.title}">
             Log in to TournamentTrail
         </h1>
 
-        <p>
+        <p th:text="#{login.intro.description}">
             Access your tournament registrations, travel groups,
             and dashboard activity.
         </p>
 
         <ul>
-            <li>Track tournament registration and payment status</li>
-            <li>Review your upcoming chess events</li>
-            <li>Manage travel groups and shared journeys</li>
+            <li th:text="#{login.intro.benefit.registration-status}">
+                Track tournament registration and payment status
+            </li>
+            <li th:text="#{login.intro.benefit.events}">
+                Review your upcoming chess events
+            </li>
+            <li th:text="#{login.intro.benefit.travel}">
+                Manage travel groups and shared journeys
+            </li>
         </ul>
     </section>
 
     <section class="auth-card">
 
         <div class="auth-card-heading">
-            <p class="eyebrow">
+            <p class="eyebrow" th:text="#{login.card.eyebrow}">
                 Account access
             </p>
 
-            <h2>
+            <h2 th:text="#{login.card.title}">
                 Login
             </h2>
 
-            <p>
+            <p th:text="#{login.card.description}">
                 Enter your username and password.
             </p>
         </div>
 
         <div class="message message-error"
-             th:if="${param.error}">
+             th:if="${param.error}"
+             th:text="#{login.message.error}">
             Invalid username or password.
         </div>
 
         <div class="message message-success"
-             th:if="${param.logout}">
+             th:if="${param.logout}"
+             th:text="#{login.message.logout}">
             You have been logged out.
         </div>
 
         <div class="message message-success"
-             th:if="${param.verified}">
+             th:if="${param.verified}"
+             th:text="#{login.message.verified}">
             Account verified successfully. You can now log in.
         </div>
 
@@ -126,43 +148,48 @@
               method="post">
 
             <div class="form-group">
-                <label for="username">
+                <label for="username" th:text="#{login.form.username}">
                     Username
                 </label>
 
                 <input id="username"
                        type="text"
                        name="username"
+                       th:placeholder="#{login.form.username}"
                        autocomplete="username"
                        required>
             </div>
 
             <div class="form-group">
-                <label for="password">
+                <label for="password" th:text="#{login.form.password}">
                     Password
                 </label>
 
                 <input id="password"
                        type="password"
                        name="password"
+                       th:placeholder="#{login.form.password}"
                        autocomplete="current-password"
                        required>
             </div>
 
             <button class="button button-primary submit-button"
+                    th:text="#{login.form.submit}"
                     type="submit">
                 Login
             </button>
         </form>
 
         <p class="auth-switch">
-            Do not have an account?
-            <a th:href="@{/register}">
+            <span th:text="#{login.switch.text}">Do not have an account?</span>
+            <a th:text="#{login.switch.link}"
+               th:href="@{/register}">
                 Create one
             </a>
         </p>
 
         <a class="back-link"
+           th:text="#{login.browse-without-login}"
            th:href="@{/tournaments}">
             Browse tournaments without logging in
         </a>
@@ -176,20 +203,20 @@
             TournamentTrail
         </a>
 
-        <p>
+        <p th:text="#{footer.description}">
             Chess tournaments, registrations, and shared travel in one platform.
         </p>
     </div>
 
     <nav>
-        <a th:href="@{/tournaments}">Tournaments</a>
-        <a th:href="@{/registrations}">My registrations</a>
-        <a th:href="@{/travel-groups}">Travel groups</a>
-        <a th:href="@{/about}">About</a>
-        <a th:href="@{/contact}">Contact</a>
+        <a th:text="#{nav.tournaments}" th:href="@{/tournaments}">Tournaments</a>
+        <a th:text="#{nav.registrations}" th:href="@{/registrations}">My registrations</a>
+        <a th:text="#{nav.travel-groups}" th:href="@{/travel-groups}">Travel groups</a>
+        <a th:text="#{nav.about}" th:href="@{/about}">About</a>
+        <a th:text="#{nav.contact}" th:href="@{/contact}">Contact</a>
     </nav>
 
-    <p>&copy; 2026 TournamentTrail</p>
+    <p th:text="#{footer.copyright}">&copy; 2026 TournamentTrail</p>
 </footer>
 
 </body>

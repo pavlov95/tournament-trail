@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en"
+<html th:lang="${#locale.language}"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
@@ -8,7 +8,7 @@
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0">
 
-    <title th:text="${travelGroup.name + ' Discussion | TournamentTrail'}">
+    <title th:text="#{comment.page.title(${travelGroup.name})}">
         Private Discussion | TournamentTrail
     </title>
 
@@ -23,25 +23,33 @@
         <a class="brand" th:href="@{/}">TournamentTrail</a>
 
         <div class="nav-links">
-            <a th:href="@{/}">Home</a>
-            <a th:href="@{/tournaments}">Tournaments</a>
-            <a th:href="@{/registrations}">My registrations</a>
-            <a class="active" th:href="@{/travel-groups}">Travel groups</a>
-            <a th:href="@{/about}">About</a>
-            <a th:href="@{/contact}">Contact</a>
+            <a th:text="#{nav.home}" th:href="@{/}">Home</a>
+            <a th:text="#{nav.tournaments}" th:href="@{/tournaments}">Tournaments</a>
+            <a th:text="#{nav.registrations}" th:href="@{/registrations}">My registrations</a>
+            <a th:text="#{nav.travel-groups}" class="active" th:href="@{/travel-groups}">Travel groups</a>
+            <a th:text="#{nav.about}" th:href="@{/about}">About</a>
+            <a th:text="#{nav.contact}" th:href="@{/contact}">Contact</a>
+        </div>
+
+        <div class="language-switcher">
+            <a th:href="@{/travel-groups/{id}/comments(id=${travelGroup.id}, lang='en')}"
+               th:text="#{language.english}">English</a>
+            <span>|</span>
+            <a th:href="@{/travel-groups/{id}/comments(id=${travelGroup.id}, lang='bg')}"
+               th:text="#{language.bulgarian}">Bulgarian</a>
         </div>
 
         <div class="nav-actions" sec:authorize="isAnonymous()">
-            <a class="button button-secondary" th:href="@{/login}">Login</a>
-            <a class="button button-primary" th:href="@{/register}">Create account</a>
+            <a class="button button-secondary" th:text="#{nav.login}" th:href="@{/login}">Login</a>
+            <a class="button button-primary" th:text="#{nav.create-account}" th:href="@{/register}">Create account</a>
         </div>
 
         <div class="nav-actions" sec:authorize="isAuthenticated()">
 
-            <a class="button button-primary" th:href="@{/home}">Dashboard</a>
+            <a class="button button-primary" th:text="#{nav.dashboard}" th:href="@{/home}">Dashboard</a>
 
             <form th:action="@{/logout}" method="post">
-                <button class="button button-secondary" type="submit">Logout</button>
+                <button class="button button-secondary" type="submit" th:text="#{nav.logout}">Logout</button>
             </form>
         </div>
     </nav>
@@ -52,50 +60,57 @@
     <section class="discussion-hero">
 
         <div class="hero-content">
-            <a class="back-link" th:href="@{/travel-groups/{id}(id=${travelGroup.id})}">← Back to travel group</a>
+            <a class="back-link"
+               th:href="@{/travel-groups/{id}(id=${travelGroup.id})}"
+               th:text="#{comment.back-to-travel-group}">
+                ← Back to travel group
+            </a>
 
-            <p class="eyebrow">Private group area</p>
+            <p class="eyebrow" th:text="#{comment.private-group-area}">Private group area</p>
 
             <h1 th:text="${travelGroup.name}">Travel group name</h1>
 
-            <p class="hero-text">
+            <p class="hero-text" th:text="#{comment.hero.text}">
                 This discussion is visible only to the group owner and accepted travelers.
                 Use it to coordinate meeting details, transport updates, and tournament travel plans.
             </p>
 
             <div class="hero-actions">
-                <a class="button button-secondary" th:href="@{/travel-groups/{id}(id=${travelGroup.id})}">
+                <a class="button button-secondary"
+                   th:href="@{/travel-groups/{id}(id=${travelGroup.id})}"
+                   th:text="#{comment.group-details}">
                     Group details
                 </a>
 
                 <a class="button button-secondary"
                    th:if="${#authentication.principal.id == travelGroup.owner.id}"
-                   th:href="@{/travel-groups/{id}/requests(id=${travelGroup.id})}">
+                   th:href="@{/travel-groups/{id}/requests(id=${travelGroup.id})}"
+                   th:text="#{comment.manage-requests}">
                     Manage requests
                 </a>
             </div>
         </div>
 
         <aside class="discussion-summary">
-            <h2>Discussion summary</h2>
+            <h2 th:text="#{comment.summary.title}">Discussion summary</h2>
 
             <dl>
                 <div>
-                    <dt>Comments</dt>
+                    <dt th:text="#{comment.summary.comments}">Comments</dt>
                     <dd th:text="${countVisibleComments}">
                         0
                     </dd>
                 </div>
 
                 <div>
-                    <dt>Owner</dt>
+                    <dt th:text="#{comment.summary.owner}">Owner</dt>
                     <dd th:text="${travelGroup.owner.username}">
                         owner
                     </dd>
                 </div>
 
                 <div>
-                    <dt>Group status</dt>
+                    <dt th:text="#{comment.summary.group-status}">Group status</dt>
                     <dd th:text="${travelGroup.status}">
                         OPEN
                     </dd>
@@ -110,12 +125,12 @@
 
             <div class="section-heading">
                 <div>
-                    <p class="eyebrow">Discussion</p>
-                    <h2>Group comments</h2>
+                    <p class="eyebrow" th:text="#{comment.discussion}">Discussion</p>
+                    <h2 th:text="#{comment.group-comments}">Group comments</h2>
                 </div>
 
                 <span class="comment-count"
-                      th:text="|${countVisibleComments} comments|">
+                      th:text="#{comment.count(${countVisibleComments})}">
                     0 comments
                 </span>
             </div>
@@ -123,8 +138,8 @@
             <div class="empty-state"
                  th:if="${#lists.isEmpty(comments)}">
                 <div class="empty-icon">♟</div>
-                <h3>No comments yet</h3>
-                <p>
+                <h3 th:text="#{comment.empty.title}">No comments yet</h3>
+                <p th:text="#{comment.empty.text}">
                     Start the private discussion by sharing meeting details,
                     transport updates, or questions for the group.
                 </p>
@@ -155,17 +170,20 @@
                                         </strong>
 
                                         <span class="role-badge owner-badge"
-                                              th:if="${comment.author.id == travelGroup.owner.id}">
+                                              th:if="${comment.author.id == travelGroup.owner.id}"
+                                              th:text="#{comment.badge.owner}">
                                             Owner
                                         </span>
 
                                         <span class="role-badge traveler-badge"
-                                              th:unless="${comment.author.id == travelGroup.owner.id}">
+                                              th:unless="${comment.author.id == travelGroup.owner.id}"
+                                              th:text="#{comment.badge.traveler}">
                                             Traveler
                                         </span>
 
                                         <span class="pinned-badge"
-                                              th:if="${comment.pinned}">
+                                              th:if="${comment.pinned}"
+                                              th:text="#{comment.badge.pinned}">
                                             Pinned
                                         </span>
                                     </div>
@@ -175,7 +193,8 @@
                                             24 Jul 2026, 10:30
                                         </span>
 
-                                        <span th:if="${comment.editedOn != null}">
+                                        <span th:if="${comment.editedOn != null}"
+                                              th:text="#{comment.edited}">
                                             · edited
                                         </span>
                                     </div>
@@ -193,7 +212,8 @@
                                                name="_method"
                                                value="patch">
                                         <button class="link-button"
-                                                type="submit">
+                                                type="submit"
+                                                th:text="#{comment.action.pin}">
                                             Pin
                                         </button>
                                     </form>
@@ -208,7 +228,8 @@
                                                name="_method"
                                                value="patch">
                                         <button class="link-button"
-                                                type="submit">
+                                                type="submit"
+                                                th:text="#{comment.action.unpin}">
                                             Unpin
                                         </button>
                                     </form>
@@ -224,7 +245,8 @@
                                                value="delete">
                                         <button class="link-button danger-link"
                                                 type="submit"
-                                                onclick="return confirm('Delete this comment?')">
+                                                th:attr="onclick=|return confirm('#{comment.delete.confirm}')|"
+                                                th:text="#{comment.action.delete}">
                                             Delete
                                         </button>
                                     </form>
@@ -238,7 +260,7 @@
 
                             <details class="edit-details"
                                      th:if="${#authentication.principal.id == comment.author.id}">
-                                <summary>Edit comment</summary>
+                                <summary th:text="#{comment.edit.summary}">Edit comment</summary>
 
                                 <form class="edit-comment-form"
                                       th:action="@{/travel-groups/{groupId}/comments/{commentId}/edit(
@@ -259,7 +281,8 @@
 
                                     <div class="inline-actions">
                                         <button class="button button-primary"
-                                                type="submit">
+                                                type="submit"
+                                                th:text="#{comment.action.save-edit}">
                                             Save edit
                                         </button>
                                     </div>
@@ -274,10 +297,10 @@
         <aside class="new-comment-panel">
 
             <div class="compose-card">
-                <p class="eyebrow">New comment</p>
-                <h2>Write an update</h2>
+                <p class="eyebrow" th:text="#{comment.new-comment}">New comment</p>
+                <h2 th:text="#{comment.write-update}">Write an update</h2>
 
-                <p class="muted">
+                <p class="muted" th:text="#{comment.compose.help}">
                     Share short, practical information. Meeting point changes,
                     delays, cost updates, and transport plans belong here.
                 </p>
@@ -289,14 +312,14 @@
 
                     <div class="form-group">
                         <label for="content">
-                            Comment
-                            <span>max 1000 characters</span>
+                            <span th:text="#{comment.form.content}">Comment</span>
+                            <span th:text="#{comment.form.max}">max 1000 characters</span>
                         </label>
 
                         <textarea id="content"
                                   rows="6"
                                   maxlength="1000"
-                                  placeholder="Write a message for the travel group..."
+                                  th:placeholder="#{comment.form.placeholder}"
                                   th:field="*{content}"></textarea>
 
                         <p class="field-error"
@@ -307,20 +330,21 @@
                     </div>
 
                     <button class="button button-primary button-full"
-                            type="submit">
+                            type="submit"
+                            th:text="#{comment.action.post}">
                         Post comment
                     </button>
                 </form>
             </div>
 
             <div class="rules-card">
-                <h3>Discussion rules</h3>
+                <h3 th:text="#{comment.rules.title}">Discussion rules</h3>
 
                 <ul>
-                    <li>Visible only to accepted travelers and the owner.</li>
-                    <li>Owners can pin useful updates.</li>
-                    <li>You can edit or delete your own comments.</li>
-                    <li>Use comments for travel coordination, not public tournament reviews.</li>
+                    <li th:text="#{comment.rules.visible}">Visible only to accepted travelers and the owner.</li>
+                    <li th:text="#{comment.rules.pin}">Owners can pin useful updates.</li>
+                    <li th:text="#{comment.rules.edit-delete}">You can edit or delete your own comments.</li>
+                    <li th:text="#{comment.rules.scope}">Use comments for travel coordination, not public tournament reviews.</li>
                 </ul>
             </div>
         </aside>
@@ -333,20 +357,20 @@
     <div>
         <a class="brand footer-brand" th:href="@{/}">TournamentTrail</a>
 
-        <p>
+        <p th:text="#{footer.description}">
             Chess tournaments, registrations, and shared travel in one platform.
         </p>
     </div>
 
     <nav>
-        <a th:href="@{/tournaments}">Tournaments</a>
-        <a th:href="@{/registrations}">My registrations</a>
-        <a th:href="@{/travel-groups}" class="active">Travel groups</a>
-        <a th:href="@{/about}">About</a>
-        <a th:href="@{/contact}">Contact</a>
+        <a th:href="@{/tournaments}" th:text="#{nav.tournaments}">Tournaments</a>
+        <a th:href="@{/registrations}" th:text="#{nav.registrations}">My registrations</a>
+        <a th:href="@{/travel-groups}" class="active" th:text="#{nav.travel-groups}">Travel groups</a>
+        <a th:href="@{/about}" th:text="#{nav.about}">About</a>
+        <a th:href="@{/contact}" th:text="#{nav.contact}">Contact</a>
     </nav>
 
-    <p>&copy; 2026 TournamentTrail</p>
+    <p th:text="#{footer.copyright}">&copy; 2026 TournamentTrail</p>
 </footer>
 
 </body>

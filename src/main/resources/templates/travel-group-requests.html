@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 <html lang="en"
+      th:lang="${#locale.language}"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title th:text="${'Requests for ' + travelGroup.name + ' | TournamentTrail'}">
+    <title th:text="#{travel-group.requests.page.title(${travelGroup.name})}">
         Travel Group Requests | TournamentTrail
     </title>
 
@@ -16,25 +17,56 @@
 <header class="site-header">
     <nav class="navbar">
         <a class="brand" th:href="@{/}">TournamentTrail</a>
+
         <div class="nav-links">
-            <a th:href="@{/}">Home</a>
-            <a th:href="@{/tournaments}">Tournaments</a>
-            <a th:href="@{/registrations}">My registrations</a>
-            <a class="active" th:href="@{/travel-groups}">Travel groups</a>
-            <a th:href="@{/about}">About</a>
-            <a th:href="@{/contact}">Contact</a>
+            <a th:href="@{/}" th:text="#{nav.home}">Home</a>
+            <a th:href="@{/tournaments}" th:text="#{nav.tournaments}">Tournaments</a>
+            <a th:href="@{/registrations}" th:text="#{nav.registrations}">My registrations</a>
+            <a class="active" th:href="@{/travel-groups}" th:text="#{nav.travel-groups}">Travel groups</a>
+            <a th:href="@{/about}" th:text="#{nav.about}">About</a>
+            <a th:href="@{/contact}" th:text="#{nav.contact}">Contact</a>
         </div>
+
         <div class="nav-actions" sec:authorize="isAnonymous()">
-            <a class="button button-secondary secondary-button" th:href="@{/login}">Login</a>
-            <a class="button button-primary primary-button" th:href="@{/register}">Create account</a>
+            <a class="button button-secondary secondary-button"
+               th:href="@{/login}"
+               th:text="#{nav.login}">
+                Login
+            </a>
+
+            <a class="button button-primary primary-button"
+               th:href="@{/register}"
+               th:text="#{nav.create-account}">
+                Create account
+            </a>
         </div>
+
         <div class="nav-actions" sec:authorize="isAuthenticated()">
-            <a class="button button-primary primary-button" th:href="@{/home}">Dashboard</a>
+            <a class="button button-primary primary-button"
+               th:href="@{/home}"
+               th:text="#{nav.dashboard}">
+                Dashboard
+            </a>
+
             <form th:action="@{/logout}" method="post">
                 <button class="button button-secondary secondary-button logout-button"
-                        type="submit">Logout
+                        type="submit"
+                        th:text="#{nav.logout}">
+                    Logout
                 </button>
             </form>
+        </div>
+
+        <div class="language-switcher">
+            <a th:href="@{/travel-groups/{id}/requests(id=${travelGroup.id}, lang='en')}"
+               th:text="#{language.english}">
+                English
+            </a>
+            <span>|</span>
+            <a th:href="@{/travel-groups/{id}/requests(id=${travelGroup.id}, lang='bg')}"
+               th:text="#{language.bulgarian}">
+                Bulgarian
+            </a>
         </div>
     </nav>
 </header>
@@ -54,10 +86,14 @@
 
     <section class="hero-section">
         <div class="hero-content">
-            <a class="back-link" th:href="@{/travel-groups/{id}(id=${travelGroup.id})}">← Back to travel group</a>
+            <a class="back-link"
+               th:href="@{/travel-groups/{id}(id=${travelGroup.id})}"
+               th:text="#{travel-group.requests.back-to-travel-group}">
+                ← Back to travel group
+            </a>
 
             <div class="title-row">
-                <h1>Travel requests</h1>
+                <h1 th:text="#{travel-group.requests.title}">Travel requests</h1>
 
                 <span class="status"
                       th:classappend="' status-' + ${#strings.toLowerCase(travelGroup.status.name())}"
@@ -67,41 +103,51 @@
             </div>
 
             <p class="description">
-                Review pending join requests for
+                <span th:text="#{travel-group.requests.description.prefix}">
+                    Review pending join requests for
+                </span>
                 <strong th:text="${travelGroup.name}">travel group</strong>.
-                Approving a request adds the applicant to the group. Rejecting a request closes it permanently.
+                <span th:text="#{travel-group.requests.description.suffix}">
+                    Approving a request adds the applicant to the group. Rejecting a request closes it permanently.
+                </span>
             </p>
 
             <div class="hero-actions">
                 <a class="button button-secondary secondary-button"
-                   th:href="@{/travel-groups/{id}(id=${travelGroup.id})}">View group details
+                   th:href="@{/travel-groups/{id}(id=${travelGroup.id})}"
+                   th:text="#{travel-group.requests.action.view-group-details}">
+                    View group details
                 </a>
 
-                <a class="button button-secondary secondary-button" th:href="@{/travel-groups}">Browse groups</a>
+                <a class="button button-secondary secondary-button"
+                   th:href="@{/travel-groups}"
+                   th:text="#{travel-group.requests.action.browse-groups}">
+                    Browse groups
+                </a>
             </div>
         </div>
 
         <aside class="summary-card">
-            <h2>Request summary</h2>
+            <h2 th:text="#{travel-group.requests.summary.title}">Request summary</h2>
 
             <dl>
                 <div>
-                    <dt>Travel group</dt>
+                    <dt th:text="#{travel-group.requests.summary.travel-group}">Travel group</dt>
                     <dd th:text="${travelGroup.name}">Sofia car group</dd>
                 </div>
 
                 <div>
-                    <dt>Available spots</dt>
+                    <dt th:text="#{travel-group.requests.summary.available-spots}">Available spots</dt>
                     <dd th:text="${availableSpots}">2</dd>
                 </div>
 
                 <div>
-                    <dt>Pending requests</dt>
+                    <dt th:text="#{travel-group.requests.summary.pending-requests}">Pending requests</dt>
                     <dd th:text="${#lists.size(travelRequests)}">3</dd>
                 </div>
 
                 <div>
-                    <dt>Maximum members</dt>
+                    <dt th:text="#{travel-group.requests.summary.maximum-members}">Maximum members</dt>
                     <dd th:text="${travelGroup.maximumMembers}">4</dd>
                 </div>
             </dl>
@@ -111,15 +157,17 @@
     <section class="management-panel">
         <div class="section-heading">
             <div>
-                <p class="eyebrow">Owner tools</p>
-                <h2>Pending join requests</h2>
+                <p class="eyebrow" th:text="#{travel-group.requests.management.eyebrow}">Owner tools</p>
+                <h2 th:text="#{travel-group.requests.management.title}">Pending join requests</h2>
             </div>
         </div>
 
         <div class="empty-state"
              th:if="${#lists.isEmpty(travelRequests)}">
-            <h3>No pending requests</h3>
-            <p>There are no pending join requests for this travel group right now.</p>
+            <h3 th:text="#{travel-group.requests.empty.title}">No pending requests</h3>
+            <p th:text="#{travel-group.requests.empty.text}">
+                There are no pending join requests for this travel group right now.
+            </p>
         </div>
 
         <div class="request-list" th:unless="${#lists.isEmpty(travelRequests)}">
@@ -129,7 +177,7 @@
                 <div class="request-main">
                     <div class="request-header">
                         <div>
-                            <p class="eyebrow">Applicant</p>
+                            <p class="eyebrow" th:text="#{travel-group.requests.card.applicant}">Applicant</p>
                             <h3 th:text="${request.applicant.username}">username</h3>
                         </div>
 
@@ -138,12 +186,12 @@
 
                     <dl class="request-meta">
                         <div>
-                            <dt>Email</dt>
+                            <dt th:text="#{travel-group.requests.card.email}">Email</dt>
                             <dd th:text="${request.applicant.email}">player@example.com</dd>
                         </div>
 
                         <div>
-                            <dt>Requested on</dt>
+                            <dt th:text="#{travel-group.requests.card.requested-on}">Requested on</dt>
                             <dd th:text="${#temporals.format(request.requestedOn, 'dd MMM yyyy, HH:mm')}">
                                 21 Jul 2026, 18:00
                             </dd>
@@ -151,7 +199,7 @@
                     </dl>
 
                     <div class="message-box">
-                        <h4>Message</h4>
+                        <h4 th:text="#{travel-group.requests.card.message}">Message</h4>
 
                         <p th:if="${request.message != null and !#strings.isEmpty(request.message)}"
                            th:text="${request.message}">
@@ -159,7 +207,8 @@
                         </p>
 
                         <p class="muted"
-                           th:if="${request.message == null or #strings.isEmpty(request.message)}">
+                           th:if="${request.message == null or #strings.isEmpty(request.message)}"
+                           th:text="#{travel-group.requests.card.no-message}">
                             The applicant did not add a message.
                         </p>
                     </div>
@@ -176,18 +225,21 @@
                         <button class="button button-primary primary-button"
                                 type="submit"
                                 th:disabled="${availableSpots <= 0}"
-                                th:title="${availableSpots <= 0 ? 'No available spots left' : 'Approve request'}">
+                                th:title="${availableSpots <= 0 ? #messages.msg('travel-group.requests.action.no-spots') : #messages.msg('travel-group.requests.action.approve')}"
+                                th:text="#{travel-group.requests.action.approve}">
                             Approve
                         </button>
                     </form>
 
                     <form th:action="@{/travel-groups/{travelGroupId}/requests/{travelRequestId}/reject(
-                            travelGroupId=${travelGroup.id},travelRequestId=${request.id})}" method="post">
+                            travelGroupId=${travelGroup.id},travelRequestId=${request.id})}"
+                          method="post">
                         <input type="hidden" name="_method" value="patch">
 
                         <button class="button button-danger"
                                 type="submit"
-                                onclick="return confirm('Are you sure you want to reject this request?')">
+                                th:onclick="|return confirm('#{travel-group.requests.confirm.reject}')|"
+                                th:text="#{travel-group.requests.action.reject}">
                             Reject
                         </button>
                     </form>
@@ -201,18 +253,20 @@
     <div>
         <a class="brand footer-brand" th:href="@{/}">TournamentTrail</a>
 
-        <p>Chess tournaments, registrations, and shared travel in one platform.</p>
+        <p th:text="#{footer.description}">
+            Chess tournaments, registrations, and shared travel in one platform.
+        </p>
     </div>
 
     <nav>
-        <a th:href="@{/tournaments}">Tournaments</a>
-        <a th:href="@{/registrations}">My registrations</a>
-        <a th:href="@{/travel-groups}" class="active">Travel groups</a>
-        <a th:href="@{/about}">About</a>
-        <a th:href="@{/contact}">Contact</a>
+        <a th:href="@{/tournaments}" th:text="#{nav.tournaments}">Tournaments</a>
+        <a th:href="@{/registrations}" th:text="#{nav.registrations}">My registrations</a>
+        <a th:href="@{/travel-groups}" class="active" th:text="#{nav.travel-groups}">Travel groups</a>
+        <a th:href="@{/about}" th:text="#{nav.about}">About</a>
+        <a th:href="@{/contact}" th:text="#{nav.contact}">Contact</a>
     </nav>
 
-    <p>&copy; 2026 TournamentTrail</p>
+    <p th:text="#{footer.copyright}">&copy; 2026 TournamentTrail</p>
 </footer>
 </body>
 </html>

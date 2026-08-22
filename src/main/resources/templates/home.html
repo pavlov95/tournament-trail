@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en"
+<html th:lang="${#locale.language}"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
@@ -8,7 +8,7 @@
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0">
 
-    <title>Home | TournamentTrail</title>
+    <title th:text="#{home.page.title}">Home | TournamentTrail</title>
 
     <link rel="stylesheet"
           th:href="@{/css/home.css}">
@@ -25,26 +25,36 @@
         </a>
 
         <div class="nav-links">
-            <a th:href="@{/home}" class="active" >Home</a>
-            <a th:href="@{/tournaments}">Tournaments</a>
-            <a th:href="@{/registrations}">My registrations</a>
-            <a th:href="@{/travel-groups}">Travel groups</a>
-            <a th:href="@{/about}">About</a>
-            <a th:href="@{/contact}">Contact</a>
+            <a th:text="#{nav.home}" th:href="@{/home}" class="active">Home</a>
+            <a th:text="#{nav.tournaments}" th:href="@{/tournaments}">Tournaments</a>
+            <a th:text="#{nav.registrations}" th:href="@{/registrations}">My registrations</a>
+            <a th:text="#{nav.travel-groups}" th:href="@{/travel-groups}">Travel groups</a>
+            <a th:text="#{nav.about}" th:href="@{/about}">About</a>
+            <a th:text="#{nav.contact}" th:href="@{/contact}">Contact</a>
         </div>
 
         <div class="nav-actions">
 
             <a class="button button-secondary"
+               th:text="#{nav.edit-profile}"
                th:href="@{/profile/edit}">
                 Edit profile
             </a>
+
+            <a class="button button-secondary"
+               th:href="@{/home(lang='en')}"
+               th:text="#{language.english}">English</a>
+
+            <a class="button button-secondary"
+               th:href="@{/home(lang='bg')}"
+               th:text="#{language.bulgarian}">Bulgarian</a>
 
             <form th:action="@{/logout}"
                   method="post">
 
                 <button class="button button-outline"
-                        type="submit">
+                        type="submit"
+                        th:text="#{nav.logout}">
                     Logout
                 </button>
             </form>
@@ -57,40 +67,43 @@
     <section class="welcome-panel">
 
         <div>
-            <p class="eyebrow">Personal dashboard</p>
+            <p class="eyebrow" th:text="#{home.hero.eyebrow}">Personal dashboard</p>
 
             <h1>
-                Welcome,
+                <span th:text="#{home.hero.welcome}">Welcome,</span>
                 <span sec:authentication="name">
                     Player
                 </span>
             </h1>
 
-            <p>
-                Track your tournaments, travel groups,
-                and role-specific activity.
+            <p th:text="#{home.hero.description}">
+                Track your tournaments, travel groups, and role-specific activity.
             </p>
         </div>
 
         <div class="quick-actions">
 
             <a class="button button-primary"
+               th:text="#{home.action.browse-tournaments}"
                th:href="@{/tournaments}">
                 Browse tournaments
             </a>
 
             <a class="button button-secondary"
+               th:text="#{home.action.browse-travel-groups}"
                th:href="@{/travel-groups}">
                 Browse travel groups
             </a>
 
             <a class="button button-secondary"
+               th:text="#{home.action.create-travel-group}"
                th:href="@{/travel-groups/create}"
                sec:authorize="hasAuthority('TRAVEL_GROUP_CREATE')">
                 Create travel group
             </a>
 
             <a class="button button-secondary"
+               th:text="#{home.action.create-tournament}"
                th:href="@{/tournaments}"
                sec:authorize="hasAuthority('TOURNAMENT_CREATE')">
                 Create tournament
@@ -103,11 +116,11 @@
 
         <div class="section-heading">
             <div>
-                <p class="eyebrow">Competition</p>
-                <h2>My tournament registrations</h2>
+                <p class="eyebrow" th:text="#{home.registrations.eyebrow}">Competition</p>
+                <h2 th:text="#{home.registrations.title}">My tournament registrations</h2>
             </div>
 
-            <a th:href="@{/registrations/mine}">
+            <a th:text="#{home.action.view-all}" th:href="@{/registrations/mine}">
                 View all
             </a>
         </div>
@@ -116,15 +129,16 @@
              th:if="${registrations == null
                      or #lists.isEmpty(registrations)}">
 
-            <h3>
+            <h3 th:text="#{home.registrations.empty.title}">
                 You have not registered for any tournaments yet.
             </h3>
 
-            <p>
+            <p th:text="#{home.registrations.empty.text}">
                 Browse the catalogue and choose your next competition.
             </p>
 
             <a class="button button-primary"
+               th:text="#{home.action.browse-tournaments}"
                th:href="@{/tournaments}">
                 Browse tournaments
             </a>
@@ -164,7 +178,7 @@
                 </p>
 
                 <p>
-                    Starts:
+                    <span th:text="#{home.label.starts}">Starts:</span>
 
                     <strong th:text="${#temporals.format(
                             registration.tournament.startTime,
@@ -175,6 +189,7 @@
                 </p>
 
                 <a class="card-link"
+                   th:text="#{home.action.view-tournament}"
                    th:href="@{/tournaments/{id}(
                         id=${registration.tournament.id}
                    )}">
@@ -190,11 +205,12 @@
         <div class="section-heading">
 
             <div>
-                <p class="eyebrow">Travel</p>
-                <h2>Travel groups I organise</h2>
+                <p class="eyebrow" th:text="#{home.organised-travel.eyebrow}">Travel</p>
+                <h2 th:text="#{home.organised-travel.title}">Travel groups I organise</h2>
             </div>
 
-            <a th:href="@{/travel-groups/create}"
+            <a th:text="#{home.action.create-group}"
+               th:href="@{/travel-groups/create}"
                sec:authorize="hasAuthority('TRAVEL_GROUP_CREATE')">
                 Create group
             </a>
@@ -204,13 +220,12 @@
              th:if="${travelGroups == null
                      or #lists.isEmpty(travelGroups)}">
 
-            <h3>
+            <h3 th:text="#{home.organised-travel.empty.title}">
                 You have not organised a travel group yet.
             </h3>
 
-            <p>
-                Create a group for one of the tournaments
-                you plan to attend.
+            <p th:text="#{home.organised-travel.empty.text}">
+                Create a group for one of the tournaments you plan to attend.
             </p>
         </div>
 
@@ -228,7 +243,7 @@
                         Open
                     </span>
 
-                    <span class="muted">
+                    <span class="muted" th:text="#{home.badge.owner}">
                         Owner
                     </span>
                 </div>
@@ -238,7 +253,7 @@
                 </h3>
 
                 <p>
-                    Tournament:
+                    <span th:text="#{home.label.tournament}">Tournament:</span>
 
                     <strong th:text="${group.tournament.name}">
                         Tournament
@@ -246,7 +261,7 @@
                 </p>
 
                 <p>
-                    Departure:
+                    <span th:text="#{home.label.departure}">Departure:</span>
 
                     <strong>
                         <span th:text="${group.departureCity}">
@@ -259,7 +274,7 @@
                 </p>
 
                 <p>
-                    Leaves:
+                    <span th:text="#{home.label.leaves}">Leaves:</span>
 
                     <strong th:text="${#temporals.format(
                             group.departureTime,
@@ -270,6 +285,7 @@
                 </p>
 
                 <a class="card-link"
+                   th:text="#{home.action.manage-group}"
                    th:href="@{/travel-groups/{id}(id=${group.id})}">
                     Manage group
                 </a>
@@ -283,11 +299,12 @@
         <div class="section-heading">
 
             <div>
-                <p class="eyebrow">Membership</p>
-                <h2>Travel groups I joined</h2>
+                <p class="eyebrow" th:text="#{home.joined-travel.eyebrow}">Membership</p>
+                <h2 th:text="#{home.joined-travel.title}">Travel groups I joined</h2>
             </div>
 
-            <a th:href="@{/travel-groups}">
+            <a th:text="#{home.action.browse-groups}"
+               th:href="@{/travel-groups}">
                 Browse groups
             </a>
         </div>
@@ -296,13 +313,12 @@
              th:if="${travelRequests == null
                      or #lists.isEmpty(travelRequests)}">
 
-            <h3>
+            <h3 th:text="#{home.joined-travel.empty.title}">
                 You have not joined any travel groups yet.
             </h3>
 
-            <p>
-                Browse open groups connected to your
-                upcoming tournaments.
+            <p th:text="#{home.joined-travel.empty.text}">
+                Browse open groups connected to your upcoming tournaments.
             </p>
         </div>
 
@@ -320,7 +336,7 @@
                         Approved
                     </span>
 
-                    <span class="muted">
+                    <span class="muted" th:text="#{home.badge.member}">
                         Member
                     </span>
                 </div>
@@ -330,7 +346,7 @@
                 </h3>
 
                 <p>
-                    Tournament:
+                    <span th:text="#{home.label.tournament}">Tournament:</span>
 
                     <strong th:text="${request.travelGroup.tournament.name}">
                         Tournament
@@ -338,7 +354,7 @@
                 </p>
 
                 <p>
-                    Organised by:
+                    <span th:text="#{home.label.organised-by}">Organised by:</span>
 
                     <strong th:text="${request.travelGroup.owner.username}">
                         Owner
@@ -346,7 +362,7 @@
                 </p>
 
                 <p>
-                    Departure:
+                    <span th:text="#{home.label.departure}">Departure:</span>
 
                     <strong th:text="${#temporals.format(
                             request.travelGroup.departureTime,
@@ -357,6 +373,7 @@
                 </p>
 
                 <a class="card-link"
+                   th:text="#{home.action.view-group}"
                    th:href="@{/travel-groups/{id}(
                         id=${request.travelGroup.id}
                    )}">
@@ -372,16 +389,16 @@
                      and currentRole.name() == 'PLAYER'}">
 
         <div>
-            <p class="eyebrow">Organise events</p>
-            <h2>Become an organiser</h2>
+            <p class="eyebrow" th:text="#{home.organiser-application.eyebrow}">Organise events</p>
+            <h2 th:text="#{home.organiser-application.title}">Become an organiser</h2>
 
-            <p>
-                Apply for permission to publish tournaments
-                and manage registrations.
+            <p th:text="#{home.organiser-application.text}">
+                Apply for permission to publish tournaments and manage registrations.
             </p>
         </div>
 
         <a class="button button-primary"
+           th:text="#{home.organiser-application.action}"
            th:href="@{/organiser-applications/create}">
             Apply to become an organiser
         </a>
@@ -394,11 +411,12 @@
         <div class="section-heading">
 
             <div>
-                <p class="eyebrow">Organiser tools</p>
-                <h2>My organised tournaments</h2>
+                <p class="eyebrow" th:text="#{home.organiser-tools.eyebrow}">Organiser tools</p>
+                <h2 th:text="#{home.organiser-tools.title}">My organised tournaments</h2>
             </div>
 
-            <a th:href="@{/tournaments}">
+            <a th:text="#{home.action.create-tournament}"
+               th:href="@{/tournaments}">
                 Create tournament
             </a>
         </div>
@@ -407,16 +425,16 @@
              th:if="${organisedTournaments == null
                      or #lists.isEmpty(organisedTournaments)}">
 
-            <h3>
+            <h3 th:text="#{home.organiser-tools.empty.title}">
                 You have not created any tournaments yet.
             </h3>
 
-            <p>
-                Create a draft and publish it when
-                the details are complete.
+            <p th:text="#{home.organiser-tools.empty.text}">
+                Create a draft and publish it when the details are complete.
             </p>
 
             <a class="button button-primary"
+               th:text="#{home.action.create-tournament}"
                th:href="@{/tournaments}">
                 Create tournament
             </a>
@@ -447,7 +465,7 @@
                 </h3>
 
                 <p>
-                    Starts:
+                    <span th:text="#{home.label.starts}">Starts:</span>
 
                     <strong th:text="${#temporals.format(
                             tournament.startTime,
@@ -458,6 +476,7 @@
                 </p>
 
                 <a class="card-link"
+                   th:text="#{home.action.manage-tournament}"
                    th:href="@{/tournaments/{id}(id=${tournament.id})}">
                     Manage tournament
                 </a>
@@ -472,12 +491,11 @@
              )">
 
         <div>
-            <p class="eyebrow">Administration</p>
-            <h2>Administrative tools</h2>
+            <p class="eyebrow" th:text="#{home.admin.eyebrow}">Administration</p>
+            <h2 th:text="#{home.admin.title}">Administrative tools</h2>
 
-            <p>
-                Review organiser applications, manage users,
-                and moderate platform content.
+            <p th:text="#{home.admin.text}">
+                Review organiser applications, manage users, and moderate platform content.
             </p>
         </div>
 
@@ -486,7 +504,7 @@
             <a class="button button-primary"
                th:href="@{/admin/organiser-applications}">
 
-                Review organiser applications
+                <span th:text="#{home.admin.review-applications}">Review organiser applications</span>
 
                 <span th:if="${pendingOrganiserApplications != null}"
                       th:text="${' ('
@@ -496,6 +514,7 @@
             </a>
 
             <a class="button button-secondary"
+               th:text="#{home.admin.manage-users}"
                th:href="@{/admin/users}">
                 Manage users
             </a>
@@ -512,22 +531,21 @@
             TournamentTrail
         </a>
 
-        <p>
-            Your tournaments, registrations, and travel activity
-            in one place.
+        <p th:text="#{home.footer.description}">
+            Your tournaments, registrations, and travel activity in one place.
         </p>
     </div>
 
     <nav>
-        <a th:href="@{/home}" class="active" >Home</a>
-        <a th:href="@{/tournaments}">Tournaments</a>
-        <a th:href="@{/registrations}" >My registrations</a>
-        <a th:href="@{/travel-groups}">Travel groups</a>
-        <a th:href="@{/about}">About</a>
-        <a th:href="@{/contact}">Contact</a>
+        <a th:text="#{nav.home}" th:href="@{/home}" class="active">Home</a>
+        <a th:text="#{nav.tournaments}" th:href="@{/tournaments}">Tournaments</a>
+        <a th:text="#{nav.registrations}" th:href="@{/registrations}">My registrations</a>
+        <a th:text="#{nav.travel-groups}" th:href="@{/travel-groups}">Travel groups</a>
+        <a th:text="#{nav.about}" th:href="@{/about}">About</a>
+        <a th:text="#{nav.contact}" th:href="@{/contact}">Contact</a>
     </nav>
 
-    <p>&copy; 2026 TournamentTrail</p>
+    <p th:text="#{footer.copyright}">&copy; 2026 TournamentTrail</p>
 </footer>
 
 </body>

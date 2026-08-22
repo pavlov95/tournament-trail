@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en"
+<html th:lang="${#locale.language}"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
@@ -8,7 +8,7 @@
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0">
 
-    <title th:text="${tournament.name + ' | TournamentTrail'}">
+    <title th:text="#{tournament.details.page.title(${tournament.name})}">
         Tournament Details | TournamentTrail
     </title>
 
@@ -27,23 +27,33 @@
         </a>
 
         <div class="nav-links">
-            <a th:href="@{/}">Home</a>
-            <a class="active" th:href="@{/tournaments}">Tournaments</a>
-            <a th:href="@{/registrations}" >My registrations</a>
-            <a th:href="@{/travel-groups}">Travel groups</a>
-            <a th:href="@{/about}">About</a>
-            <a th:href="@{/contact}">Contact</a>
+            <a th:text="#{nav.home}" th:href="@{/}">Home</a>
+            <a class="active" th:text="#{nav.tournaments}" th:href="@{/tournaments}">Tournaments</a>
+            <a th:text="#{nav.registrations}" th:href="@{/registrations}">My registrations</a>
+            <a th:text="#{nav.travel-groups}" th:href="@{/travel-groups}">Travel groups</a>
+            <a th:text="#{nav.about}" th:href="@{/about}">About</a>
+            <a th:text="#{nav.contact}" th:href="@{/contact}">Contact</a>
+        </div>
+
+        <div class="language-switcher">
+            <a th:href="@{/tournaments/{id}(id=${tournament.id}, lang='en')}"
+               th:text="#{language.english}">English</a>
+            <span>|</span>
+            <a th:href="@{/tournaments/{id}(id=${tournament.id}, lang='bg')}"
+               th:text="#{language.bulgarian}">Bulgarian</a>
         </div>
 
         <div class="nav-actions"
              sec:authorize="isAnonymous()">
 
             <a class="button button-secondary"
+               th:text="#{nav.login}"
                th:href="@{/login}">
                 Login
             </a>
 
             <a class="button button-primary"
+               th:text="#{nav.create-account}"
                th:href="@{/register}">
                 Create account
             </a>
@@ -53,6 +63,7 @@
              sec:authorize="isAuthenticated()">
 
             <a class="button button-primary"
+               th:text="#{nav.dashboard}"
                th:href="@{/home}">
                 Dashboard
             </a>
@@ -60,6 +71,7 @@
             <form th:action="@{/logout}"
                   method="post">
                 <button class="button button-secondary"
+                        th:text="#{nav.logout}"
                         type="submit">
                     Logout
                 </button>
@@ -80,6 +92,7 @@
         <div class="hero-content">
 
             <a class="back-link"
+               th:text="#{tournament.details.back-to-tournaments}"
                th:href="@{/tournaments}">
                 ← Back to tournaments
             </a>
@@ -107,7 +120,8 @@
                 <a class="button button-primary"
                    th:href="@{/login}"
                    sec:authorize="isAnonymous()"
-                   th:if="${tournament.status.name() == 'PUBLISHED'}">
+                   th:if="${tournament.status.name() == 'PUBLISHED'}"
+                   th:text="#{tournament.details.action.login-to-register}">
                     Login to register
                 </a>
 
@@ -121,44 +135,56 @@
                            th:value="${tournament.id}">
 
                     <button class="button button-primary"
-                            type="submit">
+                            type="submit"
+                            th:text="#{tournament.details.action.register}">
                         Register for tournament
                     </button>
                 </form>
+
                 <a class="button button-secondary"
-                   th:href="@{/tournaments/{tournamentId}/registrations(tournamentId=${tournament.id})}">
+                   th:href="@{/tournaments/{tournamentId}/registrations(tournamentId=${tournament.id})}"
+                   th:text="#{tournament.details.action.manage-registrations}">
                     Manage registrations
                 </a>
+
+                <a class="button button-secondary"
+                   th:href="@{/tournaments/{id}/results(id=${tournament.id})}"
+                   th:text="#{tournament.details.action.view-results}">
+                    View results
+                </a>
+
                 <div class="review-action-group">
 
                     <a class="button button-secondary"
-                       th:href="@{/tournaments/{id}/reviews(id=${tournament.id})}">
+                       th:href="@{/tournaments/{id}/reviews(id=${tournament.id})}"
+                       th:text="#{tournament.details.action.reviews}">
                         Reviews
                     </a>
 
                     <span class="review-summary-badge"
                           th:if="${(tournament.status.name() == 'STARTED' or tournament.status.name() == 'COMPLETED')
-                   and reviewSummary.reviewCount() > 0}"
-                          th:text="|${#numbers.formatDecimal(reviewSummary.averageRating(), 1, 1)} / 5 · ${reviewSummary.reviewCount()} reviews|">
-        4.3 / 5 · 12 reviews
-    </span>
+                    and reviewSummary.reviewCount() > 0}"
+                          th:text="#{tournament.details.review-summary(${#numbers.formatDecimal(reviewSummary.averageRating(), 1, 1)}, ${reviewSummary.reviewCount()})}">
+                        4.3 / 5 · 12 reviews
+                    </span>
 
                     <span class="review-summary-badge muted-badge"
                           th:if="${(tournament.status.name() == 'STARTED' or tournament.status.name() == 'COMPLETED')
-                   and reviewSummary.reviewCount() == 0}">
-        No reviews yet
-    </span>
+                    and reviewSummary.reviewCount() == 0}"
+                          th:text="#{tournament.details.no-reviews}">
+                        No reviews yet
+                    </span>
                 </div>
 
             </div>
         </div>
 
         <aside class="summary-card">
-            <h2>Event summary</h2>
+            <h2 th:text="#{tournament.details.summary.title}">Event summary</h2>
 
             <dl>
                 <div>
-                    <dt>Location</dt>
+                    <dt th:text="#{tournament.details.summary.location}">Location</dt>
                     <dd>
                         <span th:text="${tournament.city}">City</span>,
                         <span th:text="${tournament.country}">Country</span>
@@ -166,30 +192,31 @@
                 </div>
 
                 <div>
-                    <dt>Venue</dt>
+                    <dt th:text="#{tournament.details.summary.venue}">Venue</dt>
                     <dd th:text="${tournament.venue}">
                         Venue
                     </dd>
                 </div>
 
                 <div>
-                    <dt>Time control</dt>
+                    <dt th:text="#{tournament.details.summary.time-control}">Time control</dt>
                     <dd th:text="${tournament.timeControl}">
                         RAPID
                     </dd>
                 </div>
 
                 <div>
-                    <dt>Rated</dt>
-                    <dd th:text="${tournament.rated ? 'Yes' : 'No'}">
+                    <dt th:text="#{tournament.details.summary.rated}">Rated</dt>
+                    <dd th:text="${tournament.rated ? #messages.msg('common.yes') : #messages.msg('common.no')}">
                         Yes
                     </dd>
                 </div>
 
                 <div>
-                    <dt>Entry fee</dt>
+                    <dt th:text="#{tournament.details.summary.entry-fee}">Entry fee</dt>
                     <dd>
-                        <span th:if="${tournament.free}">
+                        <span th:if="${tournament.free}"
+                              th:text="#{common.free}">
                             Free
                         </span>
 
@@ -210,11 +237,11 @@
     <section class="details-grid">
 
         <article class="details-card">
-            <h2>Schedule</h2>
+            <h2 th:text="#{tournament.details.schedule.title}">Schedule</h2>
 
             <dl>
                 <div>
-                    <dt>Registration deadline</dt>
+                    <dt th:text="#{tournament.details.schedule.registration-deadline}">Registration deadline</dt>
                     <dd th:text="${#temporals.format(
                             tournament.registrationDeadline,
                             'dd MMM yyyy, HH:mm'
@@ -224,7 +251,7 @@
                 </div>
 
                 <div>
-                    <dt>Start time</dt>
+                    <dt th:text="#{tournament.details.schedule.start-time}">Start time</dt>
                     <dd th:text="${#temporals.format(
                             tournament.startTime,
                             'dd MMM yyyy, HH:mm'
@@ -234,7 +261,7 @@
                 </div>
 
                 <div>
-                    <dt>End time</dt>
+                    <dt th:text="#{tournament.details.schedule.end-time}">End time</dt>
                     <dd th:text="${#temporals.format(
                             tournament.endTime,
                             'dd MMM yyyy, HH:mm'
@@ -246,25 +273,25 @@
         </article>
 
         <article class="details-card">
-            <h2>Participation</h2>
+            <h2 th:text="#{tournament.details.participation.title}">Participation</h2>
 
             <dl>
                 <div>
-                    <dt>Edition</dt>
+                    <dt th:text="#{tournament.details.participation.edition}">Edition</dt>
                     <dd th:text="${tournament.edition}">
                         1
                     </dd>
                 </div>
 
                 <div>
-                    <dt>Maximum participants</dt>
+                    <dt th:text="#{tournament.details.participation.maximum-participants}">Maximum participants</dt>
                     <dd th:text="${tournament.maximumParticipants}">
                         100
                     </dd>
                 </div>
             </dl>
 
-            <h3>Requirements</h3>
+            <h3 th:text="#{tournament.details.participation.requirements}">Requirements</h3>
 
             <p th:text="${tournament.participationRequirements}">
                 Participation requirements.
@@ -272,7 +299,7 @@
         </article>
 
         <article class="details-card full-width">
-            <h2>Payment instructions</h2>
+            <h2 th:text="#{tournament.details.payment.title}">Payment instructions</h2>
 
             <p th:if="${tournament.paymentInstructions != null
                        and !#strings.isEmpty(tournament.paymentInstructions)}"
@@ -282,7 +309,8 @@
 
             <p class="muted"
                th:if="${tournament.paymentInstructions == null
-                       or #strings.isEmpty(tournament.paymentInstructions)}">
+                       or #strings.isEmpty(tournament.paymentInstructions)}"
+               th:text="#{tournament.details.payment.empty}">
                 No payment instructions have been added yet.
             </p>
         </article>
@@ -296,8 +324,8 @@
         <div class="section-heading">
 
             <div>
-                <p class="eyebrow">Organiser tools</p>
-                <h2>Manage tournament</h2>
+                <p class="eyebrow" th:text="#{tournament.details.management.eyebrow}">Organiser tools</p>
+                <h2 th:text="#{tournament.details.management.title}">Manage tournament</h2>
             </div>
 
             <div class="management-actions">
@@ -315,7 +343,8 @@
                            value="PUBLISHED">
 
                     <button class="button button-primary"
-                            type="submit">
+                            type="submit"
+                            th:text="#{tournament.details.management.publish}">
                         Publish tournament
                     </button>
                 </form>
@@ -333,14 +362,15 @@
 
                     <button class="button button-danger"
                             type="submit"
-                            onclick="return confirm('Are you sure you want to cancel this tournament?')">
+                            th:attr="onclick=|return confirm('#{tournament.details.confirm.cancel}')|"
+                            th:text="#{tournament.details.management.cancel}">
                         Cancel tournament
                     </button>
                 </form>
             </div>
         </div>
 
-        <h2>Edit tournament</h2>
+        <h2 th:text="#{tournament.details.edit.title}">Edit tournament</h2>
 
         <form class="edit-form"
               th:action="@{/tournaments/{id}(id=${tournament.id})}"
@@ -354,7 +384,7 @@
             <div class="form-grid">
 
                 <div class="form-group">
-                    <label for="name">Name</label>
+                    <label for="name" th:text="#{tournament.details.form.name}">Name</label>
 
                     <input id="name"
                            type="text"
@@ -368,7 +398,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="venue">Venue</label>
+                    <label for="venue" th:text="#{tournament.details.form.venue}">Venue</label>
 
                     <input id="venue"
                            type="text"
@@ -382,7 +412,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="country">Country</label>
+                    <label for="country" th:text="#{tournament.details.form.country}">Country</label>
 
                     <input id="country"
                            type="text"
@@ -396,7 +426,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="city">City</label>
+                    <label for="city" th:text="#{tournament.details.form.city}">City</label>
 
                     <input id="city"
                            type="text"
@@ -410,7 +440,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="registrationDeadline">
+                    <label for="registrationDeadline" th:text="#{tournament.details.form.registration-deadline}">
                         Registration deadline
                     </label>
 
@@ -426,7 +456,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="startTime">Start time</label>
+                    <label for="startTime" th:text="#{tournament.details.form.start-time}">Start time</label>
 
                     <input id="startTime"
                            type="datetime-local"
@@ -440,7 +470,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="endTime">End time</label>
+                    <label for="endTime" th:text="#{tournament.details.form.end-time}">End time</label>
 
                     <input id="endTime"
                            type="datetime-local"
@@ -454,12 +484,12 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="timeControl">Time control</label>
+                    <label for="timeControl" th:text="#{tournament.details.form.time-control}">Time control</label>
 
                     <select id="timeControl"
                             th:field="*{timeControl}">
 
-                        <option value="">
+                        <option value="" th:text="#{tournament.details.form.time-control.choose}">
                             Choose format
                         </option>
 
@@ -478,7 +508,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="entryFee">Entry fee</label>
+                    <label for="entryFee" th:text="#{tournament.details.form.entry-fee}">Entry fee</label>
 
                     <input id="entryFee"
                            type="number"
@@ -494,12 +524,12 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="currency">Currency</label>
+                    <label for="currency" th:text="#{tournament.details.form.currency}">Currency</label>
 
                     <select id="currency"
                             th:field="*{currency}">
 
-                        <option value="">
+                        <option value="" th:text="#{tournament.details.form.currency.choose}">
                             Choose currency
                         </option>
 
@@ -518,7 +548,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="edition">Edition</label>
+                    <label for="edition" th:text="#{tournament.details.form.edition}">Edition</label>
 
                     <input id="edition"
                            type="number"
@@ -533,7 +563,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="maximumParticipants">
+                    <label for="maximumParticipants" th:text="#{tournament.details.form.maximum-participants}">
                         Maximum participants
                     </label>
 
@@ -554,13 +584,13 @@
                            type="checkbox"
                            th:field="*{rated}">
 
-                    <label for="rated">
+                    <label for="rated" th:text="#{tournament.details.form.rated}">
                         Rated tournament
                     </label>
                 </div>
 
                 <div class="form-group full-width">
-                    <label for="description">Description</label>
+                    <label for="description" th:text="#{tournament.details.form.description}">Description</label>
 
                     <textarea id="description"
                               rows="4"
@@ -575,7 +605,7 @@
                 </div>
 
                 <div class="form-group full-width">
-                    <label for="participationRequirements">
+                    <label for="participationRequirements" th:text="#{tournament.details.form.participation-requirements}">
                         Participation requirements
                     </label>
 
@@ -592,7 +622,7 @@
                 </div>
 
                 <div class="form-group full-width">
-                    <label for="paymentInstructions">
+                    <label for="paymentInstructions" th:text="#{tournament.details.form.payment-instructions}">
                         Payment instructions
                     </label>
 
@@ -611,7 +641,8 @@
 
             <div class="form-actions">
                 <button class="button button-primary"
-                        type="submit">
+                        type="submit"
+                        th:text="#{tournament.details.edit.save-changes}">
                     Save changes
                 </button>
             </div>
@@ -628,19 +659,19 @@
             TournamentTrail
         </a>
 
-        <p>
+        <p th:text="#{footer.description}">
             Chess tournaments, registrations, and shared travel in one platform.
         </p>
     </div>
 
     <nav>
-        <a th:href="@{/tournaments}">Tournaments</a>
-        <a th:href="@{/travel-groups}">Travel groups</a>
-        <a th:href="@{/about}">About</a>
-        <a th:href="@{/contact}">Contact</a>
+        <a th:text="#{nav.tournaments}" th:href="@{/tournaments}">Tournaments</a>
+        <a th:text="#{nav.travel-groups}" th:href="@{/travel-groups}">Travel groups</a>
+        <a th:text="#{nav.about}" th:href="@{/about}">About</a>
+        <a th:text="#{nav.contact}" th:href="@{/contact}">Contact</a>
     </nav>
 
-    <p>&copy; 2026 TournamentTrail</p>
+    <p th:text="#{footer.copyright}">&copy; 2026 TournamentTrail</p>
 </footer>
 
 </body>

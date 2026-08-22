@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en"
+      th:lang="${#locale.language}"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
@@ -7,7 +8,7 @@
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0">
 
-    <title>About | TournamentTrail</title>
+    <title th:text="#{about.page.title}">About | TournamentTrail</title>
 
     <link rel="stylesheet"
           th:href="@{/css/about.css}">
@@ -17,35 +18,58 @@
     <nav class="navbar">
         <a class="brand" th:href="@{/}">TournamentTrail</a>
         <div class="nav-links">
-            <a th:href="@{/}">Home</a>
-            <a th:href="@{/tournaments}">Tournaments</a>
-            <a th:href="@{/registrations}" >My registrations</a>
-            <a th:href="@{/travel-groups}">Travel groups</a>
-            <a class="active" th:href="@{/about}">About</a>
-            <a th:href="@{/contact}">Contact</a>
+            <a th:text="#{nav.home}" th:href="@{/}">Home</a>
+            <a th:text="#{nav.tournaments}" th:href="@{/tournaments}">Tournaments</a>
+            <a th:text="#{nav.registrations}" th:href="@{/registrations}">My registrations</a>
+            <a th:text="#{nav.travel-groups}" th:href="@{/travel-groups}">Travel groups</a>
+            <a class="active" th:text="#{nav.about}" th:href="@{/about}">About</a>
+            <a th:text="#{nav.contact}" th:href="@{/contact}">Contact</a>
         </div>
+
         <div class="nav-actions" sec:authorize="isAnonymous()">
-            <a class="button button-secondary secondary-button" th:href="@{/login}">Login</a>
-            <a class="button button-primary primary-button" th:href="@{/register}">Create account</a>
+            <a class="button button-secondary secondary-button"
+               th:text="#{nav.login}"
+               th:href="@{/login}">Login</a>
+
+            <a class="button button-primary primary-button"
+               th:text="#{nav.create-account}"
+               th:href="@{/register}">Create account</a>
         </div>
+
         <div class="nav-actions" sec:authorize="isAuthenticated()">
-            <a class="button button-primary primary-button" th:href="@{/home}">Dashboard</a>
+            <a class="button button-primary primary-button"
+               th:text="#{nav.dashboard}"
+               th:href="@{/home}">Dashboard</a>
+
             <form th:action="@{/logout}" method="post">
                 <button class="button button-secondary secondary-button logout-button"
-                        type="submit">Logout
+                        th:text="#{nav.logout}"
+                        type="submit">
+                    Logout
                 </button>
             </form>
+        </div>
+
+        <div class="language-switcher">
+            <a th:href="@{/about(lang='en')}"
+               th:text="#{language.english}">English</a>
+            <span>|</span>
+            <a th:href="@{/about(lang='bg')}"
+               th:text="#{language.bulgarian}">Bulgarian</a>
         </div>
     </nav>
 </header>
 
-
 <main>
     <section class="hero-section">
         <div class="hero-content">
-            <p class="eyebrow">About TournamentTrail</p>
-            <h1>Helping chess players compete beyond their home city.</h1>
-            <p class="hero-description">
+            <p class="eyebrow" th:text="#{about.hero.eyebrow}">About TournamentTrail</p>
+
+            <h1 th:text="#{about.hero.title}">
+                Helping chess players compete beyond their home city.
+            </h1>
+
+            <p class="hero-description" th:text="#{about.hero.description}">
                 TournamentTrail brings tournament discovery, registration,
                 travel coordination, and organiser tools into one platform.
             </p>
@@ -53,35 +77,39 @@
 
         <div class="hero-summary">
             <div>
-                <strong>Discover</strong>
-                <span>Find upcoming chess tournaments.</span>
+                <strong th:text="#{about.summary.discover.title}">Discover</strong>
+                <span th:text="#{about.summary.discover.text}">Find upcoming chess tournaments.</span>
             </div>
+
             <div>
-                <strong>Compete</strong>
-                <span>Register and track participation details.</span>
+                <strong th:text="#{about.summary.compete.title}">Compete</strong>
+                <span th:text="#{about.summary.compete.text}">Register and track participation details.</span>
             </div>
+
             <div>
-                <strong>Travel</strong>
-                <span>Coordinate journeys with other players.</span>
+                <strong th:text="#{about.summary.travel.title}">Travel</strong>
+                <span th:text="#{about.summary.travel.text}">Coordinate journeys with other players.</span>
             </div>
         </div>
     </section>
 
     <section class="content-section">
         <div class="section-heading">
-            <p class="eyebrow">The idea</p>
-            <h2>Why TournamentTrail exists</h2>
+            <p class="eyebrow" th:text="#{about.idea.eyebrow}">The idea</p>
+            <h2 th:text="#{about.idea.title}">Why TournamentTrail exists</h2>
         </div>
 
         <div class="two-column">
             <article class="text-panel">
-                <h3>The problem</h3>
-                <p>
+                <h3 th:text="#{about.problem.title}">The problem</h3>
+
+                <p th:text="#{about.problem.paragraph1}">
                     Chess tournaments are often published across different websites,
                     social media pages, and local communities. Players may need to search
                     through multiple sources before finding the event details they need.
                 </p>
-                <p>
+
+                <p th:text="#{about.problem.paragraph2}">
                     Travelling to another city can also be expensive and difficult to
                     organise, especially when players do not know who else is attending
                     from their area.
@@ -89,13 +117,15 @@
             </article>
 
             <article class="text-panel">
-                <h3>The solution</h3>
-                <p>
+                <h3 th:text="#{about.solution.title}">The solution</h3>
+
+                <p th:text="#{about.solution.paragraph1}">
                     TournamentTrail provides one place where players can browse events,
                     review participation requirements, register for tournaments,
                     and track their status through My registrations.
                 </p>
-                <p>
+
+                <p th:text="#{about.solution.paragraph2}">
                     Players can also create or join travel groups connected to a specific
                     tournament and coordinate the journey with other participants.
                 </p>
@@ -105,54 +135,58 @@
 
     <section class="content-section">
         <div class="section-heading">
-            <p class="eyebrow">Platform features</p>
-            <h2>What users can do</h2>
+            <p class="eyebrow" th:text="#{about.features.eyebrow}">Platform features</p>
+            <h2 th:text="#{about.features.title}">What users can do</h2>
         </div>
 
         <div class="feature-grid">
             <article class="feature-card">
                 <span class="feature-number">01</span>
-                <h3>Browse tournaments</h3>
-                <p>Search by location, date, time control, entry fee, and tournament status.</p>
+                <h3 th:text="#{about.feature.browse.title}">Browse tournaments</h3>
+                <p th:text="#{about.feature.browse.text}">Search by location, date, time control, entry fee, and tournament status.</p>
             </article>
 
             <article class="feature-card">
                 <span class="feature-number">02</span>
-                <h3>Manage registrations</h3>
-                <p>Register for tournaments and follow registration and payment progress.</p>
+                <h3 th:text="#{about.feature.registrations.title}">Manage registrations</h3>
+                <p th:text="#{about.feature.registrations.text}">Register for tournaments and follow registration and payment progress.</p>
             </article>
 
             <article class="feature-card">
                 <span class="feature-number">03</span>
-                <h3>Organise shared travel</h3>
-                <p>Create travel groups, review join requests, and coordinate with accepted members.</p>
+                <h3 th:text="#{about.feature.travel.title}">Organise shared travel</h3>
+                <p th:text="#{about.feature.travel.text}">Create travel groups, review join requests, and coordinate with accepted members.</p>
             </article>
 
             <article class="feature-card">
                 <span class="feature-number">04</span>
-                <h3>Publish events</h3>
-                <p>Approved organisers can create tournaments and manage participants.</p>
+                <h3 th:text="#{about.feature.publish.title}">Publish events</h3>
+                <p th:text="#{about.feature.publish.text}">Approved organisers can create tournaments and manage participants.</p>
             </article>
 
             <article class="feature-card">
                 <span class="feature-number">05</span>
-                <h3>Track travel costs</h3>
-                <p>Group members can record expected and actual travel expenses.</p>
+                <h3 th:text="#{about.feature.costs.title}">Track travel costs</h3>
+                <p th:text="#{about.feature.costs.text}">Group members can record expected and actual travel expenses.</p>
             </article>
 
             <article class="feature-card">
                 <span class="feature-number">06</span>
-                <h3>Build trust</h3>
-                <p>Reviews, organiser approval, and clear event details support informed decisions.</p>
+                <h3 th:text="#{about.feature.trust.title}">Build trust</h3>
+                <p th:text="#{about.feature.trust.text}">Reviews, organiser approval, and clear event details support informed decisions.</p>
             </article>
         </div>
     </section>
 
     <section class="mission-section">
         <div>
-            <p class="eyebrow">Our goal</p>
-            <h2>Make tournament participation easier from discovery to arrival.</h2>
-            <p>
+            <p class="eyebrow" th:text="#{about.goal.eyebrow}">Our goal</p>
+
+            <h2 th:text="#{about.goal.title}">
+                Make tournament participation easier from discovery to arrival.
+            </h2>
+
+            <p th:text="#{about.goal.text}">
                 TournamentTrail reduces the organisational work around chess events,
                 so players can focus more on preparation and competition.
             </p>
@@ -160,23 +194,27 @@
 
         <div class="mission-actions">
             <a class="button button-primary"
+               th:text="#{about.action.browse-tournaments}"
                th:href="@{/tournaments}">
                 Browse tournaments
             </a>
 
             <a class="button button-secondary"
+               th:text="#{nav.registrations}"
                th:href="@{/registrations}"
                sec:authorize="isAuthenticated()">
                 My registrations
             </a>
 
             <a class="button button-secondary"
+               th:text="#{nav.create-account}"
                th:href="@{/register}"
                sec:authorize="isAnonymous()">
                 Create account
             </a>
 
             <a class="button button-secondary"
+               th:text="#{about.action.open-dashboard}"
                th:href="@{/home}"
                sec:authorize="isAuthenticated()">
                 Open dashboard
@@ -185,7 +223,6 @@
     </section>
 </main>
 
-
 <footer class="site-footer">
     <div>
         <a class="brand footer-brand"
@@ -193,21 +230,21 @@
             TournamentTrail
         </a>
 
-        <p>
+        <p th:text="#{footer.description}">
             Chess tournaments, registrations, and shared travel in one platform.
         </p>
     </div>
 
     <nav>
-        <a th:href="@{/}">Home</a>
-        <a th:href="@{/tournaments}">Tournaments</a>
-        <a th:href="@{/registrations}" >My registrations</a>
-        <a th:href="@{/travel-groups}">Travel groups</a>
-        <a class="active" th:href="@{/about}">About</a>
-        <a  th:href="@{/contact}">Contact</a>
+        <a th:text="#{nav.home}" th:href="@{/}">Home</a>
+        <a th:text="#{nav.tournaments}" th:href="@{/tournaments}">Tournaments</a>
+        <a th:text="#{nav.registrations}" th:href="@{/registrations}">My registrations</a>
+        <a th:text="#{nav.travel-groups}" th:href="@{/travel-groups}">Travel groups</a>
+        <a class="active" th:text="#{nav.about}" th:href="@{/about}">About</a>
+        <a th:text="#{nav.contact}" th:href="@{/contact}">Contact</a>
     </nav>
 
-    <p>&copy; 2026 TournamentTrail</p>
+    <p th:text="#{footer.copyright}">&copy; 2026 TournamentTrail</p>
 </footer>
 </body>
 </html>

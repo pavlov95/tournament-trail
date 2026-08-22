@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en"
+      th:lang="${#locale.language}"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
@@ -8,7 +9,7 @@
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0">
 
-    <title th:text="${travelGroup.name + ' | TournamentTrail'}">
+    <title th:text="#{travel-group.details.page.title(${travelGroup.name})}">
         Travel Group Details | TournamentTrail
     </title>
 
@@ -23,31 +24,39 @@
         <a class="brand" th:href="@{/}">TournamentTrail</a>
 
         <div class="nav-links">
-            <a th:href="@{/}">Home</a>
-            <a th:href="@{/tournaments}">Tournaments</a>
-            <a th:href="@{/registrations}">My registrations</a>
-            <a class="active" th:href="@{/travel-groups}">Travel groups</a>
-            <a th:href="@{/about}">About</a>
-            <a th:href="@{/contact}">Contact</a>
+            <a th:href="@{/}" th:text="#{nav.home}">Home</a>
+            <a th:href="@{/tournaments}" th:text="#{nav.tournaments}">Tournaments</a>
+            <a th:href="@{/registrations}" th:text="#{nav.registrations}">My registrations</a>
+            <a class="active" th:href="@{/travel-groups}" th:text="#{nav.travel-groups}">Travel groups</a>
+            <a th:href="@{/about}" th:text="#{nav.about}">About</a>
+            <a th:href="@{/contact}" th:text="#{nav.contact}">Contact</a>
         </div>
 
         <div class="nav-actions" sec:authorize="isAnonymous()">
-            <a class="button button-secondary" th:href="@{/login}">Login</a>
-            <a class="button button-primary" th:href="@{/register}">Create account</a>
+            <a class="button button-secondary" th:href="@{/login}" th:text="#{nav.login}">Login</a>
+            <a class="button button-primary" th:href="@{/register}" th:text="#{nav.create-account}">Create account</a>
         </div>
 
         <div class="nav-actions" sec:authorize="isAuthenticated()">
 
-            <a class="button button-primary" th:href="@{/home}">Dashboard</a>
+            <a class="button button-primary" th:href="@{/home}" th:text="#{nav.dashboard}">Dashboard</a>
 
             <form th:action="@{/logout}" method="post">
-                <button class="button button-secondary" type="submit">Logout</button>
+                <button class="button button-secondary" type="submit" th:text="#{nav.logout}">Logout</button>
             </form>
         </div>
     </nav>
 </header>
 
 <main>
+
+    <div class="language-switcher">
+        <a th:href="@{/travel-groups/{id}(id=${travelGroup.id}, lang='en')}"
+           th:text="#{language.english}">English</a>
+        <span>|</span>
+        <a th:href="@{/travel-groups/{id}(id=${travelGroup.id}, lang='bg')}"
+           th:text="#{language.bulgarian}">Bulgarian</a>
+    </div>
 
     <div class="flash-message success"
          th:if="${successMessage}"
@@ -64,7 +73,7 @@
     <section class="hero-section">
         <div class="hero-content">
 
-            <a class="back-link" th:href="@{/travel-groups}">← Back to travel groups</a>
+            <a class="back-link" th:href="@{/travel-groups}" th:text="#{travel-group.details.back-to-travel-groups}">← Back to travel groups</a>
 
             <div class="title-row">
 
@@ -81,14 +90,16 @@
 
             <div class="hero-actions">
 
-                <a class="button button-secondary" th:href="@{/travel-groups}">Browse groups</a>
+                <a class="button button-secondary" th:href="@{/travel-groups}" th:text="#{travel-group.details.action.browse-groups}">Browse groups</a>
                 <a class="button button-primary" th:if="${canViewPrivateGroupArea}"
-                   th:href="@{/travel-groups/{id}/comments(id=${travelGroup.id})}">
+                   th:href="@{/travel-groups/{id}/comments(id=${travelGroup.id})}"
+                   th:text="#{travel-group.details.action.open-discussion}">
                     Open discussion
                 </a>
 
                 <a class="button button-primary" th:if="${isOwner}"
-                   th:href="@{/travel-groups/{id}/requests(id=${travelGroup.id})}">
+                   th:href="@{/travel-groups/{id}/requests(id=${travelGroup.id})}"
+                   th:text="#{travel-group.details.action.manage-requests}">
                     Manage requests
                 </a>
 
@@ -97,7 +108,8 @@
 
                     <input type="hidden" name="_method" value="patch">
                     <button class="button button-danger" type="submit"
-                            onclick="return confirm('Are you sure you want to cancel this travel group?')">
+                            th:onclick="|return confirm('#{travel-group.details.confirm.cancel}')|"
+                            th:text="#{travel-group.details.action.cancel-group}">
                         Cancel group
                     </button>
                 </form>
@@ -105,32 +117,32 @@
         </div>
 
         <aside class="summary-card">
-            <h2>Group summary</h2>
+            <h2 th:text="#{travel-group.details.summary.title}">Group summary</h2>
 
             <dl>
                 <div>
-                    <dt>Status</dt>
+                    <dt th:text="#{travel-group.details.summary.status}">Status</dt>
                     <dd th:text="${travelGroup.status}">
                         OPEN
                     </dd>
                 </div>
 
                 <div>
-                    <dt>Available spots</dt>
+                    <dt th:text="#{travel-group.details.summary.available-spots}">Available spots</dt>
                     <dd th:text="${availableSpots}">
                         2
                     </dd>
                 </div>
 
                 <div>
-                    <dt>Maximum members</dt>
+                    <dt th:text="#{travel-group.details.summary.maximum-members}">Maximum members</dt>
                     <dd th:text="${travelGroup.maximumMembers}">
                         4
                     </dd>
                 </div>
 
                 <div>
-                    <dt>Estimated cost</dt>
+                    <dt th:text="#{travel-group.details.summary.estimated-cost}">Estimated cost</dt>
                     <dd>
                         <span th:text="${#numbers.formatDecimal(travelGroup.estimatedCost, 1, 2)}">
                             45.00
@@ -147,32 +159,32 @@
     <section class="details-grid">
 
         <article class="details-card">
-            <h2>Travel route</h2>
+            <h2 th:text="#{travel-group.details.route.title}">Travel route</h2>
 
             <dl>
                 <div>
-                    <dt>Departure country</dt>
+                    <dt th:text="#{travel-group.details.route.departure-country}">Departure country</dt>
                     <dd th:text="${travelGroup.departureCountry}">
                         Bulgaria
                     </dd>
                 </div>
 
                 <div>
-                    <dt>Departure city</dt>
+                    <dt th:text="#{travel-group.details.route.departure-city}">Departure city</dt>
                     <dd th:text="${travelGroup.departureCity}">
                         Sofia
                     </dd>
                 </div>
 
                 <div>
-                    <dt>Meeting point</dt>
+                    <dt th:text="#{travel-group.details.route.meeting-point}">Meeting point</dt>
                     <dd th:text="${travelGroup.meetingPoint}">
                         Central station
                     </dd>
                 </div>
 
                 <div>
-                    <dt>Departure time</dt>
+                    <dt th:text="#{travel-group.details.route.departure-time}">Departure time</dt>
                     <dd th:text="${#temporals.format(
                             travelGroup.departureTime,
                             'dd MMM yyyy, HH:mm'
@@ -184,25 +196,25 @@
         </article>
 
         <article class="details-card">
-            <h2>Group information</h2>
+            <h2 th:text="#{travel-group.details.info.title}">Group information</h2>
 
             <dl>
                 <div>
-                    <dt>Owner</dt>
+                    <dt th:text="#{travel-group.details.info.owner}">Owner</dt>
                     <dd th:text="${travelGroup.owner.username}">
                         owner
                     </dd>
                 </div>
 
                 <div>
-                    <dt>Transportation</dt>
+                    <dt th:text="#{travel-group.details.info.transportation}">Transportation</dt>
                     <dd th:text="${travelGroup.transportationType}">
                         CAR
                     </dd>
                 </div>
 
                 <div>
-                    <dt>Current members</dt>
+                    <dt th:text="#{travel-group.details.info.current-members}">Current members</dt>
                     <dd>
                         <span th:text="${travelGroup.maximumMembers - availableSpots}">
                             2
@@ -215,7 +227,7 @@
                 </div>
 
                 <div>
-                    <dt>Currency</dt>
+                    <dt th:text="#{travel-group.details.info.currency}">Currency</dt>
                     <dd th:text="${travelGroup.currency}">
                         BGN
                     </dd>
@@ -225,18 +237,19 @@
         <article class="details-card full-width travelers-card">
             <div class="section-heading">
                 <div>
-                    <p class="eyebrow">Group members</p>
-                    <h2>Accepted travelers</h2>
+                    <p class="eyebrow" th:text="#{travel-group.details.members.eyebrow}">Group members</p>
+                    <h2 th:text="#{travel-group.details.members.title}">Accepted travelers</h2>
                 </div>
 
                 <span class="member-count"
-                      th:text="${#lists.size(approvedApplicants)} + ' accepted'">
-            0 accepted
-        </span>
+                      th:text="#{travel-group.details.members.count(${#lists.size(approvedApplicants)})}">
+                    0 accepted
+                </span>
             </div>
 
             <p class="muted"
-               th:if="${#lists.isEmpty(approvedApplicants)}">
+               th:if="${#lists.isEmpty(approvedApplicants)}"
+               th:text="#{travel-group.details.members.empty}">
                 No accepted travelers yet. Approved applicants will appear here.
             </p>
 
@@ -256,30 +269,31 @@
                             username
                         </h3>
 
-                        <p>
+                        <p th:text="#{travel-group.details.members.accepted-traveler}">
                             Accepted traveler
                         </p>
                     </div>
 
                     <div class="traveler-meta">
-                <span th:if="${request.respondedOn != null}"
-                      th:text="${#temporals.format(request.respondedOn, 'dd MMM yyyy, HH:mm')}">
-                    22 Jul 2026, 14:20
-                </span>
+                        <span th:if="${request.respondedOn != null}"
+                              th:text="${#temporals.format(request.respondedOn, 'dd MMM yyyy, HH:mm')}">
+                            22 Jul 2026, 14:20
+                        </span>
 
-                        <span th:if="${request.respondedOn == null}">
-                    Approved
-                </span>
+                        <span th:if="${request.respondedOn == null}"
+                              th:text="#{travel-group.details.members.approved}">
+                            Approved
+                        </span>
                     </div>
                 </article>
             </div>
         </article>
         <article class="details-card full-width">
-            <h2>Tournament</h2>
+            <h2 th:text="#{travel-group.details.tournament.title}">Tournament</h2>
 
             <dl>
                 <div>
-                    <dt>Tournament</dt>
+                    <dt th:text="#{travel-group.details.tournament.name}">Tournament</dt>
                     <dd>
                         <a th:href="@{/tournaments/{id}(id=${travelGroup.tournament.id})}"
                            th:text="${travelGroup.tournament.name}">
@@ -289,7 +303,7 @@
                 </div>
 
                 <div>
-                    <dt>Tournament status</dt>
+                    <dt th:text="#{travel-group.details.tournament.status}">Tournament status</dt>
                     <dd th:text="${travelGroup.tournament.status}">
                         PUBLISHED
                     </dd>
@@ -300,13 +314,13 @@
         <article class="details-card full-width request-card">
             <div class="section-heading">
                 <div>
-                    <p class="eyebrow">Travel request</p>
-                    <h2>Join this group</h2>
+                    <p class="eyebrow" th:text="#{travel-group.details.request.eyebrow}">Travel request</p>
+                    <h2 th:text="#{travel-group.details.request.title}">Join this group</h2>
                 </div>
             </div>
 
             <div th:if="${canSendJoinRequest}">
-                <p class="muted">
+                <p class="muted" th:text="#{travel-group.details.request.help}">
                     Send a short request to the group owner. If it is approved,
                     you will be able to access the private group features later.
                 </p>
@@ -315,12 +329,12 @@
                       method="post" th:object="${travelJoinRequest}">
 
                     <div class="form-group full-width">
-                        <label for="joinMessage">Message to owner</label>
+                        <label for="joinMessage" th:text="#{travel-group.details.request.message}">Message to owner</label>
 
                         <textarea id="joinMessage"
                                   rows="4"
                                   maxlength="500"
-                                  placeholder="Optional message"
+                                  th:placeholder="#{travel-group.details.request.message.placeholder}"
                                   th:field="*{message}"></textarea>
 
                         <span class="field-error"
@@ -331,25 +345,25 @@
                     </div>
 
                     <div class="form-actions">
-                        <button class="button button-primary" type="submit">Send join request</button>
+                        <button class="button button-primary" type="submit" th:text="#{travel-group.details.request.send}">Send join request</button>
                     </div>
                 </form>
             </div>
 
             <div th:unless="${canSendJoinRequest}">
-                <p class="muted" th:if="${isOwner}">
-                    You own this travel group. Use <strong>Manage requests</strong> to approve or reject pending requests.
+                <p class="muted" th:if="${isOwner}" th:text="#{travel-group.details.request.owner-info}">
+                    You own this travel group. Use Manage requests to approve or reject pending requests.
                 </p>
 
-                <p class="muted" th:if="${!isOwner and travelGroup.status.name() != 'OPEN'}">
+                <p class="muted" th:if="${!isOwner and travelGroup.status.name() != 'OPEN'}" th:text="#{travel-group.details.request.closed}">
                     Requests are closed because this group is not open.
                 </p>
 
-                <p class="muted" th:if="${!isOwner and travelGroup.status.name() == 'OPEN' and availableSpots <= 0}">
+                <p class="muted" th:if="${!isOwner and travelGroup.status.name() == 'OPEN' and availableSpots <= 0}" th:text="#{travel-group.details.request.full}">
                     This travel group is full.
                 </p>
 
-                <p class="muted" th:if="${!isOwner and travelGroup.status.name() == 'OPEN' and availableSpots > 0}">
+                <p class="muted" th:if="${!isOwner and travelGroup.status.name() == 'OPEN' and availableSpots > 0}" th:text="#{travel-group.details.request.already-sent}">
                     You have already sent a request for this group.
                 </p>
             </div>
@@ -362,18 +376,19 @@
         <div class="section-heading">
 
             <div>
-                <p class="eyebrow">Owner tools</p>
-                <h2>Manage travel group</h2>
+                <p class="eyebrow" th:text="#{travel-group.details.management.eyebrow}">Owner tools</p>
+                <h2 th:text="#{travel-group.details.management.title}">Manage travel group</h2>
             </div>
 
             <div class="management-actions">
-                <a class="button button-secondary" th:href="@{/travel-groups/{id}/requests(id=${travelGroup.id})}">
+                <a class="button button-secondary" th:href="@{/travel-groups/{id}/requests(id=${travelGroup.id})}"
+                   th:text="#{travel-group.details.action.manage-requests}">
                     Manage requests
                 </a>
             </div>
         </div>
 
-        <h2>Edit travel group</h2>
+        <h2 th:text="#{travel-group.details.edit.title}">Edit travel group</h2>
 
         <form class="edit-form" th:action="@{/travel-groups/{id}(id=${travelGroup.id})}" method="post"
               th:object="${travelGroupRequest}">
@@ -385,7 +400,7 @@
             <div class="form-grid">
 
                 <div class="form-group">
-                    <label for="name">Name</label>
+                    <label for="name" th:text="#{travel-group.details.form.name}">Name</label>
 
                     <input id="name" type="text" th:field="*{name}">
 
@@ -395,7 +410,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="departureCountry">Departure country</label>
+                    <label for="departureCountry" th:text="#{travel-group.details.form.departure-country}">Departure country</label>
 
                     <input id="departureCountry"
                            type="text"
@@ -409,7 +424,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="departureCity">Departure city</label>
+                    <label for="departureCity" th:text="#{travel-group.details.form.departure-city}">Departure city</label>
 
                     <input id="departureCity" type="text" th:field="*{departureCity}">
 
@@ -421,7 +436,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="meetingPoint">Meeting point</label>
+                    <label for="meetingPoint" th:text="#{travel-group.details.form.meeting-point}">Meeting point</label>
 
                     <input id="meetingPoint"
                            type="text"
@@ -435,7 +450,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="departureTime">Departure time</label>
+                    <label for="departureTime" th:text="#{travel-group.details.form.departure-time}">Departure time</label>
 
                     <input id="departureTime"
                            type="datetime-local"
@@ -449,11 +464,11 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="transportationType">Transportation type</label>
+                    <label for="transportationType" th:text="#{travel-group.details.form.transportation-type}">Transportation type</label>
 
                     <select id="transportationType" th:field="*{transportationType}">
 
-                        <option value="">
+                        <option value="" th:text="#{travel-group.details.form.transportation-type.choose}">
                             Choose transportation
                         </option>
 
@@ -472,7 +487,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="maximumMembers">Maximum members</label>
+                    <label for="maximumMembers" th:text="#{travel-group.details.form.maximum-members}">Maximum members</label>
 
                     <input id="maximumMembers"
                            type="number"
@@ -487,7 +502,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="estimatedCost">Estimated cost</label>
+                    <label for="estimatedCost" th:text="#{travel-group.details.form.estimated-cost}">Estimated cost</label>
 
                     <input id="estimatedCost"
                            type="number"
@@ -503,11 +518,11 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="currency">Currency</label>
+                    <label for="currency" th:text="#{travel-group.details.form.currency}">Currency</label>
 
                     <select id="currency" th:field="*{currency}">
 
-                        <option value="">Choose currency</option>
+                        <option value="" th:text="#{travel-group.details.form.currency.choose}">Choose currency</option>
 
                         <option th:each="currency : ${currencies}"
                                 th:value="${currency}"
@@ -524,7 +539,7 @@
                 </div>
 
                 <div class="form-group full-width">
-                    <label for="description">Description</label>
+                    <label for="description" th:text="#{travel-group.details.form.description}">Description</label>
 
                     <textarea id="description"
                               rows="4"
@@ -539,7 +554,7 @@
             </div>
 
             <div class="form-actions">
-                <button class="button button-primary" type="submit">Save changes</button>
+                <button class="button button-primary" type="submit" th:text="#{travel-group.details.action.save-changes}">Save changes</button>
             </div>
         </form>
     </section>
@@ -551,17 +566,17 @@
     <div>
         <a class="brand footer-brand" th:href="@{/}">TournamentTrail</a>
 
-        <p>Chess tournaments, registrations, and shared travel in one platform.</p>
+        <p th:text="#{footer.description}">Chess tournaments, registrations, and shared travel in one platform.</p>
     </div>
 
     <nav>
-        <a th:href="@{/tournaments}">Tournaments</a>
-        <a th:href="@{/travel-groups}" class="active">Travel groups</a>
-        <a th:href="@{/about}">About</a>
-        <a th:href="@{/contact}">Contact</a>
+        <a th:href="@{/tournaments}" th:text="#{nav.tournaments}">Tournaments</a>
+        <a th:href="@{/travel-groups}" class="active" th:text="#{nav.travel-groups}">Travel groups</a>
+        <a th:href="@{/about}" th:text="#{nav.about}">About</a>
+        <a th:href="@{/contact}" th:text="#{nav.contact}">Contact</a>
     </nav>
 
-    <p>&copy; 2026 TournamentTrail</p>
+    <p th:text="#{footer.copyright}">&copy; 2026 TournamentTrail</p>
 </footer>
 
 </body>

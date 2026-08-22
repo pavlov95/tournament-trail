@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en"
+      th:lang="${#locale.language}"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
@@ -8,7 +9,9 @@
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0">
 
-    <title>Create Travel Group | TournamentTrail</title>
+    <title th:text="#{travel-group.create.page.title}">
+        Create Travel Group | TournamentTrail
+    </title>
 
     <link rel="stylesheet" th:href="@{/css/travel-group-create.css}">
 </head>
@@ -18,26 +21,35 @@
 <header class="site-header">
     <nav class="navbar">
         <a class="brand" th:href="@{/}">TournamentTrail</a>
+
         <div class="nav-links">
-            <a th:href="@{/}">Home</a>
-            <a th:href="@{/tournaments}">Tournaments</a>
-            <a th:href="@{/registrations}" sec:authorize="isAuthenticated()">My registrations</a>
-            <a class="active" th:href="@{/travel-groups}">Travel groups</a>
-            <a th:href="@{/about}">About</a>
-            <a th:href="@{/contact}">Contact</a>
+            <a th:href="@{/}" th:text="#{nav.home}">Home</a>
+            <a th:href="@{/tournaments}" th:text="#{nav.tournaments}">Tournaments</a>
+            <a th:href="@{/registrations}"
+               sec:authorize="isAuthenticated()"
+               th:text="#{nav.registrations}">My registrations</a>
+            <a class="active" th:href="@{/travel-groups}" th:text="#{nav.travel-groups}">Travel groups</a>
+            <a th:href="@{/about}" th:text="#{nav.about}">About</a>
+            <a th:href="@{/contact}" th:text="#{nav.contact}">Contact</a>
+        </div>
+
+        <div class="language-switcher">
+            <a th:href="@{/travel-groups/create(lang='en')}" th:text="#{language.english}">English</a>
+            <span>|</span>
+            <a th:href="@{/travel-groups/create(lang='bg')}" th:text="#{language.bulgarian}">Bulgarian</a>
         </div>
 
         <div class="nav-actions" sec:authorize="isAuthenticated()">
-            <a class="button button-primary" th:href="@{/home}">Dashboard</a>
+            <a class="button button-primary" th:href="@{/home}" th:text="#{nav.dashboard}">Dashboard</a>
 
             <form th:action="@{/logout}" method="post">
-                <button class="button button-secondary" type="submit">Logout</button>
+                <button class="button button-secondary" type="submit" th:text="#{nav.logout}">Logout</button>
             </form>
         </div>
 
         <div class="nav-actions" sec:authorize="isAnonymous()">
-            <a class="button button-secondary" th:href="@{/login}">Login</a>
-            <a class="button button-primary" th:href="@{/register}">Register</a>
+            <a class="button button-secondary" th:href="@{/login}" th:text="#{nav.login}">Login</a>
+            <a class="button button-primary" th:href="@{/register}" th:text="#{nav.create-account}">Register</a>
         </div>
     </nav>
 </header>
@@ -46,18 +58,22 @@
 
     <section class="page-heading">
         <div>
-            <a class="back-link" th:href="@{/travel-groups}">← Back to travel groups</a>
-            <p class="eyebrow">Shared travel</p>
-            <h1>Create travel group</h1>
-            <p>Select a published tournament and add the travel details for other players.</p>
+            <a class="back-link"
+               th:href="@{/travel-groups}"
+               th:text="#{travel-group.create.back-to-travel-groups}">← Back to travel groups</a>
+            <p class="eyebrow" th:text="#{travel-group.create.eyebrow}">Shared travel</p>
+            <h1 th:text="#{travel-group.create.title}">Create travel group</h1>
+            <p th:text="#{travel-group.create.description}">
+                Select a published tournament and add the travel details for other players.
+            </p>
         </div>
     </section>
 
     <section class="panel create-panel" sec:authorize="hasAuthority('TRAVEL_GROUP_CREATE')">
         <div class="section-heading">
             <div>
-                <h2>Travel group information</h2>
-                <p>
+                <h2 th:text="#{travel-group.create.info.title}">Travel group information</h2>
+                <p th:text="#{travel-group.create.info.help}">
                     Start by typing the tournament name. Select one of the suggestions before submitting.
                 </p>
             </div>
@@ -73,15 +89,15 @@
             </div>
 
             <div class="form-section">
-                <h3>Tournament</h3>
+                <h3 th:text="#{travel-group.create.section.tournament}">Tournament</h3>
 
                 <div class="form-group full-width autocomplete-wrapper">
-                    <label for="tournamentSearch">Tournament name</label>
+                    <label for="tournamentSearch" th:text="#{travel-group.create.form.tournament-name}">Tournament name</label>
 
                     <input id="tournamentSearch"
                            type="text"
                            th:value="${selectedTournamentLabel}"
-                           placeholder="Start typing tournament name"
+                           th:placeholder="#{travel-group.create.form.tournament-name.placeholder}"
                            autocomplete="off">
 
                     <input id="tournamentId"
@@ -99,17 +115,17 @@
             </div>
 
             <div class="form-section">
-                <h3>Basic information</h3>
+                <h3 th:text="#{travel-group.create.section.basic-info}">Basic information</h3>
 
                 <div class="form-grid">
 
                     <div class="form-group full-width">
-                        <label for="name">Group name</label>
+                        <label for="name" th:text="#{travel-group.create.form.group-name}">Group name</label>
 
                         <input id="name"
                                type="text"
                                th:field="*{name}"
-                               placeholder="Sofia players car group">
+                               th:placeholder="#{travel-group.create.form.group-name.placeholder}">
 
                         <span class="field-error"
                               th:if="${#fields.hasErrors('name')}"
@@ -119,12 +135,12 @@
                     </div>
 
                     <div class="form-group full-width">
-                        <label for="description">Description</label>
+                        <label for="description" th:text="#{travel-group.create.form.description}">Description</label>
 
                         <textarea id="description"
                                   rows="4"
                                   th:field="*{description}"
-                                  placeholder="Describe the travel plan, who can join, and any useful details">
+                                  th:placeholder="#{travel-group.create.form.description.placeholder}">
                         </textarea>
 
                         <span class="field-error"
@@ -137,17 +153,17 @@
             </div>
 
             <div class="form-section">
-                <h3>Departure details</h3>
+                <h3 th:text="#{travel-group.create.section.departure}">Departure details</h3>
 
                 <div class="form-grid">
 
                     <div class="form-group">
-                        <label for="departureCountry">Departure country</label>
+                        <label for="departureCountry" th:text="#{travel-group.create.form.departure-country}">Departure country</label>
 
                         <input id="departureCountry"
                                type="text"
                                th:field="*{departureCountry}"
-                               placeholder="Bulgaria">
+                               th:placeholder="#{travel-group.create.form.departure-country.placeholder}">
 
                         <span class="field-error"
                               th:if="${#fields.hasErrors('departureCountry')}"
@@ -157,12 +173,12 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="departureCity">Departure city</label>
+                        <label for="departureCity" th:text="#{travel-group.create.form.departure-city}">Departure city</label>
 
                         <input id="departureCity"
                                type="text"
                                th:field="*{departureCity}"
-                               placeholder="Sofia">
+                               th:placeholder="#{travel-group.create.form.departure-city.placeholder}">
 
                         <span class="field-error"
                               th:if="${#fields.hasErrors('departureCity')}"
@@ -172,12 +188,12 @@
                     </div>
 
                     <div class="form-group full-width">
-                        <label for="meetingPoint">Meeting point</label>
+                        <label for="meetingPoint" th:text="#{travel-group.create.form.meeting-point}">Meeting point</label>
 
                         <input id="meetingPoint"
                                type="text"
                                th:field="*{meetingPoint}"
-                               placeholder="National Palace of Culture main entrance">
+                               th:placeholder="#{travel-group.create.form.meeting-point.placeholder}">
 
                         <span class="field-error"
                               th:if="${#fields.hasErrors('meetingPoint')}"
@@ -187,7 +203,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="departureTime">Departure time</label>
+                        <label for="departureTime" th:text="#{travel-group.create.form.departure-time}">Departure time</label>
 
                         <input id="departureTime"
                                type="datetime-local"
@@ -201,11 +217,11 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="transportationType">Transportation type</label>
+                        <label for="transportationType" th:text="#{travel-group.create.form.transportation-type}">Transportation type</label>
 
                         <select id="transportationType" th:field="*{transportationType}">
 
-                            <option value="">Choose transportation</option>
+                            <option value="" th:text="#{travel-group.create.form.transportation-type.choose}">Choose transportation</option>
 
                             <option th:each="type : ${transportationTypes}"
                                     th:value="${type}"
@@ -224,16 +240,16 @@
             </div>
 
             <div class="form-section">
-                <h3>Capacity and cost</h3>
+                <h3 th:text="#{travel-group.create.section.capacity-cost}">Capacity and cost</h3>
                 <div class="form-grid">
                     <div class="form-group">
-                        <label for="maximumMembers">Maximum members</label>
+                        <label for="maximumMembers" th:text="#{travel-group.create.form.maximum-members}">Maximum members</label>
 
                         <input id="maximumMembers"
                                type="number"
                                min="1"
                                th:field="*{maximumMembers}"
-                               placeholder="4">
+                               th:placeholder="#{travel-group.create.form.maximum-members.placeholder}">
 
                         <span class="field-error"
                               th:if="${#fields.hasErrors('maximumMembers')}"
@@ -243,14 +259,14 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="estimatedCost">Estimated cost</label>
+                        <label for="estimatedCost" th:text="#{travel-group.create.form.estimated-cost}">Estimated cost</label>
 
                         <input id="estimatedCost"
                                type="number"
                                min="0"
                                step="0.01"
                                th:field="*{estimatedCost}"
-                               placeholder="45.00">
+                               th:placeholder="#{travel-group.create.form.estimated-cost.placeholder}">
 
                         <span class="field-error"
                               th:if="${#fields.hasErrors('estimatedCost')}"
@@ -260,11 +276,11 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="currency">Currency</label>
+                        <label for="currency" th:text="#{travel-group.create.form.currency}">Currency</label>
 
                         <select id="currency" th:field="*{currency}">
 
-                            <option value="">Choose currency</option>
+                            <option value="" th:text="#{travel-group.create.form.currency.choose}">Choose currency</option>
 
                             <option th:each="currency : ${currencies}" th:value="${currency}" th:text="${currency}">
                                 EUR
@@ -279,39 +295,39 @@
             </div>
 
             <div class="form-actions">
-                <a class="button button-secondary" th:href="@{/travel-groups}">Cancel</a>
-                <button class="button button-primary" type="submit">Create travel group</button>
+                <a class="button button-secondary" th:href="@{/travel-groups}" th:text="#{travel-group.create.action.cancel}">Cancel</a>
+                <button class="button button-primary" type="submit" th:text="#{travel-group.create.action.create}">Create travel group</button>
             </div>
         </form>
     </section>
 
     <section class="access-panel" sec:authorize="!hasAuthority('TRAVEL_GROUP_CREATE')">
 
-        <h2>Access denied</h2>
+        <h2 th:text="#{travel-group.create.access-denied.title}">Access denied</h2>
 
-        <p>You do not have permission to create travel groups.</p>
-        <a class="button button-primary" th:href="@{/travel-groups}">Back to travel groups</a>
+        <p th:text="#{travel-group.create.access-denied.text}">You do not have permission to create travel groups.</p>
+        <a class="button button-primary" th:href="@{/travel-groups}" th:text="#{travel-group.create.back-to-travel-groups.plain}">Back to travel groups</a>
     </section>
 </main>
 
 <footer class="site-footer">
     <div>
         <a class="brand footer-brand" th:href="@{/}">TournamentTrail</a>
-        <p>Chess tournaments, registrations, and shared travel in one platform.</p>
+        <p th:text="#{footer.description}">Chess tournaments, registrations, and shared travel in one platform.</p>
     </div>
 
     <nav>
-        <a th:href="@{/tournaments}">Tournaments</a>
-        <a th:href="@{/registrations}" sec:authorize="isAuthenticated()">My registrations</a>
-        <a th:href="@{/travel-groups}">Travel groups</a>
-        <a th:href="@{/about}">About</a>
-        <a th:href="@{/contact}">Contact</a>
+        <a th:href="@{/tournaments}" th:text="#{nav.tournaments}">Tournaments</a>
+        <a th:href="@{/registrations}" sec:authorize="isAuthenticated()" th:text="#{nav.registrations}">My registrations</a>
+        <a th:href="@{/travel-groups}" th:text="#{nav.travel-groups}">Travel groups</a>
+        <a th:href="@{/about}" th:text="#{nav.about}">About</a>
+        <a th:href="@{/contact}" th:text="#{nav.contact}">Contact</a>
     </nav>
 
-    <p>&copy; 2026 TournamentTrail</p>
+    <p th:text="#{footer.copyright}">© 2026 TournamentTrail</p>
 </footer>
 
-<script>
+<script th:inline="javascript">
     const tournamentSearchInput =
         document.getElementById("tournamentSearch");
 
@@ -321,7 +337,26 @@
     const tournamentOptionsBox =
         document.getElementById("tournamentOptions");
 
+    const noTournamentsFoundMessage =
+        /*[[#{travel-group.create.autocomplete.no-results}]]*/ "No tournaments found";
+
+    const couldNotLoadTournamentsMessage =
+        /*[[#{travel-group.create.autocomplete.load-error}]]*/ "Could not load tournaments";
+
+    const failedToFetchTournamentsMessage =
+        /*[[#{travel-group.create.autocomplete.fetch-error}]]*/ "Failed to fetch tournaments";
+
     let tournamentSearchTimeoutId;
+
+    function renderAutocompleteEmpty(message) {
+        tournamentOptionsBox.innerHTML = "";
+
+        const emptyOption = document.createElement("div");
+        emptyOption.className = "autocomplete-empty";
+        emptyOption.textContent = message;
+
+        tournamentOptionsBox.appendChild(emptyOption);
+    }
 
     if (tournamentSearchInput) {
         tournamentSearchInput.addEventListener("input", function () {
@@ -340,7 +375,7 @@
                 fetch(`/tournaments/autocomplete?query=${encodeURIComponent(query)}`)
                     .then(response => {
                         if (!response.ok) {
-                            throw new Error("Failed to fetch tournaments");
+                            throw new Error(failedToFetchTournamentsMessage);
                         }
 
                         return response.json();
@@ -349,10 +384,7 @@
                         tournamentOptionsBox.innerHTML = "";
 
                         if (tournaments.length === 0) {
-                            tournamentOptionsBox.innerHTML =
-                                `<div class="autocomplete-empty">
-                                    No tournaments found
-                                 </div>`;
+                            renderAutocompleteEmpty(noTournamentsFoundMessage);
                             return;
                         }
 
@@ -378,10 +410,7 @@
                         });
                     })
                     .catch(() => {
-                        tournamentOptionsBox.innerHTML =
-                            `<div class="autocomplete-empty">
-                                Could not load tournaments
-                             </div>`;
+                        renderAutocompleteEmpty(couldNotLoadTournamentsMessage);
                     });
             }, 300);
         });

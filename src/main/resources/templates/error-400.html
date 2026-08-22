@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>400 | TournamentTrail</title>
+    <title th:text="#{error400.page.title}">400 | TournamentTrail</title>
     <link rel="stylesheet" th:href="@{/css/error-400.css}">
 </head>
 <body>
@@ -12,12 +12,20 @@
         <a class="brand" th:href="@{/}">TournamentTrail</a>
 
         <div class="nav-links">
-            <a th:href="@{/}">Home</a>
-            <a th:href="@{/tournaments}">Tournaments</a>
-            <a th:href="@{/registrations}">My registrations</a>
-            <a th:href="@{/travel-groups}">Travel groups</a>
-            <a th:href="@{/about}">About</a>
-            <a th:href="@{/contact}">Contact</a>
+            <a th:text="#{nav.home}" th:href="@{/}">Home</a>
+            <a th:text="#{nav.tournaments}" th:href="@{/tournaments}">Tournaments</a>
+            <a th:text="#{nav.registrations}" th:href="@{/registrations}">My registrations</a>
+            <a th:text="#{nav.travel-groups}" th:href="@{/travel-groups}">Travel groups</a>
+            <a th:text="#{nav.about}" th:href="@{/about}">About</a>
+            <a th:text="#{nav.contact}" th:href="@{/contact}">Contact</a>
+        </div>
+
+        <div class="language-switcher">
+            <a th:href="@{/error/400(lang='en')}"
+               th:text="#{language.english}">English</a>
+            <span>|</span>
+            <a th:href="@{/error/400(lang='bg')}"
+               th:text="#{language.bulgarian}">Bulgarian</a>
         </div>
     </nav>
 </header>
@@ -27,30 +35,36 @@
     <section class="error-card">
         <div class="error-badge">400</div>
 
-        <p class="eyebrow">Invalid request</p>
+        <p class="eyebrow" th:text="#{error400.eyebrow}">Invalid request</p>
 
-        <h1>This action cannot be completed.</h1>
+        <h1 th:text="#{error400.title}">This action cannot be completed.</h1>
 
         <p class="error-message"
-           th:text="${message != null ? message : 'The request was invalid or the action is not allowed in the current state.'}">
+           th:text="${message != null ? message : #messages.msg('error400.default-message')}">
             The request was invalid or the action is not allowed in the current state.
         </p>
 
         <p class="error-path" th:if="${path != null}">
-            Requested path:
+            <span th:text="#{error.requested-path}">Requested path:</span>
             <span th:text="${path}">/example</span>
         </p>
 
         <div class="error-actions">
-            <a class="button button-primary" th:href="@{/tournaments}">
+            <a class="button button-primary"
+               th:href="@{/tournaments}"
+               th:text="#{error.action.browse-tournaments}">
                 Browse tournaments
             </a>
 
-            <a class="button button-secondary" th:href="@{/home}">
+            <a class="button button-secondary"
+               th:href="@{/home}"
+               th:text="#{error.action.dashboard}">
                 Go to dashboard
             </a>
 
-            <a class="button button-secondary" th:href="@{/}">
+            <a class="button button-secondary"
+               th:href="@{/}"
+               th:text="#{error.action.homepage}">
                 Back to homepage
             </a>
         </div>
@@ -61,18 +75,20 @@
 <footer class="site-footer">
     <div>
         <a class="brand footer-brand" th:href="@{/}">TournamentTrail</a>
-        <p>Chess tournaments, registrations, and shared travel in one platform.</p>
+        <p th:text="#{footer.description}">
+            Chess tournaments, registrations, and shared travel in one platform.
+        </p>
     </div>
 
     <nav>
-        <a th:href="@{/tournaments}">Tournaments</a>
-        <a th:href="@{/registrations}">My registrations</a>
-        <a th:href="@{/travel-groups}">Travel groups</a>
-        <a th:href="@{/about}">About</a>
-        <a th:href="@{/contact}">Contact</a>
+        <a th:text="#{nav.tournaments}" th:href="@{/tournaments}">Tournaments</a>
+        <a th:text="#{nav.registrations}" th:href="@{/registrations}">My registrations</a>
+        <a th:text="#{nav.travel-groups}" th:href="@{/travel-groups}">Travel groups</a>
+        <a th:text="#{nav.about}" th:href="@{/about}">About</a>
+        <a th:text="#{nav.contact}" th:href="@{/contact}">Contact</a>
     </nav>
 
-    <p>&copy; 2026 TournamentTrail</p>
+    <p th:text="#{footer.copyright}">&copy; 2026 TournamentTrail</p>
 </footer>
 
 </body>

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en"
+      th:lang="${#locale.language}"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
@@ -8,7 +9,7 @@
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0">
 
-    <title>Tournaments | TournamentTrail</title>
+    <title th:text="#{tournaments.page.title}">Tournaments | TournamentTrail</title>
 
     <link rel="stylesheet" th:href="@{/css/tournaments.css}">
 </head>
@@ -21,26 +22,48 @@
         <a class="brand" th:href="@{/}">TournamentTrail</a>
 
         <div class="nav-links">
-            <a th:href="@{/}">Home</a>
-            <a class="active" th:href="@{/tournaments}">Tournaments</a>
-            <a th:href="@{/registrations}">My registrations</a>
-            <a th:href="@{/travel-groups}">Travel groups</a>
-            <a th:href="@{/about}">About</a>
-            <a th:href="@{/contact}">Contact</a>
+            <a th:href="@{/}" th:text="#{nav.home}">Home</a>
+            <a class="active" th:href="@{/tournaments}" th:text="#{nav.tournaments}">Tournaments</a>
+            <a th:href="@{/registrations}" th:text="#{nav.registrations}">My registrations</a>
+            <a th:href="@{/travel-groups}" th:text="#{nav.travel-groups}">Travel groups</a>
+            <a th:href="@{/about}" th:text="#{nav.about}">About</a>
+            <a th:href="@{/contact}" th:text="#{nav.contact}">Contact</a>
         </div>
 
         <div class="nav-actions" sec:authorize="isAnonymous()">
-            <a class="button button-secondary secondary-button" th:href="@{/login}">Login</a>
-            <a class="button button-primary primary-button" th:href="@{/register}">Create account</a>
+            <a class="button button-secondary secondary-button"
+               th:href="@{/login}"
+               th:text="#{nav.login}">
+                Login
+            </a>
+
+            <a class="button button-primary primary-button"
+               th:href="@{/register}"
+               th:text="#{nav.create-account}">
+                Create account
+            </a>
         </div>
 
         <div class="nav-actions" sec:authorize="isAuthenticated()">
-            <a class="button button-primary primary-button" th:href="@{/home}">Dashboard</a>
+            <a class="button button-primary primary-button"
+               th:href="@{/home}"
+               th:text="#{nav.dashboard}">
+                Dashboard
+            </a>
+
             <form th:action="@{/logout}" method="post">
-                <button class="button button-secondary secondary-button logout-button" type="submit">
+                <button class="button button-secondary secondary-button logout-button"
+                        type="submit"
+                        th:text="#{nav.logout}">
                     Logout
                 </button>
             </form>
+        </div>
+
+        <div class="language-switcher">
+            <a th:href="@{/tournaments(lang='en')}" th:text="#{language.english}">English</a>
+            <span>|</span>
+            <a th:href="@{/tournaments(lang='bg')}" th:text="#{language.bulgarian}">Bulgarian</a>
         </div>
     </nav>
 </header>
@@ -55,11 +78,11 @@
 
     <section class="page-heading">
         <div>
-            <p class="eyebrow">Chess events across Europe</p>
+            <p class="eyebrow" th:text="#{tournaments.hero.eyebrow}">Chess events across Europe</p>
 
-            <h1>Find your next tournament</h1>
+            <h1 th:text="#{tournaments.hero.title}">Find your next tournament</h1>
 
-            <p>
+            <p th:text="#{tournaments.hero.description}">
                 Search upcoming tournaments by name, location,
                 time control and rating status.
             </p>
@@ -67,7 +90,8 @@
 
         <a class="button button-primary primary-button"
            th:href="@{/tournaments/create}"
-           sec:authorize="hasAuthority('TOURNAMENT_CREATE')">
+           sec:authorize="hasAuthority('TOURNAMENT_CREATE')"
+           th:text="#{tournaments.action.create}">
             Create tournament
         </a>
     </section>
@@ -76,8 +100,8 @@
 
         <div class="section-heading">
             <div>
-                <h2>Search tournaments</h2>
-                <p>Leave a field empty to include all results.</p>
+                <h2 th:text="#{tournaments.search.title}">Search tournaments</h2>
+                <p th:text="#{tournaments.search.help}">Leave a field empty to include all results.</p>
             </div>
         </div>
 
@@ -87,37 +111,40 @@
               th:object="${searchRequest}">
 
             <div class="form-group search-name">
-                <label for="search-name">Tournament name</label>
+                <label for="search-name" th:text="#{tournaments.search.name}">Tournament name</label>
 
                 <input id="search-name"
                        type="text"
                        th:field="*{name}"
-                       placeholder="For example: Varna Open">
+                       th:placeholder="#{tournaments.search.name.placeholder}">
             </div>
 
             <div class="form-group">
-                <label for="search-country">Country</label>
+                <label for="search-country" th:text="#{tournaments.search.country}">Country</label>
 
                 <input id="search-country"
                        type="text"
                        th:field="*{country}"
-                       placeholder="Bulgaria">
+                       th:placeholder="#{tournaments.search.country.placeholder}">
             </div>
 
             <div class="form-group">
-                <label for="search-city">City</label>
+                <label for="search-city" th:text="#{tournaments.search.city}">City</label>
 
                 <input id="search-city"
                        type="text"
                        th:field="*{city}"
-                       placeholder="Varna">
+                       th:placeholder="#{tournaments.search.city.placeholder}">
             </div>
 
             <div class="form-group">
-                <label for="search-time-control">Time control</label>
+                <label for="search-time-control" th:text="#{tournaments.search.time-control}">Time control</label>
 
                 <select id="search-time-control" th:field="*{timeControl}">
-                    <option value="">All time controls</option>
+                    <option value="" th:text="#{tournaments.search.all-time-controls}">
+                        All time controls
+                    </option>
+
                     <option th:each="control : ${timeControls}"
                             th:value="${control}"
                             th:text="${control}">
@@ -127,25 +154,34 @@
             </div>
 
             <div class="form-group">
-                <label for="search-rated">Rating status</label>
+                <label for="search-rated" th:text="#{tournaments.search.rating-status}">Rating status</label>
 
                 <select id="search-rated" th:field="*{rated}">
-                    <option value="">Rated and unrated</option>
-                    <option value="true">Rated</option>
-                    <option value="false">Unrated</option>
+                    <option value="" th:text="#{tournaments.search.rated-and-unrated}">
+                        Rated and unrated
+                    </option>
+
+                    <option value="true" th:text="#{common.rated}">Rated</option>
+                    <option value="false" th:text="#{common.unrated}">Unrated</option>
                 </select>
             </div>
 
             <div class="search-actions">
-                <button class="button button-primary primary-button" type="submit">
+                <button class="button button-primary primary-button"
+                        type="submit"
+                        th:text="#{tournaments.action.search}">
                     Search
                 </button>
 
-                <a class="button button-secondary secondary-button" th:href="@{/tournaments}">
+                <a class="button button-secondary secondary-button"
+                   th:href="@{/tournaments}"
+                   th:text="#{tournaments.action.clear-filters}">
                     Clear filters
                 </a>
 
-                <a class="button button-secondary secondary-button" th:href="@{/registrations}">
+                <a class="button button-secondary secondary-button"
+                   th:href="@{/registrations}"
+                   th:text="#{nav.registrations}">
                     My registrations
                 </a>
             </div>
@@ -156,25 +192,26 @@
 
         <div class="section-heading results-heading">
             <div>
-                <h2>Upcoming tournaments</h2>
+                <h2 th:text="#{tournaments.results.title}">Upcoming tournaments</h2>
 
-                <p th:if="${tournaments != null}">
-                    <span th:text="${#lists.size(tournaments)}">0</span>
-                    tournament(s) found
+                <p th:if="${tournaments != null}"
+                   th:text="#{tournaments.results.count(${#lists.size(tournaments)})}">
+                    0 tournament(s) found
                 </p>
             </div>
 
-            <a th:href="@{/registrations}">My registrations</a>
+            <a th:href="@{/registrations}" th:text="#{nav.registrations}">My registrations</a>
         </div>
 
         <div class="empty-state" th:if="${tournaments == null || #lists.isEmpty(tournaments)}">
-            <h3>No tournaments found</h3>
+            <h3 th:text="#{tournaments.empty.title}">No tournaments found</h3>
 
-            <p>Try changing or clearing some of the filters.</p>
+            <p th:text="#{tournaments.empty.text}">Try changing or clearing some of the filters.</p>
 
             <a class="button button-primary primary-button"
                th:href="@{/tournaments/create}"
-               sec:authorize="hasAuthority('TOURNAMENT_CREATE')">
+               sec:authorize="hasAuthority('TOURNAMENT_CREATE')"
+               th:text="#{tournaments.action.create}">
                 Create tournament
             </a>
         </div>
@@ -185,44 +222,50 @@
 
                 <div class="card-top">
                     <span class="status-badge" th:text="${tournament.status}">PUBLISHED</span>
+
                     <span class="rated-badge"
                           th:classappend="${tournament.rated} ? ' rated' : ' unrated'"
-                          th:text="${tournament.rated} ? 'Rated' : 'Unrated'">
+                          th:text="${tournament.rated} ? #{common.rated} : #{common.unrated}">
                         Rated
                     </span>
                 </div>
 
                 <h3 th:text="${tournament.name}">Tournament name</h3>
 
-                <p class="edition" th:text="|Edition ${tournament.edition}|">Edition 1</p>
+                <p class="edition"
+                   th:text="#{tournaments.card.edition(${tournament.edition})}">
+                    Edition 1
+                </p>
 
                 <div class="card-details">
 
                     <div class="detail-row">
-                        <span class="detail-label">Location</span>
+                        <span class="detail-label" th:text="#{tournaments.card.location}">Location</span>
                         <span th:text="|${tournament.city}, ${tournament.country}|">Varna, Bulgaria</span>
                     </div>
 
                     <div class="detail-row">
-                        <span class="detail-label">Venue</span>
+                        <span class="detail-label" th:text="#{tournaments.card.venue}">Venue</span>
                         <span th:text="${tournament.venue}">Chess Hall</span>
                     </div>
 
                     <div class="detail-row">
-                        <span class="detail-label">Starts</span>
+                        <span class="detail-label" th:text="#{tournaments.card.starts}">Starts</span>
                         <span th:text="${#temporals.format(tournament.startTime, 'dd MMM yyyy, HH:mm')}">
                             15 Jul 2026, 10:00
                         </span>
                     </div>
 
                     <div class="detail-row">
-                        <span class="detail-label">Time control</span>
+                        <span class="detail-label" th:text="#{tournaments.card.time-control}">Time control</span>
                         <span th:text="${tournament.timeControl}">RAPID</span>
                     </div>
 
                     <div class="detail-row">
-                        <span class="detail-label">Entry fee</span>
-                        <span th:if="${tournament.free}">Free</span>
+                        <span class="detail-label" th:text="#{tournaments.card.entry-fee}">Entry fee</span>
+
+                        <span th:if="${tournament.free}" th:text="#{common.free}">Free</span>
+
                         <span th:unless="${tournament.free}"
                               th:text="|${tournament.entryFee} ${tournament.currency}|">
                             20 EUR
@@ -230,17 +273,23 @@
                     </div>
 
                     <div class="detail-row">
-                        <span class="detail-label">Participants</span>
-                        <span th:text="|Maximum ${tournament.maximumParticipants}|">Maximum 100</span>
+                        <span class="detail-label" th:text="#{tournaments.card.participants}">Participants</span>
+                        <span th:text="#{tournaments.card.maximum(${tournament.maximumParticipants})}">
+                            Maximum 100
+                        </span>
                     </div>
                 </div>
 
                 <div class="card-footer">
-                    <a class="card-link" th:href="@{/tournaments/{id}(id=${tournament.id})}">
+                    <a class="card-link"
+                       th:href="@{/tournaments/{id}(id=${tournament.id})}"
+                       th:text="#{tournaments.action.view-tournament}">
                         View tournament
                     </a>
 
-                    <a class="card-link muted-link" th:href="@{/registrations}">
+                    <a class="card-link muted-link"
+                       th:href="@{/registrations}"
+                       th:text="#{nav.registrations}">
                         My registrations
                     </a>
                 </div>
@@ -256,20 +305,20 @@
             TournamentTrail
         </a>
 
-        <p>
+        <p th:text="#{footer.description}">
             Chess tournaments, registrations, and shared travel in one platform.
         </p>
     </div>
 
     <nav>
-        <a th:href="@{/tournaments}" class="active">Tournaments</a>
-        <a th:href="@{/registrations}">My registrations</a>
-        <a th:href="@{/travel-groups}">Travel groups</a>
-        <a th:href="@{/about}">About</a>
-        <a th:href="@{/contact}">Contact</a>
+        <a th:href="@{/tournaments}" class="active" th:text="#{nav.tournaments}">Tournaments</a>
+        <a th:href="@{/registrations}" th:text="#{nav.registrations}">My registrations</a>
+        <a th:href="@{/travel-groups}" th:text="#{nav.travel-groups}">Travel groups</a>
+        <a th:href="@{/about}" th:text="#{nav.about}">About</a>
+        <a th:href="@{/contact}" th:text="#{nav.contact}">Contact</a>
     </nav>
 
-    <p>&copy; 2026 TournamentTrail</p>
+    <p th:text="#{footer.copyright}">&copy; 2026 TournamentTrail</p>
 </footer>
 
 </body>
