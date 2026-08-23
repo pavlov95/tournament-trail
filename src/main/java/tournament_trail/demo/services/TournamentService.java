@@ -1,11 +1,15 @@
 package tournament_trail.demo.services;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import tournament_trail.demo.config.CacheNames;
 import tournament_trail.demo.entities.Tournament;
 import tournament_trail.demo.entities.User;
 import tournament_trail.demo.entities.enums.Role;
@@ -31,11 +35,18 @@ public class TournamentService {
         this.userService = userService;
     }
 
+    @Cacheable(CacheNames.UPCOMING_TOURNAMENTS)
+    @Transactional(readOnly = true)
     public List<Tournament> getAllUpcomingTournaments() {
         return tournamentRepository.findAllByOrderByRegistrationDeadlineAsc();
     }
 
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = CacheNames.UPCOMING_TOURNAMENTS, allEntries = true),
+            @CacheEvict(value = CacheNames.TOURNAMENT_SEARCH, allEntries = true),
+            @CacheEvict(value = CacheNames.TOURNAMENT_OPTIONS, allEntries = true),
+            @CacheEvict(value = CacheNames.TOURNAMENT_OPTION_LABEL, allEntries = true)})
     public Tournament createTournament(TournamentRequest tournamentRequest, UUID userID) {
         User organiser = userService.findById(userID);
 
@@ -66,6 +77,9 @@ public class TournamentService {
         return tournament;
     }
 
+    @Cacheable(value = CacheNames.TOURNAMENT_SEARCH, key =
+            "{#request.name, #request.country, #request.city, #request.timeControl, #request.rated}")
+    @Transactional(readOnly = true)
     public List<Tournament> searchTournaments(TournamentSearchRequest request) {
         Specification<Tournament> specification = Specification.where(null);
 
@@ -127,10 +141,18 @@ public class TournamentService {
         return tournamentRepository.findAll(specification, Sort.by(Sort.Direction.ASC, "startTime"));
     }
 
+    @Cacheable(value = CacheNames.TOURNAMENT_BY_ID, key = "#id")
+    @Transactional(readOnly = true)
     public Tournament findById(UUID id) {
         return tournamentRepository.findById(id).orElseThrow(TournamentDoesNotExist::new);
     }
 
+    @Caching(evict = {
+            @CacheEvict(value = CacheNames.UPCOMING_TOURNAMENTS, allEntries = true),
+            @CacheEvict(value = CacheNames.TOURNAMENT_SEARCH, allEntries = true),
+            @CacheEvict(value = CacheNames.TOURNAMENT_OPTIONS, allEntries = true),
+            @CacheEvict(value = CacheNames.TOURNAMENT_OPTION_LABEL, allEntries = true),
+            @CacheEvict(value = CacheNames.TOURNAMENT_BY_ID, key = "#tournamentId")})
     @Transactional
     public void updateTournamentStatus(UUID tournamentId, TournamentStatus requestedStatus,
                                        UUID userId, Role role) {
@@ -159,8 +181,15 @@ public class TournamentService {
         throw new IllegalArgumentException("This status cannot be changed manually.");
     }
 
-    public void editTournament(TournamentRequest tournamentRequest, UUID tournamentId,
-                               UUID userId, Role role) {
+    @Caching(evict = {
+            @CacheEvict(value = CacheNames.UPCOMING_TOURNAMENTS, allEntries = true),
+            @CacheEvict(value = CacheNames.TOURNAMENT_SEARCH, allEntries = true),
+            @CacheEvict(value = CacheNames.TOURNAMENT_OPTIONS, allEntries = true),
+            @CacheEvict(value = CacheNames.TOURNAMENT_OPTION_LABEL, allEntries = true),
+            @CacheEvict(value = CacheNames.TOURNAMENT_BY_ID, key = "#tournamentId")})
+    @Transactional
+    public void editTournament(TournamentRequest tournamentRequest, UUID tournamentId, UUID userId
+            , Role role) {
 
         Tournament tournament = findById(tournamentId);
 
@@ -288,6 +317,10 @@ public class TournamentService {
         tournament.setUpdatedOn(LocalDateTime.now());
     }
 
+    @Cacheable(value = CacheNames.TOURNAMENT_OPTIONS,
+            key = "#query == null ? '' : #query.trim().toLowerCase()",
+            condition = "#query != null && #query.trim().length() >= 2")
+    @Transactional(readOnly = true)
     public List<TournamentOptionResponse> searchTournamentOptions(String query) {
         if (query == null || query.trim().length() < 2) {
             return List.of();
@@ -301,6 +334,10 @@ public class TournamentService {
         );
     }
 
+
+    @Cacheable(value = CacheNames.TOURNAMENT_OPTION_LABEL, key = "#tournamentId",
+            condition = "#tournamentId != null")
+    @Transactional(readOnly = true)
     public String getTournamentOptionLabel(UUID tournamentId) {
         if (tournamentId == null) {
             return "";
@@ -311,6 +348,12 @@ public class TournamentService {
         return tournament.getName();
     }
 
+    @Caching(evict = {
+            @CacheEvict(value = CacheNames.UPCOMING_TOURNAMENTS, allEntries = true),
+            @CacheEvict(value = CacheNames.TOURNAMENT_SEARCH, allEntries = true),
+            @CacheEvict(value = CacheNames.TOURNAMENT_OPTIONS, allEntries = true),
+            @CacheEvict(value = CacheNames.TOURNAMENT_OPTION_LABEL, allEntries = true),
+            @CacheEvict(value = CacheNames.TOURNAMENT_BY_ID, allEntries = true)})
     @Transactional
     public void updateTournamentStatuses() {
         List<Tournament> tournaments = tournamentRepository.findAllByStatusIn(
