@@ -145,9 +145,6 @@ public class TravelGroupCommentService {
         return new TravelGroupCommentsPageData(travelGroup, comments, countVisibleComments);
     }
 
-    //    public int countVisibleComments(UUID travelGroupId) {
-//        return travelGroupCommentRepository.countByTravelGroupIdAndHiddenFalse(travelGroupId);
-//    }
     private TravelGroupComment findByIdAndTravelGroupId(UUID commentId, UUID travelGroupId) {
         return travelGroupCommentRepository.findByIdAndTravelGroupIdAndHiddenFalse(commentId, travelGroupId)
                 .orElseThrow(InvalidCommentException::new);

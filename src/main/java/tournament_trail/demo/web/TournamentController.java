@@ -37,8 +37,9 @@ public class TournamentController {
     }
 
     @GetMapping
-    public ModelAndView getTournaments(@ModelAttribute("searchRequest")
-                                       TournamentSearchRequest searchRequest) {
+    public ModelAndView getTournaments(
+            @ModelAttribute("searchRequest") TournamentSearchRequest searchRequest) {
+
         ModelAndView modelAndView = new ModelAndView("tournaments");
         modelAndView.addObject("tournaments",
                 tournamentService.searchTournaments(searchRequest));

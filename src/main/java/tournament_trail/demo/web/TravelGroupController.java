@@ -73,9 +73,10 @@ public class TravelGroupController {
 
     @PostMapping("/create")
     @PreAuthorize("isAuthenticated()")
-    public ModelAndView createTravelGroup(@Valid @ModelAttribute("travelGroupRequest")
-                                          TravelGroupRequest travelGroupRequest, BindingResult bindingResult,
-                                          @AuthenticationPrincipal AuthenticationUserDetails userDetails) {
+    public ModelAndView createTravelGroup(
+            @Valid @ModelAttribute("travelGroupRequest") TravelGroupRequest travelGroupRequest
+            , BindingResult bindingResult
+            , @AuthenticationPrincipal AuthenticationUserDetails userDetails) {
 
         if (bindingResult.hasErrors()) {
             ModelAndView modelAndView = new ModelAndView("travel-group-create");

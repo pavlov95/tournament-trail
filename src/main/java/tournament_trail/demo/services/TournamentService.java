@@ -351,4 +351,8 @@ public class TournamentService {
         }
     }
 
+    public boolean canEditGames(UUID tournamentId, UUID userId, Role role) {
+        UUID organiserId = findById(tournamentId).getOrganiser().getId();
+        return organiserId.equals(userId) || role == Role.ADMIN;
+    }
 }

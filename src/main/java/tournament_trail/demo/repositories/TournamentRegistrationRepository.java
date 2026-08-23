@@ -1,5 +1,7 @@
 package tournament_trail.demo.repositories;
 
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import tournament_trail.demo.entities.TournamentRegistration;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -26,4 +28,15 @@ public interface TournamentRegistrationRepository extends JpaRepository<Tourname
             RegistrationStatus registrationStatus, PaymentStatus paymentStatus, LocalDateTime now);
 
     List<TournamentRegistration> findAllByTournamentIdOrderByRegisteredOnDesc(UUID id);
+
+    @Query("""
+        SELECT registration
+        FROM TournamentRegistration registration
+        JOIN FETCH registration.player
+        WHERE registration.tournament.id = :tournamentId
+        AND registration.registrationStatus = :status
+        ORDER BY registration.registeredOn ASC
+        """)
+    List<TournamentRegistration> findAllByTournamentIdAndStatus(@Param("tournamentId") UUID tournamentId,
+            @Param("status") RegistrationStatus status);
 }

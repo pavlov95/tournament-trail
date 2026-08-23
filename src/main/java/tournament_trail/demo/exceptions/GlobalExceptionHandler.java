@@ -33,7 +33,8 @@ public class GlobalExceptionHandler {
             , MethodArgumentTypeMismatchException.class
             , MissingServletRequestParameterException.class
             , BindException.class
-            , ConversionFailedException.class})
+            , ConversionFailedException.class
+            , AlreadyRegisteredException.class})
     public ModelAndView handle400Exception(Exception exception, HttpServletRequest request) {
 
         ModelAndView modelAndView = new ModelAndView("error-400", HttpStatus.BAD_REQUEST);
@@ -63,7 +64,7 @@ public class GlobalExceptionHandler {
             , NoHandlerFoundException.class})
     public ModelAndView handle404Exception(Exception exception, HttpServletRequest request) {
 
-        ModelAndView modelAndView =new ModelAndView("error-404", HttpStatus.NOT_FOUND);
+        ModelAndView modelAndView = new ModelAndView("error-404", HttpStatus.NOT_FOUND);
         modelAndView.addObject("message", exception.getMessage());
         modelAndView.addObject("path", request.getRequestURI());
 
@@ -71,7 +72,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(Exception.class)
-    public ModelAndView handleUnexpectedExceptions(Exception exception, HttpServletRequest request){
+    public ModelAndView handleUnexpectedExceptions(Exception exception, HttpServletRequest request) {
 
         ModelAndView modelAndView = new ModelAndView("error-500"
                 , HttpStatus.INTERNAL_SERVER_ERROR);

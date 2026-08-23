@@ -22,7 +22,7 @@ import java.util.UUID;
 
 @Controller
 public class IndexController {
-    ;
+
     private final TournamentRegistrationService tournamentRegistrationService;
     private final TravelGroupService travelGroupService;
     private final TravelRequestService travelRequestService;

@@ -11,7 +11,9 @@ import tournament_trail.demo.entities.enums.RegistrationStatus;
 import tournament_trail.demo.entities.enums.Role;
 import tournament_trail.demo.exceptions.*;
 import tournament_trail.demo.repositories.TournamentRegistrationRepository;
+import tournament_trail.demo.resultclient.GameRequest;
 import tournament_trail.demo.web.dtos.PaymentRequest;
+import tournament_trail.demo.web.dtos.PlayerOption;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -156,7 +158,7 @@ public class TournamentRegistrationService {
         return registration;
     }
 
-    @Transactional
+    @Transactional(noRollbackFor = RegistrationReservationExpiredException.class)
     public void addPayment(UUID id, PaymentRequest paymentRequest, UUID userId) {
         TournamentRegistration registration = findById(id);
         boolean isOwner = checkOwnership(registration, userId);
@@ -183,7 +185,6 @@ public class TournamentRegistrationService {
 
             throw new RegistrationReservationExpiredException();
         }
-
 
         registration.setPaymentStatus(PaymentStatus.SUBMITTED);
         registration.setPaymentReference(paymentRequest.getPaymentReference().trim());
@@ -311,5 +312,39 @@ public class TournamentRegistrationService {
 
     public Optional<TournamentRegistration> findByTournamentIdAndPlayerId(UUID tournamentId, UUID playerId) {
         return tournamentRegistrationRepository.findByTournamentIdAndPlayerId(tournamentId, playerId);
+    }
+
+    public List<PlayerOption> getConfirmedPlayersForTournament(UUID tournamentId) {
+        return tournamentRegistrationRepository
+                .findAllByTournamentIdAndStatus(tournamentId, RegistrationStatus.CONFIRMED)
+                .stream()
+                .map(registration -> new PlayerOption(
+                        registration.getPlayer().getId(),
+                        registration.getPlayer().getUsername()
+                ))
+                .toList();
+    }
+
+    public void populatePlayerUsernames(UUID tournamentId, GameRequest gameRequest) {
+        List<PlayerOption> players = getConfirmedPlayersForTournament(tournamentId);
+
+        if (gameRequest.getWhitePlayerId().equals(gameRequest.getBlackPlayerId())) {
+            throw new IllegalArgumentException("White and black player cannot be the same.");
+        }
+
+        String whiteUsername = players.stream()
+                .filter(player -> player.id().equals(gameRequest.getWhitePlayerId()))
+                .map(PlayerOption::username)
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("White player is not confirmed for this tournament."));
+
+        String blackUsername = players.stream()
+                .filter(player -> player.id().equals(gameRequest.getBlackPlayerId()))
+                .map(PlayerOption::username)
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Black player is not confirmed for this tournament."));
+
+        gameRequest.setWhitePlayerUsername(whiteUsername);
+        gameRequest.setBlackPlayerUsername(blackUsername);
     }
 }

@@ -7,9 +7,7 @@ import tournament_trail.demo.entities.VerificationToken;
 import tournament_trail.demo.exceptions.ExpiredVerificationTokenException;
 import tournament_trail.demo.exceptions.InvalidVerificationTokenException;
 import tournament_trail.demo.repositories.VerificationTokenRepository;
-
 import java.time.LocalDateTime;
-import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
@@ -36,10 +34,6 @@ public class VerificationTokenService {
 
     public void update(VerificationToken verificationToken) {
         verificationTokenRepository.save(verificationToken);
-    }
-
-    public Optional<VerificationToken> findByToken(String tokenValue) {
-        return verificationTokenRepository.findByToken(tokenValue);
     }
 
     public void delete(VerificationToken token) {

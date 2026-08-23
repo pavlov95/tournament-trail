@@ -35,12 +35,4 @@ public class EmailService {
 
         mailSender.send(message);
     }
-
-
-
-
-//    public void sendSuccessfulTournamentCreation(){
-//        SimpleMailMessage message = new SimpleMailMessage();
-//        message.setTo(rec);
-//    }
 }

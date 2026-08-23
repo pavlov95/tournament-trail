@@ -12,7 +12,7 @@ public class TournamentRegistrationScheduler {
         this.tournamentRegistrationService = tournamentRegistrationService;
     }
 
-    @Scheduled(cron = "0 * * * * *")
+    @Scheduled(fixedDelay = 60_000)
     public void expirePendingPaymentRegistrations(){
         tournamentRegistrationService.expirePendingTournamentRegistrations();
     }

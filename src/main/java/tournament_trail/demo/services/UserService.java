@@ -72,12 +72,6 @@ public class UserService implements UserDetailsService {
                 .build();
     }
 
-
-    public User findByUsername(String username) {
-       return userRepository.findByUsername(username).orElseThrow(
-               () -> new UsernameNotFoundException(username));
-    }
-
     public User findById(UUID userID) {
         return userRepository.findById(userID).orElseThrow(UserDoesNotExist::new);
 
