@@ -37,4 +37,29 @@ public class GameFixture {
                 .updatedOn(now)
                 .build();
     }
+
+    public static Game create(UUID tournamentId, int roundNumber, int boardNumber) {
+        LocalDateTime now = LocalDateTime.now();
+        return Game.builder()
+                .roundNumber(roundNumber)
+                .boardNumber(boardNumber)
+                .tournamentId(tournamentId)
+                .whitePlayerId(UUID.randomUUID())
+                .blackPlayerId(UUID.randomUUID())
+                .whitePlayerUsername(TEST_WHITE_PLAYER_USERNAME)
+                .blackPlayerUsername(TEST_BLACK_PLAYER_USERNAME)
+                .result(GameResult.BLACK_WIN)
+                .totalMoves(TEST_TOTAL_MOVES)
+                .winCondition(WinCondition.RESIGNATION)
+                .organiserNotes(TEST_ORGANISER_NOTE)
+                .playedOn(now.minusDays(1))
+                .whitePoints(BigDecimal.ZERO)
+                .blackPoints(BigDecimal.ONE)
+                .createdOn(now)
+                .updatedOn(now)
+                .build();
+    }
+
+
+
 }
