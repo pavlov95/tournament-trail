@@ -19,9 +19,7 @@ import tournament_trail.demo.fixtures.TournamentFixture;
 import tournament_trail.demo.fixtures.TournamentRegistrationFixture;
 import tournament_trail.demo.fixtures.UserFixture;
 import tournament_trail.demo.fixtures.dtos.TournamentRequestFixture;
-import tournament_trail.demo.repositories.TournamentRegistrationRepository;
-import tournament_trail.demo.repositories.TournamentRepository;
-import tournament_trail.demo.repositories.UserRepository;
+import tournament_trail.demo.repositories.*;
 import tournament_trail.demo.security.AuthenticationUserDetails;
 import tournament_trail.demo.web.dtos.TournamentRequest;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -47,7 +45,19 @@ public class TournamentControllerTest {
     private UserRepository userRepository;
 
     @Autowired
+    private TravelGroupRepository travelGroupRepository;
+
+    @Autowired
     private TournamentRegistrationRepository tournamentRegistrationRepository;
+
+    @Autowired
+    private TravelGroupCommentRepository travelGroupCommentRepository;
+
+    @Autowired
+    private TravelRequestRepository travelRequestRepository;
+
+    @Autowired
+    private ReviewRepository reviewRepository;
 
     private AuthenticationUserDetails userDetails;
     private AuthenticationUserDetails organiserDetails;
@@ -56,9 +66,17 @@ public class TournamentControllerTest {
 
     @BeforeEach
     public void setUp() {
-        tournamentRegistrationRepository.deleteAll();
-        tournamentRepository.deleteAll();
-        userRepository.deleteAll();
+        travelGroupCommentRepository.deleteAllInBatch();
+        travelRequestRepository.deleteAllInBatch();
+
+        tournamentRegistrationRepository.deleteAllInBatch();
+        reviewRepository.deleteAllInBatch();
+
+        travelGroupRepository.deleteAllInBatch();
+
+        tournamentRepository.deleteAllInBatch();
+
+        userRepository.deleteAllInBatch();
 
         user = UserFixture.createWithAllFieldsAndRoleOrganiser();
         organiser = UserFixture.createWithAllFieldsWithDifferentUsernameAndEmail();

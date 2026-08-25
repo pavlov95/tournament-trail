@@ -7,18 +7,12 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-import tournament_trail.demo.entities.Tournament;
-import tournament_trail.demo.entities.TravelGroup;
-import tournament_trail.demo.entities.TravelRequest;
-import tournament_trail.demo.entities.User;
+import tournament_trail.demo.entities.*;
 import tournament_trail.demo.entities.enums.TravelGroupStatus;
 import tournament_trail.demo.entities.enums.TravelRequestStatus;
 import tournament_trail.demo.fixtures.*;
 import tournament_trail.demo.fixtures.dtos.TravelGroupRequestFixture;
-import tournament_trail.demo.repositories.TournamentRepository;
-import tournament_trail.demo.repositories.TravelGroupRepository;
-import tournament_trail.demo.repositories.TravelRequestRepository;
-import tournament_trail.demo.repositories.UserRepository;
+import tournament_trail.demo.repositories.*;
 import tournament_trail.demo.security.AuthenticationUserDetails;
 import tournament_trail.demo.web.dtos.TravelGroupRequest;
 
@@ -51,16 +45,28 @@ public class TravelGroupControllerTest {
     @Autowired
     private TravelRequestRepository travelRequestRepository;
 
+    @Autowired
+    private TravelGroupCommentRepository travelGroupCommentRepository;
+
+    @Autowired
+    private TournamentRegistrationRepository tournamentRegistrationRepository;
+
+    @Autowired
+    private ReviewRepository reviewRepository;
+
     private AuthenticationUserDetails userDetails;
     private Tournament tournament;
     private TravelGroup travelGroup;
 
     @BeforeEach
     public void setUp() {
-        travelRequestRepository.deleteAll();
-        travelGroupRepository.deleteAll();
-        tournamentRepository.deleteAll();
-        userRepository.deleteAll();
+        travelGroupCommentRepository.deleteAllInBatch();
+        travelRequestRepository.deleteAllInBatch();
+        tournamentRegistrationRepository.deleteAllInBatch();
+        reviewRepository.deleteAllInBatch();
+        travelGroupRepository.deleteAllInBatch();
+        tournamentRepository.deleteAllInBatch();
+        userRepository.deleteAllInBatch();
 
 
         User user = UserFixture.createWithAllFields();

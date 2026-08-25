@@ -14,10 +14,7 @@ import tournament_trail.demo.entities.User;
 import tournament_trail.demo.entities.enums.TravelGroupStatus;
 import tournament_trail.demo.entities.enums.TravelRequestStatus;
 import tournament_trail.demo.fixtures.*;
-import tournament_trail.demo.repositories.TournamentRepository;
-import tournament_trail.demo.repositories.TravelGroupRepository;
-import tournament_trail.demo.repositories.TravelRequestRepository;
-import tournament_trail.demo.repositories.UserRepository;
+import tournament_trail.demo.repositories.*;
 import tournament_trail.demo.security.AuthenticationUserDetails;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -46,6 +43,15 @@ public class TravelRequestControllerTest {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private TravelGroupCommentRepository travelGroupCommentRepository;
+
+    @Autowired
+    private ReviewRepository reviewRepository;
+
+    @Autowired
+    private TournamentRegistrationRepository tournamentRegistrationRepository;
+
     private AuthenticationUserDetails ownerDetails;
     private AuthenticationUserDetails organiserDetails;
     private User applicant;
@@ -54,10 +60,13 @@ public class TravelRequestControllerTest {
 
     @BeforeEach
     public void setUp() {
-        travelRequestRepository.deleteAll();
-        travelGroupRepository.deleteAll();
-        tournamentRepository.deleteAll();
-        userRepository.deleteAll();
+        travelGroupCommentRepository.deleteAllInBatch();
+        travelRequestRepository.deleteAllInBatch();
+        tournamentRegistrationRepository.deleteAllInBatch();
+        reviewRepository.deleteAllInBatch();
+        travelGroupRepository.deleteAllInBatch();
+        tournamentRepository.deleteAllInBatch();
+        userRepository.deleteAllInBatch();
 
         User owner = UserFixture.createWithAllFields();
         User organiser = UserFixture.createWithAllFieldsWithDifferentUsernameAndEmail();

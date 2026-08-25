@@ -18,9 +18,7 @@ import tournament_trail.demo.fixtures.AuthenticationUserDetailsFixture;
 import tournament_trail.demo.fixtures.TournamentFixture;
 import tournament_trail.demo.fixtures.TournamentRegistrationFixture;
 import tournament_trail.demo.fixtures.UserFixture;
-import tournament_trail.demo.repositories.TournamentRegistrationRepository;
-import tournament_trail.demo.repositories.TournamentRepository;
-import tournament_trail.demo.repositories.UserRepository;
+import tournament_trail.demo.repositories.*;
 import tournament_trail.demo.security.AuthenticationUserDetails;
 
 import java.math.BigDecimal;
@@ -50,6 +48,18 @@ public class TournamentRegistrationControllerTest {
     @Autowired
     private TournamentRegistrationRepository tournamentRegistrationRepository;
 
+    @Autowired
+    private TravelGroupRepository travelGroupRepository;
+
+    @Autowired
+    private ReviewRepository reviewRepository;
+
+    @Autowired
+    private TravelGroupCommentRepository travelGroupCommentRepository;
+
+    @Autowired
+    private TravelRequestRepository travelRequestRepository;
+
     private AuthenticationUserDetails organiserDetails;
     private Tournament tournament;
     private User applicant;
@@ -57,9 +67,13 @@ public class TournamentRegistrationControllerTest {
 
     @BeforeEach
     public void setUp() {
-        tournamentRegistrationRepository.deleteAll();
-        tournamentRepository.deleteAll();
-        userRepository.deleteAll();
+        travelGroupCommentRepository.deleteAllInBatch();
+        travelRequestRepository.deleteAllInBatch();
+        tournamentRegistrationRepository.deleteAllInBatch();
+        reviewRepository.deleteAllInBatch();
+        travelGroupRepository.deleteAllInBatch();
+        tournamentRepository.deleteAllInBatch();
+        userRepository.deleteAllInBatch();
 
         User organiser = UserFixture.createWithAllFields();
         applicant = UserFixture.createWithAllFieldsWithDifferentUsernameAndEmail();

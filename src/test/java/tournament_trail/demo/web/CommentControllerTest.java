@@ -12,10 +12,7 @@ import tournament_trail.demo.entities.TravelGroup;
 import tournament_trail.demo.entities.TravelGroupComment;
 import tournament_trail.demo.entities.User;
 import tournament_trail.demo.fixtures.*;
-import tournament_trail.demo.repositories.TournamentRepository;
-import tournament_trail.demo.repositories.TravelGroupCommentRepository;
-import tournament_trail.demo.repositories.TravelGroupRepository;
-import tournament_trail.demo.repositories.UserRepository;
+import tournament_trail.demo.repositories.*;
 import tournament_trail.demo.security.AuthenticationUserDetails;
 
 
@@ -47,25 +44,35 @@ public class CommentControllerTest {
     @Autowired
     private TravelGroupCommentRepository commentRepository;
 
-    private User user;
+    @Autowired
+    private TravelRequestRepository travelRequestRepository;
+
+    @Autowired
+    private TournamentRegistrationRepository tournamentRegistrationRepository;
+
+    @Autowired
+    private ReviewRepository reviewRepository;
+
     private AuthenticationUserDetails userDetails;
-    private Tournament tournament;
     private TravelGroup travelGroup;
     private TravelGroupComment comment;
 
     @BeforeEach
     public void setUp() {
-        commentRepository.deleteAll();
-        travelGroupRepository.deleteAll();
-        tournamentRepository.deleteAll();
-        userRepository.deleteAll();
+        commentRepository.deleteAllInBatch();
+        travelRequestRepository.deleteAllInBatch();
+        tournamentRegistrationRepository.deleteAllInBatch();
+        reviewRepository.deleteAllInBatch();
+        travelGroupRepository.deleteAllInBatch();
+        tournamentRepository.deleteAllInBatch();
+        userRepository.deleteAllInBatch();
 
-        user = UserFixture.createWithAllFields();
+        User user = UserFixture.createWithAllFields();
         userRepository.save(user);
 
         userDetails = AuthenticationUserDetailsFixture.createFromUser(user);
 
-        tournament = TournamentFixture.createWithoutIdAndOrganiser(user);
+        Tournament tournament = TournamentFixture.createWithoutIdAndOrganiser(user);
         tournamentRepository.save(tournament);
 
         travelGroup = TravelGroupFixture.createWithoutIdAndUserAndTournament();
@@ -128,7 +135,7 @@ public class CommentControllerTest {
                 .andExpect(redirectedUrl("/travel-groups/" + travelGroup.getId() + "/comments"));
 
         assertEquals(1, commentRepository.count());
-        TravelGroupComment result = commentRepository.findById(comment.getId()).get();
+        TravelGroupComment result = commentRepository.findById(comment.getId()).orElseThrow();
         assertEquals("Test", result.getContent());
     }
 
@@ -144,7 +151,7 @@ public class CommentControllerTest {
                 .andExpect(model().attributeHasFieldErrors("commentRequest", "content"));
 
         assertEquals(1, commentRepository.count());
-        TravelGroupComment result = commentRepository.findById(comment.getId()).get();
+        TravelGroupComment result = commentRepository.findById(comment.getId()).orElseThrow();
         assertNotEquals("", result.getContent());
     }
 
@@ -158,7 +165,7 @@ public class CommentControllerTest {
                 .andExpect(redirectedUrl("/travel-groups/" + travelGroup.getId() + "/comments"));
 
         assertEquals(1, commentRepository.count());
-        TravelGroupComment result = commentRepository.findById(comment.getId()).get();
+        TravelGroupComment result = commentRepository.findById(comment.getId()).orElseThrow();
         assertTrue(result.isPinned());
 
     }
@@ -173,7 +180,7 @@ public class CommentControllerTest {
                 .andExpect(redirectedUrl("/travel-groups/" + travelGroup.getId() + "/comments"));
 
         assertEquals(1, commentRepository.count());
-        TravelGroupComment result = commentRepository.findById(comment.getId()).get();
+        TravelGroupComment result = commentRepository.findById(comment.getId()).orElseThrow();
         assertFalse(result.isPinned());
 
     }
@@ -188,7 +195,7 @@ public class CommentControllerTest {
                 .andExpect(redirectedUrl("/travel-groups/" + travelGroup.getId() + "/comments"));
 
         assertEquals(1, commentRepository.count());
-        TravelGroupComment result = commentRepository.findById(comment.getId()).get();
+        TravelGroupComment result = commentRepository.findById(comment.getId()).orElseThrow();
         assertTrue(result.isHidden());
     }
 }

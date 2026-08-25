@@ -17,9 +17,7 @@ import tournament_trail.demo.fixtures.ReviewFixture;
 import tournament_trail.demo.fixtures.TournamentFixture;
 import tournament_trail.demo.fixtures.UserFixture;
 import tournament_trail.demo.fixtures.dtos.ReviewRequestFixture;
-import tournament_trail.demo.repositories.ReviewRepository;
-import tournament_trail.demo.repositories.TournamentRepository;
-import tournament_trail.demo.repositories.UserRepository;
+import tournament_trail.demo.repositories.*;
 import tournament_trail.demo.security.AuthenticationUserDetails;
 import tournament_trail.demo.services.TournamentRegistrationService;
 import tournament_trail.demo.web.dtos.ReviewRequest;
@@ -51,6 +49,18 @@ public class ReviewControllerTest {
     @Autowired
     private TournamentRepository tournamentRepository;
 
+    @Autowired
+    private TravelGroupRepository travelGroupRepository;
+
+    @Autowired
+    private TravelGroupCommentRepository travelGroupCommentRepository;
+
+    @Autowired
+    private TravelRequestRepository travelRequestRepository;
+
+    @Autowired
+    private TournamentRegistrationRepository tournamentRegistrationRepository;
+
     @MockitoBean
     private TournamentRegistrationService tournamentRegistrationService;
 
@@ -60,9 +70,13 @@ public class ReviewControllerTest {
 
     @BeforeEach
     public void setUp() {
-        reviewRepository.deleteAll();
-        tournamentRepository.deleteAll();
-        userRepository.deleteAll();
+        travelGroupCommentRepository.deleteAllInBatch();
+        travelRequestRepository.deleteAllInBatch();
+        tournamentRegistrationRepository.deleteAllInBatch();
+        reviewRepository.deleteAllInBatch();
+        travelGroupRepository.deleteAllInBatch();
+        tournamentRepository.deleteAllInBatch();
+        userRepository.deleteAllInBatch();
 
         User organiser = UserFixture.createWithAllFields();
         User author = UserFixture.createWithAllFieldsWithDifferentUsernameAndEmail();
