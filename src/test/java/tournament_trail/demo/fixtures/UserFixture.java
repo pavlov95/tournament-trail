@@ -47,4 +47,40 @@ public class UserFixture {
 
         return user;
     }
+
+    public static User createEnabledUser(){
+        return User.builder()
+                .role(Role.PLAYER)
+                .username(TEST_USERNAME)
+                .password("$2b$10$N9qo8uLOickgx2ZMRZoMyeZOZTZ27Cz8McCi1n5muM5bJd8qK51vK")
+                .email("example@abv.bg")
+                .enabled(true)
+                .createdOn(LocalDateTime.now())
+                .updatedOn(LocalDateTime.now())
+                .build();
+    }
+
+    public static User createEnabledUser(String password){
+        return User.builder()
+                .role(Role.PLAYER)
+                .username(TEST_USERNAME)
+                .password(password)
+                .email("example@abv.bg")
+                .enabled(true)
+                .createdOn(LocalDateTime.now())
+                .updatedOn(LocalDateTime.now())
+                .build();
+    }
+
+    public static User createEnabledUserWithRoleOrganiser(String password){
+        return User.builder()
+                .role(Role.ORGANISER)
+                .username(TEST_USERNAME)
+                .password(password)
+                .email("example@abv.bg")
+                .enabled(true)
+                .createdOn(LocalDateTime.now())
+                .updatedOn(LocalDateTime.now())
+                .build();
+    }
 }

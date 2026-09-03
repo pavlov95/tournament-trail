@@ -20,6 +20,18 @@ public class TournamentRegistrationFixture {
                 .build();
     }
 
+    public static TournamentRegistration create(User player, Tournament tournament) {
+        return TournamentRegistration.builder()
+                .player(player)
+                .tournament(tournament)
+                .registrationStatus(RegistrationStatus.CONFIRMED)
+                .paymentStatus(PaymentStatus.PENDING)
+                .registeredOn(LocalDateTime.now())
+                .updatedOn(LocalDateTime.now())
+                .hidden(false)
+                .build();
+    }
+
 
     public static TournamentRegistration createWithStatusCancelled() {
         return TournamentRegistration.builder()

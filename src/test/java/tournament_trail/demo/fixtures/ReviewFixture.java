@@ -19,6 +19,17 @@ public class ReviewFixture {
                 .build();
     }
 
+    public static Review create(User author, Tournament tournament){
+        return Review.builder()
+                .tournament(tournament)
+                .author(author)
+                .rating(Rating.GOOD)
+                .content("TEST")
+                .createdOn(LocalDateTime.now())
+                .updatedOn(LocalDateTime.now())
+                .build();
+    }
+
     public static Review createWithNeutralRating(){
         return Review.builder().rating(Rating.NEUTRAL).build();
     }
