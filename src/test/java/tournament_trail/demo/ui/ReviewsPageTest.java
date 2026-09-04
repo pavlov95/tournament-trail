@@ -30,7 +30,8 @@ import tournament_trail.demo.repositories.UserRepository;
 
 import java.time.Duration;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
+import tournament_trail.demo.ui.pages.LoginPage;
 
 
 @ActiveProfiles("test")
@@ -63,6 +64,8 @@ public class ReviewsPageTest {
 
     private Tournament tournament;
 
+    private LoginPage loginPage;
+
     @BeforeEach
     public void setUp() {
         webDriver = new ChromeDriver();
@@ -79,6 +82,7 @@ public class ReviewsPageTest {
         TournamentRegistration tournamentRegistration = TournamentRegistrationFixture.create(user, tournament);
         tournamentRegistrationRepository.save(tournamentRegistration);
 
+        loginPage = new LoginPage(webDriver, port);
     }
 
     @AfterEach
@@ -95,13 +99,8 @@ public class ReviewsPageTest {
     @Test
     public void reviewsPage_shouldCreateReview_withValidData() {
         try {
-            webDriver.get("http://localhost:" + port + "/login");
-            webDriver.findElement(By.name("username")).sendKeys(user.getUsername());
-            webDriver.findElement(By.name("password")).sendKeys(RAW_PASSWORD);
-            webDriver.findElement(By.cssSelector("button[type='submit']")).click();
-
+            loginPage.login(user.getUsername(), RAW_PASSWORD);
             WebDriverWait webDriverWait = new WebDriverWait(webDriver, Duration.ofSeconds(5));
-            webDriverWait.until(webDriver -> webDriver.getCurrentUrl().endsWith("home"));
 
             webDriver.get("http://localhost:" + port + "/tournaments/" + tournament.getId() + "/reviews");
 
@@ -126,13 +125,9 @@ public class ReviewsPageTest {
     @Test
     public void reviewsPage_shouldNotCreateReview_withInvalidData() {
         try {
-            webDriver.get("http://localhost:" + port + "/login");
-            webDriver.findElement(By.name("username")).sendKeys(user.getUsername());
-            webDriver.findElement(By.name("password")).sendKeys(RAW_PASSWORD);
-            webDriver.findElement(By.cssSelector("button[type='submit']")).click();
+           loginPage.login(user.getUsername(), RAW_PASSWORD);
 
             WebDriverWait webDriverWait = new WebDriverWait(webDriver, Duration.ofSeconds(5));
-            webDriverWait.until(webDriver -> webDriver.getCurrentUrl().endsWith("home"));
 
             webDriver.get("http://localhost:" + port + "/tournaments/" + tournament.getId() + "/reviews");
 
@@ -158,13 +153,9 @@ public class ReviewsPageTest {
             Review review = ReviewFixture.create(user, tournament);
             reviewRepository.save(review);
 
-            webDriver.get("http://localhost:" + port + "/login");
-            webDriver.findElement(By.name("username")).sendKeys(user.getUsername());
-            webDriver.findElement(By.name("password")).sendKeys(RAW_PASSWORD);
-            webDriver.findElement(By.cssSelector("button[type='submit']")).click();
+           loginPage.login(user.getUsername(), RAW_PASSWORD);
 
             WebDriverWait webDriverWait = new WebDriverWait(webDriver, Duration.ofSeconds(5));
-            webDriverWait.until(webDriver -> webDriver.getCurrentUrl().endsWith("home"));
 
             webDriver.get("http://localhost:" + port + "/tournaments/" + tournament.getId() + "/reviews");
 
@@ -206,13 +197,9 @@ public class ReviewsPageTest {
             Review review = ReviewFixture.create(user, tournament);
             reviewRepository.save(review);
 
-            webDriver.get("http://localhost:" + port + "/login");
-            webDriver.findElement(By.name("username")).sendKeys(user.getUsername());
-            webDriver.findElement(By.name("password")).sendKeys(RAW_PASSWORD);
-            webDriver.findElement(By.cssSelector("button[type='submit']")).click();
+            loginPage.login(user.getUsername(), RAW_PASSWORD);
 
             WebDriverWait webDriverWait = new WebDriverWait(webDriver, Duration.ofSeconds(5));
-            webDriverWait.until(webDriver -> webDriver.getCurrentUrl().endsWith("home"));
 
             webDriver.get("http://localhost:" + port + "/tournaments/" + tournament.getId() + "/reviews");
 
@@ -235,7 +222,7 @@ public class ReviewsPageTest {
             webDriverWait.until(ExpectedConditions.stalenessOf(submitButton));
 
             assertEquals(1, reviewRepository.count());
-            Review result = reviewRepository.findAll().get(0);
+            Review result = reviewRepository.findById(review.getId()).orElseThrow();
 
             assertEquals(review.getRating(), result.getRating());
             assertEquals(review.getContent(), result.getContent());
@@ -245,4 +232,32 @@ public class ReviewsPageTest {
             throw e;
         }
     }
+
+    @Test
+    public void reviewsPage_shouldDeleteReview() {
+        try {
+            Review review = ReviewFixture.create(user, tournament);
+            reviewRepository.save(review);
+
+           loginPage.login(user.getUsername(), RAW_PASSWORD);
+
+            WebDriverWait webDriverWait = new WebDriverWait(webDriver, Duration.ofSeconds(5));
+
+            webDriver.get("http://localhost:" + port + "/tournaments/" + tournament.getId() + "/reviews");
+
+            WebElement reviewElement = webDriver.findElement(By.cssSelector(".review-item"));
+
+            webDriver.findElement(By.cssSelector(".text-danger-button")).click();
+
+            webDriverWait.until(ExpectedConditions.alertIsPresent()).accept();
+            webDriverWait.until(ExpectedConditions.stalenessOf(reviewElement));
+            assertTrue(reviewRepository.findById(review.getId()).isEmpty());
+
+        } catch (Throwable e) {
+            Utils.takeScreenshot(webDriver, "deleteReview");
+            throw e;
+        }
+    }
+
+
 }
