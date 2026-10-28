@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html th:lang="${#locale.language}"
-      xmlns:th="http://www.thymeleaf.org">
+      xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,11 +13,33 @@
         <a class="brand" th:href="@{/}">TournamentTrail</a>
 
         <div class="nav-links">
-            <a th:text="#{nav.home}" th:href="@{/}">Home</a>
-            <a th:text="#{nav.tournaments}" th:href="@{/tournaments}">Tournaments</a>
-            <a th:text="#{nav.registrations}" th:href="@{/registrations}">My registrations</a>
-            <a th:text="#{nav.about}" th:href="@{/about}">About</a>
-            <a th:text="#{nav.contact}" th:href="@{/contact}">Contact</a>
+            <a th:href="@{/tournaments}" th:text="#{nav.tournaments}">Tournaments</a>
+            <a th:href="@{/registrations}" th:text="#{nav.registrations}">My registrations</a>
+            <a th:href="@{/travel-groups}" th:text="#{nav.travel-groups}">Travel groups</a>
+            <a th:href="@{/about}" th:text="#{nav.about}">About</a>
+            <a th:href="@{/contact}" th:text="#{nav.contact}">Contact</a>
+        </div>
+
+        <div class="nav-actions" sec:authorize="isAnonymous()">
+            <a class="button button-secondary secondary-button"
+               th:href="@{/login}"
+               th:text="#{nav.login}">Login</a>
+
+            <a class="button button-primary primary-button"
+               th:href="@{/register}"
+               th:text="#{nav.create-account}">Create account</a>
+        </div>
+
+        <div class="nav-actions" sec:authorize="isAuthenticated()">
+            <a class="button button-primary primary-button"
+               th:href="@{/home}"
+               th:text="#{nav.dashboard}">Dashboard</a>
+
+            <form th:action="@{/logout}" method="post">
+                <button class="button button-secondary secondary-button logout-button"
+                        type="submit"
+                        th:text="#{nav.logout}">Logout</button>
+            </form>
         </div>
 
         <div class="language-switcher">
@@ -27,10 +49,6 @@
             <a th:href="@{/register(lang='bg')}"
                th:text="#{language.bulgarian}">Bulgarian</a>
         </div>
-
-        <a class="button button-secondary"
-           th:text="#{nav.login}"
-           th:href="@{/login}">Login</a>
     </nav>
 </header>
 

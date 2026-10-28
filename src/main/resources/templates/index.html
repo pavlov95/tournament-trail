@@ -31,14 +31,6 @@
             <a th:text="#{nav.contact}" th:href="@{/contact}">Contact</a>
         </div>
 
-        <div class="language-switcher">
-            <a th:href="@{/(lang='en')}"
-               th:text="#{language.english}">English</a>
-            <span>|</span>
-            <a th:href="@{/(lang='bg')}"
-               th:text="#{language.bulgarian}">Bulgarian</a>
-        </div>
-
         <div class="nav-actions"
              sec:authorize="isAnonymous()">
 
@@ -54,7 +46,13 @@
                 Create account
             </a>
         </div>
-
+        <div class="language-switcher">
+            <a th:href="@{/(lang='en')}"
+               th:text="#{language.english}">English</a>
+            <span>|</span>
+            <a th:href="@{/(lang='bg')}"
+               th:text="#{language.bulgarian}">Bulgarian</a>
+        </div>
         <div class="nav-actions"
              sec:authorize="isAuthenticated()">
 
