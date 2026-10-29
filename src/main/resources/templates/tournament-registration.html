@@ -12,58 +12,13 @@
         Registration | TournamentTrail
     </title>
 
-    <link rel="stylesheet"
-          th:href="@{/css/tournament-registration.css}">
+    <link rel="stylesheet" th:href="@{/css/tournament-registration.css}">
+    <link rel="stylesheet" th:href="@{/css/navbar.css}">
 </head>
 
 <body>
 
-<header class="site-header">
-    <nav class="navbar">
-
-        <a class="brand"
-           th:href="@{/}">
-            TournamentTrail
-        </a>
-
-        <div class="nav-links">
-            <a th:text="#{nav.home}" th:href="@{/}">Home</a>
-            <a th:text="#{nav.tournaments}" th:href="@{/tournaments}">Tournaments</a>
-            <a th:text="#{nav.registrations}" class="active" th:href="@{/registrations}">My registrations</a>
-            <a th:text="#{nav.travel-groups}" th:href="@{/travel-groups}">Travel groups</a>
-            <a th:text="#{nav.about}" th:href="@{/about}">About</a>
-            <a th:text="#{nav.contact}" th:href="@{/contact}">Contact</a>
-        </div>
-
-        <div class="nav-actions"
-             sec:authorize="isAuthenticated()">
-
-            <div class="language-switcher">
-                <a th:href="@{/registrations/{id}(id=${registration.id}, lang='en')}"
-                   th:text="#{language.english}">English</a>
-                <span>|</span>
-                <a th:href="@{/registrations/{id}(id=${registration.id}, lang='bg')}"
-                   th:text="#{language.bulgarian}">Bulgarian</a>
-            </div>
-
-            <a class="button button-primary"
-               th:text="#{nav.dashboard}"
-               th:href="@{/home}">
-                Dashboard
-            </a>
-
-            <form th:action="@{/logout}"
-                  method="post">
-                <button class="button button-secondary"
-                        th:text="#{nav.logout}"
-                        type="submit">
-                    Logout
-                </button>
-            </form>
-        </div>
-    </nav>
-</header>
-
+<div th:replace="~{fragments/header :: siteHeader(false, 'tournaments')}"></div>
 <main class="container">
 
     <div class="flash-message success"

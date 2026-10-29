@@ -1,0 +1,122 @@
+
+/* Shared TournamentTrail Navigation */
+
+.site-header {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: rgba(255, 255, 255, 0.96);
+    border-bottom: 1px solid #d7e1dc;
+    backdrop-filter: blur(12px);
+}
+
+.navbar {
+    width: min(100% - 2rem, 1180px);
+    min-height: 74px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.navbar .brand {
+    margin-right: auto;
+    color: #203f36;
+    font-size: 1.35rem;
+    font-weight: 800;
+}
+
+.navbar .nav-links,
+.navbar .nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.navbar .nav-links a {
+    padding-bottom: 0.2rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.navbar .nav-links a.active {
+    color: #203f36;
+    border-bottom: 2px solid #d5a84b;
+}
+
+.navbar .nav-actions form {
+    margin: 0;
+}
+
+.navbar .button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 0.7rem 1.1rem;
+    border: 1px solid transparent;
+    border-radius: 9px;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+    transition:
+        transform 0.2s ease,
+        background-color 0.2s ease;
+}
+
+.navbar .button:hover {
+    transform: translateY(-1px);
+}
+
+.navbar .button-primary {
+    color: #ffffff;
+    background: #2f5d50;
+}
+
+.navbar .button-primary:hover {
+    color: #ffffff;
+    background: #203f36;
+}
+
+.navbar .button-secondary {
+    color: #203f36;
+    background: #ffffff;
+    border-color: #d7e1dc;
+}
+
+.navbar .button-secondary:hover {
+    color: #203f36;
+    background: #e8f0ed;
+}
+
+/* Responsive navigation */
+
+@media (max-width: 920px) {
+    .navbar {
+        padding: 1rem 0;
+        flex-wrap: wrap;
+    }
+
+    .navbar .brand {
+        width: 100%;
+    }
+
+    .navbar .nav-links,
+    .navbar .nav-actions {
+        flex-wrap: wrap;
+    }
+}
+
+@media (max-width: 620px) {
+    .navbar,
+    .navbar .nav-links,
+    .navbar .nav-actions {
+        width: 100%;
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .navbar .button {
+        width: 100%;
+    }
+}

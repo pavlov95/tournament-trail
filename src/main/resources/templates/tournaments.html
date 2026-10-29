@@ -12,61 +12,12 @@
     <title th:text="#{tournaments.page.title}">Tournaments | TournamentTrail</title>
 
     <link rel="stylesheet" th:href="@{/css/tournaments.css}">
+    <link rel="stylesheet" th:href="@{/css/navbar.css}">
 </head>
 
 <body>
 
-<header class="site-header">
-    <nav class="navbar">
-
-        <a class="brand" th:href="@{/}">TournamentTrail</a>
-
-        <div class="nav-links">
-            <a class="active" th:href="@{/tournaments}" th:text="#{nav.tournaments}">Tournaments</a>
-            <a th:href="@{/registrations}" th:text="#{nav.registrations}">My registrations</a>
-            <a th:href="@{/travel-groups}" th:text="#{nav.travel-groups}">Travel groups</a>
-            <a th:href="@{/about}" th:text="#{nav.about}">About</a>
-            <a th:href="@{/contact}" th:text="#{nav.contact}">Contact</a>
-        </div>
-
-        <div class="nav-actions" sec:authorize="isAnonymous()">
-            <a class="button button-secondary secondary-button"
-               th:href="@{/login}"
-               th:text="#{nav.login}">
-                Login
-            </a>
-
-            <a class="button button-primary primary-button"
-               th:href="@{/register}"
-               th:text="#{nav.create-account}">
-                Create account
-            </a>
-        </div>
-
-        <div class="nav-actions" sec:authorize="isAuthenticated()">
-            <a class="button button-primary primary-button"
-               th:href="@{/home}"
-               th:text="#{nav.dashboard}">
-                Dashboard
-            </a>
-
-            <form th:action="@{/logout}" method="post">
-                <button class="button button-secondary secondary-button logout-button"
-                        type="submit"
-                        th:text="#{nav.logout}">
-                    Logout
-                </button>
-            </form>
-        </div>
-
-        <div class="language-switcher">
-            <a th:href="@{/tournaments(lang='en')}" th:text="#{language.english}">English</a>
-            <span>|</span>
-            <a th:href="@{/tournaments(lang='bg')}" th:text="#{language.bulgarian}">Bulgarian</a>
-        </div>
-    </nav>
-</header>
-
+<div th:replace="~{fragments/header :: siteHeader(false, 'tournaments')}"></div>
 <main class="container">
 
     <div class="alert alert-success"

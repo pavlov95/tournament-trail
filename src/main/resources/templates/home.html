@@ -16,53 +16,7 @@
 
 <body>
 
-<header class="site-header">
-    <nav class="navbar">
-
-        <a class="brand"
-           th:href="@{/home}">
-            TournamentTrail
-        </a>
-
-        <div class="nav-links">
-            <a th:text="#{nav.home}" th:href="@{/home}" class="active">Home</a>
-            <a th:text="#{nav.tournaments}" th:href="@{/tournaments}">Tournaments</a>
-            <a th:text="#{nav.registrations}" th:href="@{/registrations}">My registrations</a>
-            <a th:text="#{nav.travel-groups}" th:href="@{/travel-groups}">Travel groups</a>
-            <a th:text="#{nav.about}" th:href="@{/about}">About</a>
-            <a th:text="#{nav.contact}" th:href="@{/contact}">Contact</a>
-        </div>
-
-        <div class="nav-actions">
-
-            <a class="button button-secondary"
-               th:text="#{nav.edit-profile}"
-               th:href="@{/profile/edit}">
-                Edit profile
-            </a>
-
-            <a class="button button-secondary"
-               th:href="@{/home(lang='en')}"
-               th:text="#{language.english}">English</a>
-
-            <a class="button button-secondary"
-               th:href="@{/home(lang='bg')}"
-               th:text="#{language.bulgarian}">Bulgarian</a>
-
-            <form th:action="@{/logout}"
-                  method="post">
-
-                <button class="button button-outline"
-                        type="submit"
-                        th:text="#{nav.logout}">
-                    Logout
-                </button>
-            </form>
-        </div>
-    </nav>
-</header>
-
-<main>
+<div th:replace="~{fragments/header :: siteHeader(true, '')}"></div><main>
 
     <section class="welcome-panel">
 

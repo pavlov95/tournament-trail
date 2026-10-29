@@ -4,32 +4,11 @@
     <meta charset="UTF-8">
     <title th:text="#{error400.page.title}">400 | TournamentTrail</title>
     <link rel="stylesheet" th:href="@{/css/error-400.css}">
+    <link rel="stylesheet" th:href="@{/css/navbar.css}">
 </head>
 <body>
 
-<header class="site-header">
-    <nav class="navbar">
-        <a class="brand" th:href="@{/}">TournamentTrail</a>
-
-        <div class="nav-links">
-            <a th:text="#{nav.home}" th:href="@{/}">Home</a>
-            <a th:text="#{nav.tournaments}" th:href="@{/tournaments}">Tournaments</a>
-            <a th:text="#{nav.registrations}" th:href="@{/registrations}">My registrations</a>
-            <a th:text="#{nav.travel-groups}" th:href="@{/travel-groups}">Travel groups</a>
-            <a th:text="#{nav.about}" th:href="@{/about}">About</a>
-            <a th:text="#{nav.contact}" th:href="@{/contact}">Contact</a>
-        </div>
-
-        <div class="language-switcher">
-            <a th:href="@{/error/400(lang='en')}"
-               th:text="#{language.english}">English</a>
-            <span>|</span>
-            <a th:href="@{/error/400(lang='bg')}"
-               th:text="#{language.bulgarian}">Bulgarian</a>
-        </div>
-    </nav>
-</header>
-
+<div th:replace="~{fragments/header :: siteHeader(false)}"></div>
 <main class="error-shell">
 
     <section class="error-card">

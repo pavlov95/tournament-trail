@@ -13,47 +13,12 @@
     </title>
 
     <link rel="stylesheet" th:href="@{/css/comment.css}">
+    <link rel="stylesheet" th:href="@{/css/navbar.css}">
 </head>
 
 <body>
 
-<header class="site-header">
-    <nav class="navbar">
-
-        <a class="brand" th:href="@{/}">TournamentTrail</a>
-
-        <div class="nav-links">
-            <a th:text="#{nav.tournaments}" th:href="@{/tournaments}">Tournaments</a>
-            <a th:text="#{nav.registrations}" th:href="@{/registrations}">My registrations</a>
-            <a th:text="#{nav.travel-groups}" class="active" th:href="@{/travel-groups}">Travel groups</a>
-            <a th:text="#{nav.about}" th:href="@{/about}">About</a>
-            <a th:text="#{nav.contact}" th:href="@{/contact}">Contact</a>
-        </div>
-
-        <div class="language-switcher">
-            <a th:href="@{/travel-groups/{id}/comments(id=${travelGroup.id}, lang='en')}"
-               th:text="#{language.english}">English</a>
-            <span>|</span>
-            <a th:href="@{/travel-groups/{id}/comments(id=${travelGroup.id}, lang='bg')}"
-               th:text="#{language.bulgarian}">Bulgarian</a>
-        </div>
-
-        <div class="nav-actions" sec:authorize="isAnonymous()">
-            <a class="button button-secondary" th:text="#{nav.login}" th:href="@{/login}">Login</a>
-            <a class="button button-primary" th:text="#{nav.create-account}" th:href="@{/register}">Create account</a>
-        </div>
-
-        <div class="nav-actions" sec:authorize="isAuthenticated()">
-
-            <a class="button button-primary" th:text="#{nav.dashboard}" th:href="@{/home}">Dashboard</a>
-
-            <form th:action="@{/logout}" method="post">
-                <button class="button button-secondary" type="submit" th:text="#{nav.logout}">Logout</button>
-            </form>
-        </div>
-    </nav>
-</header>
-
+<div th:replace="~{fragments/header :: siteHeader(false, 'comment')}"></div>
 <main>
 
     <section class="discussion-hero">

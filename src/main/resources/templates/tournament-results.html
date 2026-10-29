@@ -6,45 +6,12 @@
     <meta charset="UTF-8">
     <title th:text="#{results.page.title}">Tournament Results | TournamentTrail</title>
     <link rel="stylesheet" th:href="@{/css/tournament-results.css}">
+    <link rel="stylesheet" th:href="@{/css/navbar.css}">
 </head>
 
 <body>
 
-<header class="site-header">
-    <nav class="navbar">
-        <a class="brand" th:href="@{/}">TournamentTrail</a>
-
-        <div class="nav-links">
-            <a th:text="#{nav.home}" th:href="@{/}">Home</a>
-            <a th:text="#{nav.tournaments}" class="active" th:href="@{/tournaments}">Tournaments</a>
-            <a th:text="#{nav.registrations}" th:href="@{/registrations}">My registrations</a>
-            <a th:text="#{nav.travel-groups}" th:href="@{/travel-groups}">Travel groups</a>
-            <a th:text="#{nav.about}" th:href="@{/about}">About</a>
-            <a th:text="#{nav.contact}" th:href="@{/contact}">Contact</a>
-        </div>
-
-        <div class="nav-actions" sec:authorize="isAnonymous()">
-            <a class="button button-secondary" th:text="#{nav.login}" th:href="@{/login}">Login</a>
-            <a class="button button-primary" th:text="#{nav.create-account}" th:href="@{/register}">Create account</a>
-        </div>
-
-        <div class="nav-actions" sec:authorize="isAuthenticated()">
-            <a class="button button-primary" th:text="#{nav.dashboard}" th:href="@{/home}">Dashboard</a>
-
-            <form th:action="@{/logout}" method="post">
-                <input th:if="${_csrf != null}"
-                       type="hidden"
-                       th:name="${_csrf.parameterName}"
-                       th:value="${_csrf.token}">
-
-                <button class="button button-secondary logout-button" th:text="#{nav.logout}" type="submit">
-                    Logout
-                </button>
-            </form>
-        </div>
-    </nav>
-</header>
-
+<div th:replace="~{fragments/header :: siteHeader(false, 'tournaments')}"></div>
 <main class="page-shell">
 
     <section class="results-hero">
