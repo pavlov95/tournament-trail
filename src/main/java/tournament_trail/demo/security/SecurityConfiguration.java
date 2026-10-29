@@ -19,6 +19,9 @@ public class SecurityConfiguration {
                         .requestMatchers(
                                 PathRequest.toStaticResources().atCommonLocations())
                         .permitAll()
+                        .requestMatchers(    "/actuator/health",
+                                "/actuator/prometheus")
+                        .permitAll()
                         .requestMatchers(
                                 "/",
                                 "/about",
