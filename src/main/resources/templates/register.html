@@ -6,6 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title th:text="#{register.page.title}">Register | TournamentTrail</title>
     <link rel="stylesheet" th:href="@{/css/register.css}">
+    <link rel="stylesheet" th:href="@{/css/navbar.css}">
+    <link rel="stylesheet" th:href="@{/css/footer.css}">
+
 </head>
 <body>
 <div th:replace="~{fragments/header :: siteHeader(false, '')}"></div>
@@ -100,15 +103,6 @@
     </section>
 </main>
 
-<footer class="site-footer">
-    <p th:text="#{footer.copyright}">&copy; 2026 TournamentTrail</p>
-    <nav>
-        <a th:text="#{nav.home}" th:href="@{/}">Home</a>
-        <a th:text="#{nav.tournaments}" th:href="@{/tournaments}">Tournaments</a>
-        <a th:text="#{nav.registrations}" th:href="@{/registrations}">My registrations</a>
-        <a th:text="#{nav.about}" th:href="@{/about}">About</a>
-        <a th:text="#{nav.contact}" th:href="@{/contact}">Contact</a>
-    </nav>
-</footer>
+<div th:replace="~{fragments/footer :: siteFooter}"></div>
 </body>
 </html>

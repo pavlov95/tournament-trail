@@ -12,6 +12,7 @@
 
     <link rel="stylesheet" th:href="@{/css/error-500.css}">
     <link rel="stylesheet" th:href="@{/css/navbar.css}">
+    <link rel="stylesheet" th:href="@{/css/footer.css}">
 </head>
 
 <body>
@@ -56,25 +57,7 @@
 
 </main>
 
-<footer class="site-footer">
-
-    <div>
-        <a class="brand footer-brand" th:href="@{/}">TournamentTrail</a>
-        <p th:text="#{footer.description}">
-            Chess tournaments, registrations, and shared travel in one platform.
-        </p>
-    </div>
-
-    <nav>
-        <a th:text="#{nav.tournaments}" th:href="@{/tournaments}">Tournaments</a>
-        <a th:text="#{nav.registrations}" th:href="@{/registrations}">My registrations</a>
-        <a th:text="#{nav.travel-groups}" th:href="@{/travel-groups}">Travel groups</a>
-        <a th:text="#{nav.about}" th:href="@{/about}">About</a>
-        <a th:text="#{nav.contact}" th:href="@{/contact}">Contact</a>
-    </nav>
-
-    <p th:text="#{footer.copyright}">&copy; 2026 TournamentTrail</p>
-</footer>
+<div th:replace="~{fragments/footer :: siteFooter}"></div>
 
 </body>
 </html>

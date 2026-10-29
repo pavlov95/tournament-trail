@@ -1,0 +1,45 @@
+
+/* Shared TournamentTrail Footer */
+
+.site-footer {
+    padding: 2.5rem max(1rem, calc((100% - 1180px) / 2));
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    align-items: center;
+    gap: 2rem;
+    color: #dbe8e3;
+    background: #203f36;
+}
+
+.site-footer .footer-brand {
+    display: inline-block;
+    margin: 0 0 0.4rem;
+    color: #ffffff;
+    font-size: 1.35rem;
+    font-weight: 800;
+}
+
+.site-footer p {
+    margin: 0;
+}
+
+.site-footer nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.site-footer a {
+    color: #ffffff;
+    text-decoration: none;
+}
+
+.site-footer a:hover {
+    color: #d5a84b;
+}
+
+@media (max-width: 900px) {
+    .site-footer {
+        grid-template-columns: 1fr;
+    }
+}

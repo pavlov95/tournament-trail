@@ -1,0 +1,45 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<body>
+
+<footer class="site-footer" th:fragment="siteFooter">
+
+    <div>
+        <a class="brand footer-brand"
+           th:href="@{/}">
+            TournamentTrail
+        </a>
+
+        <p th:text="#{footer.description}">
+            Chess tournaments, registrations, and shared travel in one platform.
+        </p>
+    </div>
+
+    <nav>
+        <a th:href="@{/tournaments}"
+           th:text="#{nav.tournaments}">Tournaments</a>
+
+        <a th:href="@{/registrations}"
+           th:text="#{nav.registrations}">My registrations</a>
+
+        <a th:href="@{/travel-groups}"
+           th:text="#{nav.travel-groups}">Travel groups</a>
+
+        <a th:href="@{/about}"
+           th:text="#{nav.about}">About</a>
+
+        <a th:href="@{/contact}"
+           th:text="#{nav.contact}">Contact</a>
+    </nav>
+
+    <p th:text="#{footer.copyright}">
+        © 2026 TournamentTrail
+    </p>
+
+</footer>
+
+</body>
+</html>
