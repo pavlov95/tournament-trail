@@ -34,8 +34,20 @@ services:
       DB_PASSWORD: ${DB_PASSWORD}
       MAIL_USERNAME: ${MAIL_USERNAME}
       MAIL_PASSWORD: ${MAIL_PASSWORD}
-      TOURNAMENT_RESULTS_SERVICE_URL: "http://host.docker.internal:8081"
+      TOURNAMENT_RESULTS_SERVICE_URL: "http://tournament-results:8081"
     restart: unless-stopped
+
+  tournament-results:
+    build:
+      context: ../tournament-results-service
+      dockerfile: Dockerfile
+    image: tournament-results:local
+    environment:
+      SPRING_DATASOURCE_URL: "jdbc:mysql://host.docker.internal:3306/tournament_results?createDatabaseIfNotExist=true"
+      DB_USERNAME: ${DB_USERNAME:?DB_USERNAME is required}
+      DB_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
+    restart: unless-stopped
+
 
 volumes:
   prometheus_data:
