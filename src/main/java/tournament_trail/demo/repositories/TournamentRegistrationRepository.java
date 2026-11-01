@@ -39,4 +39,6 @@ public interface TournamentRegistrationRepository extends JpaRepository<Tourname
         """)
     List<TournamentRegistration> findAllByTournamentIdAndStatus(@Param("tournamentId") UUID tournamentId,
             @Param("status") RegistrationStatus status);
+
+    List<TournamentRegistration> findAllByTournamentId(UUID tournamentId);
 }

@@ -347,4 +347,15 @@ public class TournamentRegistrationService {
         gameRequest.setWhitePlayerUsername(whiteUsername);
         gameRequest.setBlackPlayerUsername(blackUsername);
     }
+
+    @Transactional
+    public void seedDemoRegistrations(List<TournamentRegistration> registrations) {
+
+        tournamentRegistrationRepository.saveAll(registrations);
+    }
+
+    @Transactional(readOnly = true)
+    public List<TournamentRegistration> findAllByTournamentId(UUID tournamentId) {
+        return tournamentRegistrationRepository.findAllByTournamentId(tournamentId);
+    }
 }

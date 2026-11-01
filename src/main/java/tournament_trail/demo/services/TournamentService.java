@@ -20,7 +20,9 @@ import tournament_trail.demo.web.dtos.TournamentOptionResponse;
 import tournament_trail.demo.web.dtos.TournamentRequest;
 import tournament_trail.demo.web.dtos.TournamentSearchRequest;
 import org.springframework.security.access.AccessDeniedException;
+
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -397,5 +399,17 @@ public class TournamentService {
     public boolean canEditGames(UUID tournamentId, UUID userId, Role role) {
         UUID organiserId = findById(tournamentId).getOrganiser().getId();
         return organiserId.equals(userId) || role == Role.ADMIN;
+    }
+
+    public boolean existsByName(String name) {
+        return tournamentRepository.existsByName(name);
+    }
+
+    public void save(Tournament tournament) {
+        tournamentRepository.save(tournament);
+    }
+
+    public List<Tournament> findAll() {
+        return tournamentRepository.findAll();
     }
 }

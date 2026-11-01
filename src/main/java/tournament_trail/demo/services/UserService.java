@@ -16,6 +16,9 @@ import tournament_trail.demo.security.AuthenticationUserDetails;
 import tournament_trail.demo.web.dtos.RegisterRequest;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
@@ -75,5 +78,17 @@ public class UserService implements UserDetailsService {
     public User findById(UUID userID) {
         return userRepository.findById(userID).orElseThrow(UserDoesNotExist::new);
 
+    }
+
+    public Optional<User> findByUsername(String username) {
+        return userRepository.findByUsername(username);
+    }
+
+    public User save(User user) {
+        return userRepository.save(user);
+    }
+
+    public List<User> findAll() {
+        return userRepository.findAll();
     }
 }
