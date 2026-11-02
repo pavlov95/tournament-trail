@@ -4,6 +4,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -34,7 +35,15 @@ public class TravelGroupTest {
 
     @BeforeEach
     public void setUp() {
-        webDriver = new ChromeDriver();
+        ChromeOptions options = new ChromeOptions();
+
+        options.addArguments("--headless=new");
+        options.addArguments("--window-size=1920,1080");
+        options.addArguments("--force-device-scale-factor=1");
+        options.addArguments("--disable-dev-shm-usage");
+
+        webDriver = new ChromeDriver(options);
+        
         User user = UserFixture.createEnabledUser();
         user.setPassword(encoder.encode(RAW_PASSWORD));
         userRepository.save(user);

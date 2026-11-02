@@ -7,6 +7,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -68,7 +69,14 @@ public class ReviewsPageTest {
 
     @BeforeEach
     public void setUp() {
-        webDriver = new ChromeDriver();
+        ChromeOptions options = new ChromeOptions();
+
+        options.addArguments("--headless=new");
+        options.addArguments("--window-size=1920,1080");
+        options.addArguments("--force-device-scale-factor=1");
+        options.addArguments("--disable-dev-shm-usage");
+
+        webDriver = new ChromeDriver(options);
         user = UserFixture.createEnabledUser(encoder.encode(RAW_PASSWORD));
         userRepository.save(user);
 
