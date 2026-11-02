@@ -10,6 +10,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import tournament_trail.demo.entities.*;
 import tournament_trail.demo.entities.enums.*;
+import tournament_trail.demo.resultclient.GameRequest;
+import tournament_trail.demo.resultclient.GameResult;
+import tournament_trail.demo.resultclient.WinCondition;
 import tournament_trail.demo.services.*;
 import tournament_trail.demo.web.dtos.ReviewRequest;
 import tournament_trail.demo.web.dtos.TravelGroupRequest;
@@ -27,6 +30,7 @@ public class DemoDataInitializer {
     ApplicationRunner seedDemoData(TournamentService tournamentService, UserService userService
             , TournamentRegistrationService tournamentRegistrationService, TravelGroupService travelGroupService
             , PasswordEncoder passwordEncoder, TravelRequestService travelRequestService, ReviewService reviewService
+            , TournamentResultsService tournamentResultsService
             , @Value("${demo.organiser.password:}") String demoPassword) {
 
         return args -> {
@@ -97,6 +101,8 @@ public class DemoDataInitializer {
             createDemoTravelRequests(userService, travelGroupService, travelRequestService);
             createDemoReviews(tournamentService, tournamentRegistrationService, reviewService);
 
+            createDemoGames(tournamentService, tournamentRegistrationService, tournamentResultsService);
+
             System.out.println("Demo data initialization completed!");
         };
     }
@@ -129,6 +135,7 @@ public class DemoDataInitializer {
 
 
     }
+
     private void createDemoTournaments(TournamentService tournamentService, User organiser) {
 
         LocalDateTime now = LocalDateTime.now();
@@ -206,7 +213,7 @@ public class DemoDataInitializer {
     }
 
     private void createDemoRegistrations(TournamentService tournamentService, UserService userService,
-            TournamentRegistrationService tournamentRegistrationService) {
+                                         TournamentRegistrationService tournamentRegistrationService) {
 
         LocalDateTime now = LocalDateTime.now();
 
@@ -293,18 +300,18 @@ public class DemoDataInitializer {
                 LocalDateTime registeredOn = now.minusDays(2);
 
                 TournamentRegistration registration = TournamentRegistration.builder()
-                                .tournament(tournament)
-                                .player(player)
-                                .registrationStatus(registrationStatus)
-                                .paymentStatus(paymentStatus)
-                                .paymentReference(paymentReference)
-                                .registeredOn(registeredOn)
-                                .updatedOn(now)
-                                .cancelledOn(cancelledOn)
-                                .reservedUntil(reservedUntil)
-                                .paymentSubmittedOn(paymentSubmittedOn)
-                                .hidden(false)
-                                .build();
+                        .tournament(tournament)
+                        .player(player)
+                        .registrationStatus(registrationStatus)
+                        .paymentStatus(paymentStatus)
+                        .paymentReference(paymentReference)
+                        .registeredOn(registeredOn)
+                        .updatedOn(now)
+                        .cancelledOn(cancelledOn)
+                        .reservedUntil(reservedUntil)
+                        .paymentSubmittedOn(paymentSubmittedOn)
+                        .hidden(false)
+                        .build();
 
                 registrations.add(registration);
             }
@@ -316,7 +323,7 @@ public class DemoDataInitializer {
     }
 
     private void createDemoTravelGroups(TournamentService tournamentService, UserService userService,
-            TravelGroupService travelGroupService) {
+                                        TravelGroupService travelGroupService) {
 
         LocalDateTime now = LocalDateTime.now();
 
@@ -376,7 +383,7 @@ public class DemoDataInitializer {
 
 
     private void createDemoTravelRequests(UserService userService, TravelGroupService travelGroupService,
-            TravelRequestService travelRequestService) {
+                                          TravelRequestService travelRequestService) {
 
         int created = 0;
 
@@ -463,7 +470,7 @@ public class DemoDataInitializer {
 
 
     private void createDemoReviews(TournamentService tournamentService, TournamentRegistrationService tournamentRegistrationService,
-            ReviewService reviewService) {
+                                   ReviewService reviewService) {
 
         Rating[] ratings = {
                 Rating.EXCELLENT,
@@ -507,7 +514,7 @@ public class DemoDataInitializer {
             UUID tournamentId = tournament.getId();
 
             List<TournamentRegistration> registrations = tournamentRegistrationService
-                            .findAllByTournamentId(tournamentId);
+                    .findAllByTournamentId(tournamentId);
 
             Set<UUID> existingAuthors = reviewService
                     .findAllByTournamentId(tournamentId)
@@ -555,6 +562,76 @@ public class DemoDataInitializer {
         }
 
         System.out.println("Created " + created + " new demo reviews");
+    }
+
+    private void createDemoGames(TournamentService tournamentService, TournamentRegistrationService registrationService,
+                                 TournamentResultsService resultsService) {
+
+        List<Tournament> tournaments = tournamentService.findAll()
+                .stream()
+                .filter(t -> t.getName().startsWith("Demo Chess Tournament "))
+                .filter(t -> t.getStatus() == TournamentStatus.STARTED
+                        || t.getStatus() == TournamentStatus.COMPLETED)
+                .sorted(Comparator.comparing(Tournament::getName))
+                .toList();
+
+        int created = 0;
+
+        GameResult[] results = {GameResult.WHITE_WIN, GameResult.DRAW, GameResult.BLACK_WIN};
+
+        for (Tournament tournament : tournaments) {
+            UUID tournamentId = tournament.getId();
+
+            if (!resultsService.getGamesByTournament(tournamentId).isEmpty()) {
+                continue;
+            }
+
+            List<TournamentRegistration> confirmed = registrationService.findAllByTournamentId(tournamentId)
+                    .stream()
+                    .filter(r -> r.getRegistrationStatus() == RegistrationStatus.CONFIRMED)
+                    .sorted(Comparator.comparing(r -> r.getPlayer().getUsername()))
+                    .toList();
+
+            if (confirmed.size() < 2) {
+                continue;
+            }
+
+            User player1 = confirmed.get(0).getPlayer();
+            User player2 = confirmed.get(1).getPlayer();
+
+            for (int round = 1; round <= 3; round++) {
+
+                GameRequest request = new GameRequest();
+
+                request.setRoundNumber(round);
+                request.setBoardNumber(1);
+
+                User white = round % 2 == 0 ? player2 : player1;
+                User black = round % 2 == 0 ? player1 : player2;
+
+                request.setWhitePlayerId(white.getId());
+                request.setWhitePlayerUsername(white.getUsername());
+
+                request.setBlackPlayerId(black.getId());
+                request.setBlackPlayerUsername(black.getUsername());
+
+                GameResult result = results[(round - 1) % results.length];
+
+                request.setResult(result);
+                request.setTotalMoves(25 + round * 8);
+
+                request.setWinCondition(result == GameResult.DRAW ? WinCondition.AGREEMENT : WinCondition.RESIGNATION);
+
+                request.setPlayedOn(tournament.getStartTime().plusHours(round));
+
+                request.setOrganiserNotes("Demonstration game");
+
+                resultsService.createGame(tournamentId, request);
+                created++;
+            }
+        }
+
+        System.out.println("Created " + created + " demo games");
     }
 
 
