@@ -1,3 +1,4 @@
+
 package tournament_trail.demo.ui;
 
 import org.junit.jupiter.api.AfterEach;
@@ -5,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +19,9 @@ import tournament_trail.demo.entities.User;
 import tournament_trail.demo.entities.enums.Role;
 import tournament_trail.demo.fixtures.UserFixture;
 import tournament_trail.demo.repositories.UserRepository;
+import tournament_trail.demo.repositories.VerificationTokenRepository;
 import tournament_trail.demo.services.EmailService;
+
 import java.time.Duration;
 import java.util.List;
 
@@ -38,18 +42,27 @@ public class RegisterPageUiTest {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private VerificationTokenRepository verificationTokenRepository;
+
     @MockitoBean
     private EmailService emailService;
 
-
     @BeforeEach
     public void setUp() {
-        webDriver = new ChromeDriver();
-        webDriver.manage().window().setSize(new Dimension(1440, 1000));
+        ChromeOptions options = new ChromeOptions();
+
+        options.addArguments("--headless=new");
+        options.addArguments("--window-size=1920,1080");
+        options.addArguments("--force-device-scale-factor=1");
+
+        webDriver = new ChromeDriver(options);
     }
 
     @AfterEach
     public void tearDown() {
+        verificationTokenRepository.deleteAll();
+        userRepository.deleteAll();
         if (webDriver != null) {
             webDriver.quit();
         }
@@ -102,7 +115,7 @@ public class RegisterPageUiTest {
             WebDriverWait wait = new WebDriverWait(webDriver, Duration.ofSeconds(5));
 
             WebElement registerButton = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector(
-                                    "button.button.button-primary.submit-button")));
+                    "button.button.button-primary.submit-button")));
 
             ((JavascriptExecutor) webDriver).executeScript(
                     "arguments[0].scrollIntoView({block: 'center'});", registerButton);
@@ -110,7 +123,7 @@ public class RegisterPageUiTest {
             registerButton.click();
 
             List<WebElement> errorMessages = wait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(
-                            By.cssSelector(".field-error")));
+                    By.cssSelector(".field-error")));
 
             assertTrue(webDriver.getCurrentUrl().endsWith("/register"),
                     "User should remain on registration page after invalid input");

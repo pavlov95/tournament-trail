@@ -1,5 +1,6 @@
 package tournament_trail.demo.web;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,12 +45,6 @@ public class TravelRequestControllerTest {
     private UserRepository userRepository;
 
     @Autowired
-    private TravelGroupCommentRepository travelGroupCommentRepository;
-
-    @Autowired
-    private ReviewRepository reviewRepository;
-
-    @Autowired
     private TournamentRegistrationRepository tournamentRegistrationRepository;
 
     private AuthenticationUserDetails ownerDetails;
@@ -60,14 +55,6 @@ public class TravelRequestControllerTest {
 
     @BeforeEach
     public void setUp() {
-        travelGroupCommentRepository.deleteAllInBatch();
-        travelRequestRepository.deleteAllInBatch();
-        tournamentRegistrationRepository.deleteAllInBatch();
-        reviewRepository.deleteAllInBatch();
-        travelGroupRepository.deleteAllInBatch();
-        tournamentRepository.deleteAllInBatch();
-        userRepository.deleteAllInBatch();
-
         User owner = UserFixture.createWithAllFields();
         User organiser = UserFixture.createWithAllFieldsWithDifferentUsernameAndEmail();
         applicant = UserFixture.createWithAllFieldsWithDifferentUsernameAndEmail();
@@ -86,7 +73,15 @@ public class TravelRequestControllerTest {
         travelGroup.setOwner(owner);
         travelGroup.setTournament(tournament);
         travelGroupRepository.save(travelGroup);
+    }
 
+    @AfterEach
+    public void tearDown(){
+        travelRequestRepository.deleteAll();
+        tournamentRegistrationRepository.deleteAll();
+        travelGroupRepository.deleteAll();
+        tournamentRepository.deleteAll();
+        userRepository.deleteAll();
     }
 
     @Test

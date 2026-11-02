@@ -58,8 +58,8 @@ public class IndexControllerTest {
 
     @BeforeEach
     public void setUp() {
-        userRepository.deleteAll();
         verificationTokenRepository.deleteAll();
+        userRepository.deleteAll();
     }
 
     @Test

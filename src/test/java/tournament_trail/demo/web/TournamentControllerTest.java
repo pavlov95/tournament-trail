@@ -1,5 +1,6 @@
 package tournament_trail.demo.web;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,19 +46,7 @@ public class TournamentControllerTest {
     private UserRepository userRepository;
 
     @Autowired
-    private TravelGroupRepository travelGroupRepository;
-
-    @Autowired
     private TournamentRegistrationRepository tournamentRegistrationRepository;
-
-    @Autowired
-    private TravelGroupCommentRepository travelGroupCommentRepository;
-
-    @Autowired
-    private TravelRequestRepository travelRequestRepository;
-
-    @Autowired
-    private ReviewRepository reviewRepository;
 
     private AuthenticationUserDetails userDetails;
     private AuthenticationUserDetails organiserDetails;
@@ -66,18 +55,6 @@ public class TournamentControllerTest {
 
     @BeforeEach
     public void setUp() {
-        travelGroupCommentRepository.deleteAllInBatch();
-        travelRequestRepository.deleteAllInBatch();
-
-        tournamentRegistrationRepository.deleteAllInBatch();
-        reviewRepository.deleteAllInBatch();
-
-        travelGroupRepository.deleteAllInBatch();
-
-        tournamentRepository.deleteAllInBatch();
-
-        userRepository.deleteAllInBatch();
-
         user = UserFixture.createWithAllFieldsAndRoleOrganiser();
         organiser = UserFixture.createWithAllFieldsWithDifferentUsernameAndEmail();
         organiser.setRole(Role.ORGANISER);
@@ -86,6 +63,14 @@ public class TournamentControllerTest {
         userDetails = AuthenticationUserDetailsFixture.createFromUser(user);
         organiserDetails = AuthenticationUserDetailsFixture.createFromUser(organiser);
     }
+
+    @AfterEach
+    public void tearDown(){
+        tournamentRegistrationRepository.deleteAll();
+        tournamentRepository.deleteAll();
+        userRepository.deleteAll();
+    }
+
 
     @Test
     public void getTournament_shouldReturnSearchedTournaments() throws Exception {

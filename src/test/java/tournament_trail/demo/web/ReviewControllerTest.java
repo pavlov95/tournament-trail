@@ -1,5 +1,6 @@
 package tournament_trail.demo.web;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,14 +71,6 @@ public class ReviewControllerTest {
 
     @BeforeEach
     public void setUp() {
-        travelGroupCommentRepository.deleteAllInBatch();
-        travelRequestRepository.deleteAllInBatch();
-        tournamentRegistrationRepository.deleteAllInBatch();
-        reviewRepository.deleteAllInBatch();
-        travelGroupRepository.deleteAllInBatch();
-        tournamentRepository.deleteAllInBatch();
-        userRepository.deleteAllInBatch();
-
         User organiser = UserFixture.createWithAllFields();
         User author = UserFixture.createWithAllFieldsWithDifferentUsernameAndEmail();
         tournament = TournamentFixture.createWithoutIdAndOrganiser(organiser);
@@ -89,6 +82,17 @@ public class ReviewControllerTest {
         tournamentRepository.save(tournament);
         reviewRepository.save(review);
 
+    }
+
+    @AfterEach
+    public void tearDown() {
+        travelGroupCommentRepository.deleteAll();
+        travelRequestRepository.deleteAll();
+        tournamentRegistrationRepository.deleteAll();
+        reviewRepository.deleteAll();
+        travelGroupRepository.deleteAll();
+        tournamentRepository.deleteAll();
+        userRepository.deleteAll();
     }
 
     @Test

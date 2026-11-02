@@ -61,11 +61,12 @@ public class UserFixture {
     }
 
     public static User createEnabledUser(String password){
+        String unique = UUID.randomUUID().toString().substring(0,8);
         return User.builder()
                 .role(Role.PLAYER)
-                .username(TEST_USERNAME)
+                .username(TEST_USERNAME+ unique)
                 .password(password)
-                .email("example@abv.bg")
+                .email("example"+unique+"@abv.bg")
                 .enabled(true)
                 .createdOn(LocalDateTime.now())
                 .updatedOn(LocalDateTime.now())
