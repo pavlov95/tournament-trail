@@ -1,7 +1,10 @@
 package tournament_trail.demo.ui.pages;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
@@ -18,12 +21,19 @@ public class LoginPage {
 
     public void login(String username, String password) {
         webDriver.get(baseUrl + "/login");
+        WebDriverWait wait = new WebDriverWait(webDriver, Duration.ofSeconds(10));
 
-        webDriver.findElement(By.name("username")).sendKeys(username);
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.name("username"))).sendKeys(username);
+
         webDriver.findElement(By.name("password")).sendKeys(password);
-        webDriver.findElement(By.cssSelector("button[type='submit']")).click();
 
-        WebDriverWait wait = new WebDriverWait(webDriver, Duration.ofSeconds(5));
+        WebElement loginButton = wait.until(ExpectedConditions.elementToBeClickable(
+                By.cssSelector("form.auth-form button[type='submit']")));
+
+        ((JavascriptExecutor) webDriver).executeScript(
+                "arguments[0].scrollIntoView({block: 'center'});", loginButton);
+
+        loginButton.click();
 
         wait.until(driver -> driver.getCurrentUrl().endsWith("/home"));
     }

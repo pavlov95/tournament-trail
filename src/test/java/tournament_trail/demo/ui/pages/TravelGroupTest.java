@@ -43,7 +43,7 @@ public class TravelGroupTest {
         options.addArguments("--disable-dev-shm-usage");
 
         webDriver = new ChromeDriver(options);
-        
+
         User user = UserFixture.createEnabledUser();
         user.setPassword(encoder.encode(RAW_PASSWORD));
         userRepository.save(user);

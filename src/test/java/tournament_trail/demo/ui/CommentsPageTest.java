@@ -77,7 +77,6 @@ public class CommentsPageTest {
         options.addArguments("--disable-dev-shm-usage");
 
         webDriver = new ChromeDriver(options);
-        webDriver.manage().window().maximize();
 
         user = UserFixture.createEnabledUser(encoder.encode(RAW_PASSWORD));
         userRepository.save(user);
