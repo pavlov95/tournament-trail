@@ -1,0 +1,5 @@
+tournamenttrail.duckdns.org {
+    @actuator path /actuator /actuator/*
+    respond @actuator 404
+    reverse_proxy tournament-trail:8080
+}

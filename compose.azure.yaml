@@ -31,10 +31,26 @@ services:
       MAIL_USERNAME: ${MAIL_USERNAME:-}
       MAIL_PASSWORD: ${MAIL_PASSWORD:-}
       JAVA_TOOL_OPTIONS: "-Xms128m -Xmx768m"
+      SERVER_FORWARD_HEADERS_STRATEGY: framework
     depends_on:
       mysql:
         condition: service_healthy
     restart: unless-stopped
 
+  caddy:
+    image: caddy:2
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./caddy:/etc/caddy:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - tournament-trail
+    restart: unless-stopped
+
 volumes:
   mysql_data:
+  caddy_data:
+  caddy_config:
