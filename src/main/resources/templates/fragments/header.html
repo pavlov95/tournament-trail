@@ -66,11 +66,13 @@
         </div>
 
         <div class="language-switcher">
-            <a th:href="@{/login(lang='en')}"
-               th:text="#{language.english}">English</a>
-            <span>|</span>
-            <a th:href="@{/login(lang='bg')}"
-               th:text="#{language.bulgarian}">Bulgarian</a>
+            <a href="?lang=en" th:classappend="${#locale.language == 'en'} ? 'active' : ''">
+                EN
+            </a>
+
+            <a href="?lang=bg" th:classappend="${#locale.language == 'bg'} ? 'active' : ''">
+                BG
+            </a>
         </div>
     </nav>
 </header>
