@@ -26,3 +26,15 @@ jobs:
             --name vm-tournament-trail \
             --query name \
             --output tsv
+          
+
+      - name: Test Azure VM Run Command
+        run: |
+          az vm run-command invoke \
+            --resource-group rg-tournament-trail \
+            --name vm-tournament-trail \
+            --command-id RunShellScript \
+            --scripts 'set -eu; hostname; whoami; test -f /home/azureuser/tournament-trail/compose.azure.yaml; echo "VM command OK"' \
+            --query "value[].message" \
+            --output tsv
+
