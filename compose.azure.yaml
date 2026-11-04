@@ -31,6 +31,7 @@ services:
       MAIL_PASSWORD: ${MAIL_PASSWORD:-}
       JAVA_TOOL_OPTIONS: "-Xms128m -Xmx768m"
       SERVER_FORWARD_HEADERS_STRATEGY: framework
+      TOURNAMENT_RESULTS_URL: http://tournament-results:8081
       APP_PUBLIC_URL: https://tournamenttrail.duckdns.org
     depends_on:
       mysql:
